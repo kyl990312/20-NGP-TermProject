@@ -1,0 +1,2 @@
+E:\Git\CrossFriends\Debug\CrossFriends.exe
+E:\Git\CrossFriends\Debug\CrossFriends.pdb
