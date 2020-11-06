@@ -1,39 +1,95 @@
 #include "MyHero.h"
 
-void kyrHero::move() {
-	// hero will move to its direction and jump
-	// hero move to its direction
-	if(!soul_moving)
-		current_pos.z += 5;
-	if (moving && !soul_moving) {
-		on_the_log = false;
-		log_speed = 0;
-		switch ((int)direction_angle) {
-		case 0:
-			// directon == front
-			current_pos.z -= 10;
-			break;
-		case 90:
-			// direction == right
-			current_pos.x += 10;
-			break;
-		case -90:
-			// direction == left
-			current_pos.x -= 10;
-			break;
+void kyrHero::Jump(int tag, MyPos* obs_pos, int obs_cnt1)
+{
+	std::cout << "JUMP" << std::endl;
+	// Jump
+	switch ((int)direction_angle) {
+	case 0:
+		// directon == front
+		current_pos.z -= 10;
+		break;
+	case 90:
+		// direction == right
+		current_pos.x += 10;
+		break;
+	case -90:
+		// direction == left
+		current_pos.x -= 10;
+		break;
+	}
+	// hero is jumping : frame : 5 , height : 30
+	jump_DeltaX += 1.f;		// 0 ~ 5
+	// 0 ~ 30  : 20, 30, 30, 20, 0
+	current_pos.y = -5.f * jump_DeltaX * (jump_DeltaX - 5.f); 
+
+
+	// Check Collsion
+	switch (tag) {
+	case MapState::River:
+		for (int i = 0; i < obs_cnt1; i++) {
+			// if True : Land on Log
+			if (check_collision(obs_pos[i], tag)) {
+				_state = HeroState::Float;
+				current_pos.z = cur_mapState_posZ;
+				current_pos.y = obs_pos->y + size / 2;
+				jump_DeltaX = 0;
+			}
 		}
-		// hero is jumping
-		jumping_velocity -= 10;
-		current_pos.y += jumping_velocity;
-		//test
-		if (current_pos.y <= 0.0f) {
-			// hero fell to the floor
-			// we have to init 'jumping values'
-			moving = false;
-			arrive_at_floor = true;
-			jumping_velocity = 30.0f;
-			current_pos.y = 0.0f;
+		break;
+	case MapState::Common:
+		for (int i = 0; i < obs_cnt1; i++) {
+			if (check_collision(obs_pos[i], tag)) {
+				switch ((int)direction_angle) {
+				case 0:
+					current_pos.x += 50;
+					break;
+				case -90:
+					current_pos.x += 10;
+					break;
+				case 90:
+					current_pos.x -= 10;
+					break;
+				}
+			}
 		}
+		break;
+	default:
+		for (int i = 0; i < obs_cnt1; i++) {
+			if (check_collision(obs_pos[i], tag)) {
+				_state = HeroState::Die;
+			}
+		}
+		break;
+	}
+
+	// Check where hero Land (except Landing at Log)
+	if (current_pos.y <= 0) {
+		if (tag == MapState::River) {
+			current_pos.y -= 10;
+			if (current_pos.y < -50)
+				_state = HeroState::Die;
+			return;
+		}
+		// set hero's positionZ at map's positionZ
+		current_pos.z = cur_mapState_posZ;
+		current_pos.y = 0.f;		
+		_state = HeroState::Idle;
+		jump_DeltaX = 0;
+	}
+}
+
+void kyrHero::Float()
+{
+	std::cout << "Float" << std::endl;
+	// move along the log
+	current_pos.x += log_speed;
+
+	// Check hero included in screen range
+	MyPos hero_view_pos = { current_pos.x * cos(glm::radians(10.0f)) - current_pos.z * sin(glm::radians(10.0f)),0.0f,current_pos.x * sin(glm::radians(10.0f)) + current_pos.z * cos(glm::radians(10.0f)) };
+	// screen out
+	if (hero_view_pos.z > 550 || hero_view_pos.x < -400 || hero_view_pos.x > 400) {
+		_state = HeroState::Die;
 	}
 }
 
@@ -54,7 +110,7 @@ bool kyrHero::check_collision(MyPos obs_pos, int obs_tag) {
 		current_pos.x + size / 2,current_pos.y + size / 2,current_pos.z + size / 2,
 		current_pos.x - size / 2,current_pos.y - size / 2,current_pos.z - size / 2
 	};
-	// start checking
+
 	// aabb - aabb collision checking
 	if (bounding_box.right < obs_bounding_box.left)
 		return false;
@@ -88,106 +144,67 @@ void kyrHero::draw(glm::mat4 projection, glm::mat4 view, Shader shader) {
 	obj.setTransform(model);
 
 	// draw obj
-	obj.draw();
-	soul_draw(projection,view,shader);
+	if(_state == HeroState::Die)
+		soul_draw(projection,view,shader);
+	else
+		obj.draw();
 
 }
 
-bool kyrHero::check_death(MyPos obs_pos,int obs_tag) {
-	MyPos hero_view_pos = { current_pos.x * cos(glm::radians(10.0f)) - current_pos.z * sin(glm::radians(10.0f)),0.0f,current_pos.x*sin(glm::radians(10.0f)) + current_pos.z*cos(glm::radians(10.0f)) };
-	if (hero_view_pos.z > 550 || hero_view_pos.x < -400 || hero_view_pos.x > 400) {
-		soul_moving = true;
-	}
-	// case 1. collision with obstacles
-	if (obs_tag == 1) {
-		// obstacle is log
-		if (check_collision(obs_pos,obs_tag)&& current_pos.y - obs_pos.y < 5) {
-			// hero is on the log
-			current_pos.y = obs_pos.y +size/2;
-			// hero has to stop jumping
-			arrive_at_floor = true;
-			moving = false;
-			on_the_log = true;
-			fall_into_river = false;
-			jumping_velocity = 30.0f;
-			return false;
+void kyrHero::update(int tag, MyPos* obs_pos1, int obs_cnt1) {
+		
+	if (_state != HeroState::Die)
+		// move backward following map
+		current_pos.z += 5;
+	MyPos hero_view_pos = { current_pos.x * cos(glm::radians(10.0f)) - current_pos.z * sin(glm::radians(10.0f)),0.0f,current_pos.x * sin(glm::radians(10.0f)) + current_pos.z * cos(glm::radians(10.0f)) };
+
+	switch (_state)
+	{
+	case HeroState::Idle:
+		std::cout << "Idle" << std::endl;
+		// Check hero included in screen range			
+		// screen out
+		if (hero_view_pos.z > 550 || hero_view_pos.x < -400 || hero_view_pos.x > 400) {
+			_state = HeroState::Die;
 		}
-		else {
-			// hero falls into the river
-			if (current_pos.y < obs_pos.y + size / 2) {
-				fall_into_river = true;
-				current_pos.y -= 5;
-				moving = false;
-				if (current_pos.y < -50) {
-					soul_moving = true;
-					current_pos.y += 5;
-					return true;		
+
+		// check collision
+		if (tag == MapState::Road || tag == MapState::Trail) {
+			for (int i = 0; i < obs_cnt1; i++) {
+				if (check_collision(obs_pos1[i], tag)) {
+					_state = HeroState::Die;
 				}
 			}
-			else
-				return false;
 		}
+		break;
+	case HeroState::Jump:
+		Jump(tag, obs_pos1, obs_cnt1);
+		break;
+	case HeroState::Float:
+		Float();
+		break;
+	case HeroState::Die:
+		std::cout << "Die" << std::endl;
+		Die();
+		break;
 	}
-	else if (obs_tag == 2) {
-		if (check_collision(obs_pos,obs_tag)) {
-			// hero is on the common state
-			// when collide with tree reverse the moving
-			switch (int(direction_angle)) {
-			case 0 :
-				// when hero collide with tree change its state. and move it on that state
-				cur_state_idx--;
-			case 90:
-				//move hero to rihgt
-				current_pos.x -= 10;
-				break;
-			case -90:
-				// move hero to left
-				current_pos.x += 10;
-				break;
-			}
-			return false;
-		}		
-	}
-	else {
-		if (check_collision(obs_pos,obs_tag)) {
-			moving = false;
-			soul_moving = true;
-			return true;
-		}
-		else
-			return false;
-	}
+	
 }
 
-void kyrHero::update(int tag,MyPos* obs_pos1, int obs_cnt1) {
-	if (!soul_moving) {
-		move();
-		current_pos.x += log_speed;
-		for (int i = 0; i < obs_cnt1; ++i) {
-			if (check_death(obs_pos1[i], tag)) {
-
-			}
-		}
-	}
-	soul_move();
+void kyrHero::Die() {
+	soul_pos.y += 5;
+	soul_pos.x = 20*sin(glm::radians(soul_pos.y));
 }
 
-void kyrHero::soul_move() {
-	if (soul_moving) {
-		soul_pos.y += 5;
-		soul_pos.x = 20*sin(glm::radians(soul_pos.y));
-	}
-}
+void kyrHero::soul_draw(glm::mat4 projection, glm::mat4 view, Shader shader){
 
-void kyrHero::soul_draw(glm::mat4 projection, glm::mat4 view, Shader shader) {
-	if (soul_moving){
-		loadOBJ soul_obj("Resources/ghost.obj", shader.ID);
-		soul_obj.load(projection, view);
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(soul_pos.x+current_pos.x, soul_pos.y+current_pos.y, current_pos.z));
-		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
+	loadOBJ soul_obj("Resources/ghost.obj", shader.ID);
+	soul_obj.load(projection, view);
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(soul_pos.x+current_pos.x, soul_pos.y+current_pos.y, current_pos.z));
+	model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 
-		soul_obj.setTransform(model);
-		soul_obj.draw();
-	}
+	soul_obj.setTransform(model);
+	soul_obj.draw();
+
 }

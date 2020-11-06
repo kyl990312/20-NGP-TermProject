@@ -16,6 +16,7 @@ MyRoad::MyRoad() {
 
 	// init remaining variables
 	moving = false;
+	tag = 4;
 	// please changeg
 	moving_degree = 0;
 	collision_pos[0] = trucks[0]->pos;

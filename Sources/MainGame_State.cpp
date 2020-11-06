@@ -48,8 +48,8 @@ void MainGame_State::Display() {
 
 void MainGame_State::update() {
 	if (start) {
-		// change this code into using 'for'
-		if (!hero.soul_moving) {
+		// map moving
+		if (hero._state != HeroState::Die) {
 			for (int i = 0; i < map_count; i++) {
 				states[i]->move();
 				states[i]->pos.z += 5;
@@ -58,7 +58,7 @@ void MainGame_State::update() {
 		//hero
 		hero_update();
 	}
-	if (hero.soul_moving) {
+	if (hero._state == HeroState::Die) {
 		if (back_music) {
 			PlaySound(TEXT("Resources/fail2.wav"), NULL, SND_FILENAME | SND_NODEFAULT | SND_ASYNC);
 			back_music = false;
@@ -71,7 +71,7 @@ void MainGame_State::update() {
 }
 
 void MainGame_State::keyboard(unsigned char key, int x, int y) {
-	if (!hero.soul_moving && !hero.moving && !hero.fall_into_river) {
+	if (hero._state == HeroState::Idle || hero._state == HeroState::Float) {
 		//PlaySound(TEXT("./jump2.wav"), NULL, SND_FILENAME | SND_NODEFAULT | SND_ASYNC);
 		switch (key) {
 		case 'w':
@@ -95,7 +95,7 @@ void MainGame_State::keyboard(unsigned char key, int x, int y) {
 		default:
 			return;
 		}
-		hero.moving = true;
+		hero._state = HeroState::Jump;
 		start = true;
 	}
 }
@@ -144,14 +144,10 @@ void MainGame_State::hero_update() {
 	cur_state_obs_cnt = states[cur_state_idx]->obs_cnt;
 	// get current state's tag
 	cur_state_tag = states[cur_state_idx]->tag;
-	if (hero.on_the_log) {
+	if (hero._state == HeroState::Float) {
 		// when hero is on the log run this code
 		hero.log_speed = states[cur_state_idx]->get_obs_speed(0);
 	}
 	hero.update(cur_state_tag, cur_state_obs_pos, cur_state_obs_cnt);
-	// hero arrived at floor. hero was jumping before
-	if (hero.arrive_at_floor && hero.direction_angle == 0.0f) {
-		hero.arrive_at_floor = false;
-		hero.current_pos.z = states[cur_state_idx]->pos.z;
-	}
+	hero.cur_mapState_posZ = states[cur_state_idx]->pos.z;
 }
