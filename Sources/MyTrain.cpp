@@ -1,6 +1,6 @@
 #include "MyTrain.h"
 
-
+extern loadOBJ models[26];
 
 MyTrain::MyTrain(MyPos road_pos) {
 	// pos init
@@ -12,16 +12,16 @@ MyTrain::MyTrain(MyPos road_pos) {
 }
 
 void MyTrain::draw(glm::mat4 projection, glm::mat4 view, glm::mat4 model, Shader shader) {
-	loadOBJ obj(obj_path, shader.ID);
-	shader.use();
-	obj.load(projection, view);
+	//loadOBJ obj(obj_path, shader.ID);
+	//shader.use();
+	models[18].load(projection, view);
 
 	// change road's positoin 
 	model = glm::translate(model, glm::vec3(pos.x, 0.0f, 0.0f));
 	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0, 0.0f));
-	obj.setTransform(model);
+	models[18].setTransform(model);
 
-	obj.draw();
+	models[18].draw();
 }
 
 void MyTrain::move(MyPos road_pos) {

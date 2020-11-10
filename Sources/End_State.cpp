@@ -1,5 +1,8 @@
 #include "End_State.h"
 
+extern loadOBJ models[26];
+extern Shader* shader1;
+
 End_State::End_State() {
 	std::cout << "enter endstate" << std::endl;
 	std::ifstream in("rank.txt");
@@ -74,53 +77,53 @@ void End_State::draw_score(float y_pos, int score) {
 
 void End_State::first_number(float y_pos)
 {
-	loadOBJ* first = nullptr;
+	loadOBJ first;
 	shader1->use();
 
 	switch (num[2]) {
 	case 0:
-		first = new loadOBJ("Resources/number_0.obj", shader1->ID);
-		first->load(projection, view);
+		first = models[2];
+		first.load(projection, view);
 		break;
 	case 1:
-		first = new loadOBJ("Resources/number_1.obj", shader1->ID);
-		first->load(projection, view);
+		first = models[3];
+		first.load(projection, view);
 		break;
 	case 2:
-		first = new loadOBJ("Resources/number_2.obj", shader1->ID);
-		first->load(projection, view);
+		first = models[3];
+		first.load(projection, view);
 		break;
 	case 3:
-		first = new loadOBJ("Resources/number_3.obj", shader1->ID);
-		first->load(projection, view);
+		first = models[4];
+		first.load(projection, view);
 		break;
 	case 4:
-		first = new loadOBJ("Resources/number_4.obj", shader1->ID);
-		first->load(projection, view);
+		first = models[5];
+		first.load(projection, view);
 		break;
 	case 5:
-		first = new loadOBJ("Resources/number_5.obj", shader1->ID);
-		first->load(projection, view);
+		first = models[6];
+		first.load(projection, view);
 		break;
 	case 6:
-		first = new loadOBJ("Resources/number_6.obj", shader1->ID);
-		first->load(projection, view);
+		first = models[7];
+		first.load(projection, view);
 		break;
 	case 7:
-		first = new loadOBJ("Resources/number_7.obj", shader1->ID);
-		first->load(projection, view);
+		first = models[8];
+		first.load(projection, view);
 		break;
 	case 8:
-		first = new loadOBJ("Resources/number_8.obj", shader1->ID);
-		first->load(projection, view);
+		first = models[9];
+		first.load(projection, view);
 		break;
 	case 9:
-		first = new loadOBJ("Resources/number_9.obj", shader1->ID);
-		first->load(projection, view);
+		first = models[10];
+		first.load(projection, view);
 		break;
 	default:
-		first = new loadOBJ("Resources/number_0.obj", shader1->ID);
-		first->load(projection, view);
+		first = models[2];
+		first.load(projection, view);
 		break;
 	}
 
@@ -131,65 +134,63 @@ void End_State::first_number(float y_pos)
 
 	translation = glm::translate(translation, glm::vec3(-100.0f, y_pos, 100.0f));
 	model = scaling * translation;
-	first->setTransform(model);
-	first->draw();
-	delete first;
+	first.setTransform(model);
+	first.draw();
 }
 
 
 void End_State::second_number(float y_pos)
 {
-	loadOBJ* second = nullptr;
+	loadOBJ second;
 
 	shader1->use();
 
 	switch (num[1]) {
 	case 0:
-		second = new loadOBJ("Resources/number_0.obj", shader1->ID);
-		second->load(projection, view);
+		second = models[2];
+		second.load(projection, view);
 		break;
 	case 1:
-		second = new loadOBJ("Resources/number_1.obj", shader1->ID);
-		second->load(projection, view);
+		second = models[3];
+		second.load(projection, view);
 		break;
 	case 2:
-		second = new loadOBJ("Resources/number_2.obj", shader1->ID);
-		second->load(projection, view);
+		second = models[3];
+		second.load(projection, view);
 		break;
 	case 3:
-		second = new loadOBJ("Resources/number_3.obj", shader1->ID);
-		second->load(projection, view);
+		second = models[4];
+		second.load(projection, view);
 		break;
 	case 4:
-		second = new loadOBJ("Resources/number_4.obj", shader1->ID);
-		second->load(projection, view);
+		second = models[5];
+		second.load(projection, view);
 		break;
 	case 5:
-		second = new loadOBJ("Resources/number_5.obj", shader1->ID);
-		second->load(projection, view);
+		second = models[6];
+		second.load(projection, view);
 		break;
 	case 6:
-		second = new loadOBJ("Resources/number_6.obj", shader1->ID);
-		second->load(projection, view);
+		second = models[7];
+		second.load(projection, view);
 		break;
 	case 7:
-		second = new loadOBJ("Resources/number_7.obj", shader1->ID);
-		second->load(projection, view);
+		second = models[8];
+		second.load(projection, view);
 		break;
 	case 8:
-		second = new loadOBJ("Resources/number_8.obj", shader1->ID);
-		second->load(projection, view);
+		second = models[9];
+		second.load(projection, view);
 		break;
 	case 9:
-		second = new loadOBJ("Resources/number_9.obj", shader1->ID);
-		second->load(projection, view);
+		second = models[10];
+		second.load(projection, view);
 		break;
 	default:
-		second = new loadOBJ("Resources/number_0.obj", shader1->ID);
-		second->load(projection, view);
+		second = models[2];
+		second.load(projection, view);
 		break;
 	}
-
 
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 translation = glm::mat4(1.0f);
@@ -197,63 +198,61 @@ void End_State::second_number(float y_pos)
 
 	translation = glm::translate(translation, glm::vec3(0.0f, y_pos, 100.0f));
 	model = scaling * translation;
-	second->setTransform(model);
-	second->draw();
-	delete second;
-
+	second.setTransform(model);
+	second.draw();
 }
 
 
 void End_State::third_number(float y_pos)
 {
-	loadOBJ* third = nullptr;
+	loadOBJ third;
 
 	shader1->use();
 
 	switch (num[0]) {
 	case 0:
-		third = new loadOBJ("Resources/number_0.obj", shader1->ID);
-		third->load(projection, view);
+		third = models[2];
+		third.load(projection, view);
 		break;
 	case 1:
-		third = new loadOBJ("Resources/number_1.obj", shader1->ID);
-		third->load(projection, view);
+		third = models[3];
+		third.load(projection, view);
 		break;
 	case 2:
-		third = new loadOBJ("Resources/number_2.obj", shader1->ID);
-		third->load(projection, view);
+		third = models[3];
+		third.load(projection, view);
 		break;
 	case 3:
-		third = new loadOBJ("Resources/number_3.obj", shader1->ID);
-		third->load(projection, view);
+		third = models[4];
+		third.load(projection, view);
 		break;
 	case 4:
-		third = new loadOBJ("Resources/number_4.obj", shader1->ID);
-		third->load(projection, view);
+		third = models[5];
+		third.load(projection, view);
 		break;
 	case 5:
-		third = new loadOBJ("Resources/number_5.obj", shader1->ID);
-		third->load(projection, view);
+		third = models[6];
+		third.load(projection, view);
 		break;
 	case 6:
-		third = new loadOBJ("Resources/number_6.obj", shader1->ID);
-		third->load(projection, view);
+		third = models[7];
+		third.load(projection, view);
 		break;
 	case 7:
-		third = new loadOBJ("Resources/number_7.obj", shader1->ID);
-		third->load(projection, view);
+		third = models[8];
+		third.load(projection, view);
 		break;
 	case 8:
-		third = new loadOBJ("Resources/number_8.obj", shader1->ID);
-		third->load(projection, view);
+		third = models[9];
+		third.load(projection, view);
 		break;
 	case 9:
-		third = new loadOBJ("Resources/number_9.obj", shader1->ID);
-		third->load(projection, view);
+		third = models[10];
+		third.load(projection, view);
 		break;
 	default:
-		third = new loadOBJ("Resources/number_0.obj", shader1->ID);
-		third->load(projection, view);
+		third = models[2];
+		third.load(projection, view);
 		break;
 	}
 
@@ -264,8 +263,6 @@ void End_State::third_number(float y_pos)
 
 	translation = glm::translate(translation, glm::vec3(100.0f, y_pos, 100.0f));
 	model = scaling * translation;
-	third->setTransform(model);
-	third->draw();
-	delete third;
-
+	third.setTransform(model);
+	third.draw();
 }

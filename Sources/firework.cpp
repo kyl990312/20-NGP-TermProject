@@ -1,5 +1,7 @@
 #include "firework_particle.h"
 
+extern loadOBJ models[26];
+
 firework::firework()
 {
 	color_random1 = (rand() % 500 + 500) * 0.001;
@@ -26,7 +28,7 @@ void firework::draw() {
 
 	for (int i = 0; i < 50; i++) {
 
-		snow_obj[i] = loadOBJ("Resources/snow.obj", snowShader.ID);
+		snow_obj[i] = models[21];
 
 		if (snow[i].timer < 0) {
 			color_random1 = (rand() % 500+ 500) * 0.001;

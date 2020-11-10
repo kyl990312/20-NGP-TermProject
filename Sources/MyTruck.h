@@ -6,6 +6,7 @@ class MyTruck
 {
 public:
 	const char* obj_path;
+	loadOBJ obj;
 	float speed;
 	float size;
 	float direction;

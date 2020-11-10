@@ -1,5 +1,8 @@
 #include "MyRiver.h"
 
+extern loadOBJ models[26];
+extern Shader* shader1;
+
 MyRiver::MyRiver() {
 	std::cout << "creating River..." << std::endl;
 	// init pos
@@ -26,18 +29,20 @@ MyRiver::MyRiver() {
 }
 
 void MyRiver::draw(glm::mat4 projection, glm::mat4 view, Shader shader) {
-	loadOBJ obj(obj_path, shader.ID);
-	shader.use();
-	obj.load(projection, view);
+	//loadOBJ obj(obj_path, shader.ID);
+	//shader.use();
+
+	shader1->use();
+	models[14].load(projection, view);
 
 	glm::mat4 model = glm::mat4(1.0f);
 
 	// change road's positoin 
 	model = glm::translate(model, glm::vec3(pos.x, pos.y, pos.z));
 
-	obj.setTransform(model);
+	models[14].setTransform(model);
 
-	obj.draw();
+	models[14].draw();
 	for (int i = 0; i < 3; i++)
 		logs[i]->draw(projection, view, model, shader);
 }

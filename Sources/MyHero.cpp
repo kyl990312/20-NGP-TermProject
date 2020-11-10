@@ -1,5 +1,7 @@
 #include "MyHero.h"
 
+extern loadOBJ models[26];
+
 void kyrHero::Jump(int tag, MyPos* obs_pos, int obs_cnt1)
 {
 	std::cout << "JUMP" << std::endl;
@@ -126,9 +128,9 @@ bool kyrHero::check_collision(MyPos obs_pos, int obs_tag) {
 }
 
 void kyrHero::draw(glm::mat4 projection, glm::mat4 view, Shader shader) {
-	loadOBJ obj("Resources/rabit.obj", shader.ID);
+	//loadOBJ obj("Resources/rabit.obj", shader.ID);
 	shader.use();
-	obj.load(projection, view);
+	models[0].load(projection, view);
 	// init model_matrix
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(current_pos.x, current_pos.y, current_pos.z));
@@ -136,18 +138,18 @@ void kyrHero::draw(glm::mat4 projection, glm::mat4 view, Shader shader) {
 	model = glm::rotate(model, glm::radians(-direction_angle), glm::vec3(0.0f, 1.0f, 0.0f));
 
 	// lightning
-	shader.setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
-	shader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 0.9f));
-	shader.setVec3("lightPos", glm::vec3(0, 800, 2000));
+	//shader.setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
+	//shader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 0.9f));
+	//shader.setVec3("lightPos", glm::vec3(0, 800, 2000));
 
 	// apply transform matix
-	obj.setTransform(model);
+	models[0].setTransform(model);
 
 	// draw obj
 	if(_state == HeroState::Die)
 		soul_draw(projection,view,shader);
 	else
-		obj.draw();
+		models[0].draw();
 
 }
 

@@ -1,6 +1,9 @@
 #include "MyTrail.h"
 #include<iostream>
 
+extern loadOBJ models[26];
+extern Shader* shader1;
+
 MyTrail::MyTrail() {
 	std::cout << "creating Trail..." << std::endl;
 	// init pos
@@ -27,17 +30,17 @@ MyTrail::MyTrail() {
 }
 
 void MyTrail::draw(glm::mat4 projection, glm::mat4 view, Shader shader) {
-	loadOBJ obj(obj_path, shader.ID);
-	shader.use();
-	obj.load(projection, view);
+	//loadOBJ obj(obj_path, shader.ID);
+	shader1->use();
+	models[15].load(projection, view);
 
 	glm::mat4 model = glm::mat4(1.0f);
 
 	// change road's positoin 
 	model = glm::translate(model, glm::vec3(pos.x, pos.y, pos.z));
-	obj.setTransform(model);
+	models[15].setTransform(model);
 
-	obj.draw();
+	models[15].draw();
 	train_warning_light(projection, view);
 	trains[0]->draw(projection, view, model, shader);
 }

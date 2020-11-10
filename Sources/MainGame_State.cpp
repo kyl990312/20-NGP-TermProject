@@ -8,7 +8,7 @@ MainGame_State::MainGame_State() {
 }
 
 MainGame_State::~MainGame_State() {
-	std::ofstream out("Resources/rank.txt", std::ios::app);
+	std::ofstream out("rank.txt", std::ios::app);
 	out << pass_state_cnt << '\n';
 	out.close();
 	for (int i = 0; i < map_count;++i) {

@@ -1,12 +1,11 @@
 #include "Title_State.h"
 
-void Title_State::Display() {
-	shader->use();
+extern loadOBJ models[26];
+extern Shader* shader1;
 
+void Title_State::Display() {
+	shader1->use();
 	// lightning
-	shader->setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
-	shader->setVec3("lightColor", glm::vec3(0.5f, 0.5f, 0.5f));
-	shader->setVec3("lightPos", glm::vec3(0, 800, 2000));
 	draw_rabit();
 
 	font_shader->use();
@@ -34,8 +33,7 @@ void Title_State::keyboard(unsigned char key, int x, int y) {
 }
 
 void Title_State::draw_font() {	
-	loadOBJ font("Resources/title_font.obj", font_shader->ID);
-	font.load(projection, view);
+	models[23].load(projection, view);
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 translation = glm::mat4(1.0f);
 	glm::mat4 scaling = glm::mat4(1.0f);	
@@ -44,15 +42,14 @@ void Title_State::draw_font() {
 	translation = glm::translate(translation, glm::vec3(obj_pos.x, obj_pos.y, obj_pos.z));
 	scaling = glm::scale(scaling, glm::vec3(1.0f, 1.0f, 1.0f));
 	model = scaling * translation;
-	font.setTransform(model);
+	models[23].setTransform(model);
 
-	font.draw();
+	models[23].draw();
 }
 
 void Title_State::draw_rabit()
 {
-	loadOBJ rabit("Resources/rabit.obj", shader->ID);
-	rabit.load(projection, view);
+	models[0].load(projection, view);
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 translation = glm::mat4(1.0f);
 	glm::mat4 scaling = glm::mat4(1.0f);
@@ -61,7 +58,7 @@ void Title_State::draw_rabit()
 	translation = glm::translate(translation, glm::vec3(300, obj_pos.y, obj_pos.z));
 	scaling = glm::scale(scaling, glm::vec3(3.0f, 3.0f, 3.0f));
 	model = translation * scaling;
-	rabit.setTransform(model);
+	models[0].setTransform(model);
 
-	rabit.draw();
+	models[0].draw();
 }

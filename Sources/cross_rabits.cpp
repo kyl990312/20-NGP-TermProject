@@ -13,6 +13,54 @@ GLvoid keyboard(unsigned char key, int x, int y);
 
 int state_mode = 0;
 
+loadOBJ models[26];
+Shader *shader1;
+
+void ModelLoad() {
+	shader1 = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
+	// Hero
+	models[0] = loadOBJ("Resources/rabit.obj", shader1->ID);
+
+	// box
+	models[1] = loadOBJ("Resources/box.obj", shader1->ID);
+
+	// 숫자
+	models[2] = loadOBJ("Resources/number_0.obj", shader1->ID);
+	models[3] = loadOBJ("Resources/number_1.obj", shader1->ID);
+	models[4] = loadOBJ("Resources/number_2.obj", shader1->ID);
+	models[5] = loadOBJ("Resources/number_3.obj", shader1->ID);
+	models[6] = loadOBJ("Resources/number_4.obj", shader1->ID);
+	models[7] = loadOBJ("Resources/number_5.obj", shader1->ID);
+	models[8] = loadOBJ("Resources/number_6.obj", shader1->ID);
+	models[9] = loadOBJ("Resources/number_7.obj", shader1->ID);
+	models[10] = loadOBJ("Resources/number_8.obj", shader1->ID);
+	models[11] = loadOBJ("Resources/number_9.obj", shader1->ID);
+
+	// State
+	models[12] = loadOBJ("Resources/common.obj", shader1->ID);
+	models[13] = loadOBJ("Resources/road.obj", shader1->ID);
+	models[14] = loadOBJ("Resources/river.obj", shader1->ID);
+	models[15] = loadOBJ("Resources/trail.obj", shader1->ID);
+
+	// obj in state
+	models[16] = loadOBJ("Resources/car.obj", shader1->ID);
+	models[17] = loadOBJ("Resources/truck.obj", shader1->ID);
+	models[18] = loadOBJ("Resources/train.obj", shader1->ID);
+	models[19] = loadOBJ("Resources/tree.obj", shader1->ID);
+	models[20] = loadOBJ("Resources/log.obj", shader1->ID);
+
+	// 기타
+	models[21] = loadOBJ("Resources/snow.obj", shader1->ID);
+	models[22] = loadOBJ("Resources/soul_cube.obj", shader1->ID);
+	models[23] = loadOBJ("Resources/title_font.obj", shader1->ID);
+	models[24] = loadOBJ("Resources/title_plane.obj", shader1->ID);
+	models[25] = loadOBJ("Resources/ghost.obj", shader1->ID);
+
+	shader1->setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
+	shader1->setVec3("lightColor", glm::vec3(0.5f, 0.5f, 0.5f));
+	shader1->setVec3("lightPos", glm::vec3(0, 800, 2000));
+}
+
 int main(int argc, char** argv)
 {
 	srand((unsigned int)time(NULL));
@@ -28,6 +76,8 @@ int main(int argc, char** argv)
 	}
 	else
 		std::cout << "GLEW Initialized" << std::endl;
+	ModelLoad();
+
 	title.shader = new Shader("shaders/hero_vertexshader.glvs", "shaders/hero_fragmentshader.glfs");
 	title.font_shader = new Shader("shaders/font_vertexshader.glvs", "shaders/font_fragmentshader.glfs");
 	glutDisplayFunc(drawScene);
