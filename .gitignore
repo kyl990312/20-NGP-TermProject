@@ -31,3 +31,9 @@
 *.out
 *.app
 *.ipch
+*.db
+*.db-shm
+*.db-wal
+*.opendb
+*.json
+*.sqlite
