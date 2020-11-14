@@ -167,6 +167,7 @@
     <ClCompile Include="Sources\Title_State.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ClientStruct.h" />
     <ClInclude Include="Sources\End_State.h" />
     <ClInclude Include="Sources\firework_particle.h" />
     <ClInclude Include="Sources\loadObj.h" />

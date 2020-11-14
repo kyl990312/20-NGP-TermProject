@@ -1,6 +1,15 @@
+#define _WINSOCK_DEPRECATED_NO_WARNINGS // 최신 VC++ 컴파일 시 경고 방지
+#pragma comment(lib, "ws2_32")
+#include <winsock2.h>
+#include <stdlib.h>
 #include "MainGame_State.h"
 #include "Title_State.h"
 #include "End_State.h"
+#include "ClientStruct.h"
+
+#define SERVERIP   "127.0.0.1"
+#define SERVERPORT 9000
+#define BUFSIZE    128
 
 Title_State title;
 MainGame_State* main_game = nullptr;
@@ -14,7 +23,10 @@ GLvoid keyboard(unsigned char key, int x, int y);
 int state_mode = 0;
 
 loadOBJ models[26];
-Shader *shader1;
+Shader* shader1;
+
+// 맵 데이터 받아보기
+MapData tmpMap;
 
 void ModelLoad() {
 	shader1 = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
@@ -63,6 +75,47 @@ void ModelLoad() {
 
 int main(int argc, char** argv)
 {
+	int retval;
+
+	// 윈속 초기화
+	WSADATA wsa;
+	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+		return 1;
+
+	// socket()
+	// 대기 소켓
+	SOCKET listen_sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (listen_sock == INVALID_SOCKET) err_quit((char*)"socket()");
+
+	// socket()
+	SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (sock == INVALID_SOCKET) err_quit((char*)"socket()");
+
+	// connect()
+	SOCKADDR_IN serveraddr;
+	ZeroMemory(&serveraddr, sizeof(serveraddr));
+	serveraddr.sin_family = AF_INET;
+	serveraddr.sin_addr.s_addr = inet_addr(SERVERIP);
+	serveraddr.sin_port = htons(SERVERPORT);
+	retval = connect(sock, (SOCKADDR*)&serveraddr, sizeof(serveraddr));
+	if (retval == SOCKET_ERROR) err_quit((char*)"connect()");
+
+
+	// 통신 스레드 생성
+	// 전용 소켓
+	SOCKET client_sock;
+	SOCKADDR_IN clientaddr;
+	int addrlen;
+
+	HANDLE hThread;
+
+	hThread = CreateThread(NULL, 0, ProcessClient, (LPVOID)client_sock, 0, NULL);
+
+	if (hThread == NULL)
+		closesocket(client_sock);
+	else
+		CloseHandle(hThread);
+
 	srand((unsigned int)time(NULL));
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
@@ -80,6 +133,8 @@ int main(int argc, char** argv)
 
 	title.shader = new Shader("shaders/hero_vertexshader.glvs", "shaders/hero_fragmentshader.glfs");
 	title.font_shader = new Shader("shaders/font_vertexshader.glvs", "shaders/font_fragmentshader.glfs");
+	
+	// 콜백
 	glutDisplayFunc(drawScene);
 	glutTimerFunc(10, TimerFunction, 1);
 	glutKeyboardFunc(keyboard);
@@ -88,6 +143,13 @@ int main(int argc, char** argv)
 
 	delete title.shader;
 	delete title.font_shader;
+
+	// closesocket()
+	closesocket(listen_sock);
+
+	// 윈속 종료
+	WSACleanup();
+	return 0;
 }
 
 GLvoid drawScene()
@@ -171,4 +233,108 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		delete end;
 		break;
 	}
+}
+
+// 소켓 함수 오류 출력 후 종료
+void err_quit(char* msg)
+{
+	LPVOID lpMsgBuf;
+	FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL, WSAGetLastError(),
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPTSTR)&lpMsgBuf, 0, NULL);
+	MessageBox(NULL, (LPCTSTR)lpMsgBuf, (LPCTSTR)msg, MB_ICONERROR);
+	LocalFree(lpMsgBuf);
+	exit(1);
+}
+
+// 소켓 함수 오류 출력
+void err_display(char* msg)
+{
+	LPVOID lpMsgBuf;
+	FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL, WSAGetLastError(),
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPTSTR)&lpMsgBuf, 0, NULL);
+	printf("[%s] %s", msg, (char*)lpMsgBuf);
+	LocalFree(lpMsgBuf);
+}
+
+bool recvFixedVar(SOCKET& client_sock, int& len, char buf[])
+{
+	int retval;
+	// 데이터 받기(고정 길이)
+	// 소켓, 데이터 저장할 버퍼, 수신 버퍼로부터 복사할 데이터 크기(BYTE), flag
+	retval = recvn(client_sock, (char*)&len, sizeof(int), 0);
+	if (retval == SOCKET_ERROR) {
+		err_display((char*)"recv()");
+		return false;
+	}
+	else if (retval == 0)
+		return false;
+
+	// 데이터 받기(가변 길이)
+	retval = recvn(client_sock, buf, len, 0);
+	if (retval == SOCKET_ERROR) {
+		err_display((char*)"recv()");
+		return false;
+	}
+	else if (retval == 0)
+		return false;
+
+	return true;
+}
+
+
+// 사용자 정의 데이터 수신 함수
+int recvn(SOCKET s, char* buf, int len, int flags)
+{
+	int received;
+	// 받은 데이터를 저장할 버퍼
+	char* ptr = buf;
+	// 수신 버퍼로부터 복사할 데이터 크기(BYTE)
+	int left = len;
+
+	while (left > 0) {
+		// 소켓, 받은 데이터를 저장할 버퍼, 수신 버퍼로부터 복사할 데이터 크기(BYTE), flag(0) 
+		// 받은 바이트 수 or 0(연결 종료) or SOKET_ERROR
+		received = recv(s, ptr, left, flags);
+		if (received == SOCKET_ERROR)
+			return SOCKET_ERROR;
+		else if (received == 0)
+			break;
+		left -= received;
+		ptr += received;
+	}
+
+	return (len - left);
+}
+
+
+DWORD WINAPI ProcessClient(LPVOID arg)
+{
+	SOCKET client_sock = (SOCKET)arg;
+	SOCKADDR_IN clientaddr;
+
+	int addrlen = sizeof(clientaddr);
+	getpeername(client_sock, (SOCKADDR*)&clientaddr, &addrlen);
+
+	// 데이터 통신에 사용할 변수
+	char buf[BUFSIZE + 1];
+	int len = 0;
+
+	//서버와 데이터 통신
+
+	while (recvFixedVar(client_sock, len, buf)) {
+		// if(마지막 데이터)
+			// 업데이트 해라
+		ZeroMemory(&buf, sizeof(buf));
+	}
+
+	// closesocket()
+	closesocket(client_sock);
+
+	return 0;
 }
