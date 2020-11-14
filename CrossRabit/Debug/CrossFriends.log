@@ -1,0 +1,62 @@
+﻿  cross_rabits.cpp
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\MyRoad.h(9,28): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\MyRiver.h(9,28): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework_particle.h(19,59): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework_particle.h(19,86): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  End_State.cpp
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\End_State.cpp(64,2): warning C4065: switch문에 'default'가 있으나 'case' 레이블이 없습니다.
+  firework.cpp
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework_particle.h(19,59): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework_particle.h(19,86): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(7,39): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(8,39): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(9,39): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(10,14): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(11,14): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(12,19): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(18,24): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(34,40): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(35,41): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(36,41): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(37,16): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(38,16): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(39,21): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(45,26): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(50,63): warning C4244: '+=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(51,63): warning C4244: '+=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(52,64): warning C4244: '+=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(56,63): warning C4244: '+=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(57,63): warning C4244: '+=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(58,64): warning C4244: '+=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(61,63): warning C4244: '+=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(62,63): warning C4244: '+=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(63,63): warning C4244: '+=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(66,63): warning C4244: '+=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(67,64): warning C4244: '+=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework.cpp(68,64): warning C4244: '+=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  loadOBJ.cpp
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\loadOBJ.cpp(79,48): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+  MainGame_State.cpp
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\MyRoad.h(9,28): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\MyRiver.h(9,28): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\MainGame_State.cpp(134,24): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  Mycommon.cpp
+  MyHero.cpp
+  MyLog.cpp
+  MyObstacles.cpp
+  MyRiver.cpp
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\MyRiver.h(9,28): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  MyRoad.cpp
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\MyRoad.h(9,28): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  MyState.cpp
+  MyTrail.cpp
+  MyTrain.cpp
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\MyTrain.cpp(8,22): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  MyTree.cpp
+  MyTruck.cpp
+  Title_State.cpp
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework_particle.h(19,59): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework_particle.h(19,86): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\Title_State.cpp(32,2): warning C4065: switch문에 'default'가 있으나 'case' 레이블이 없습니다.
+  코드를 생성하고 있습니다...
+  CrossFriends.vcxproj -> E:\Git\20-NGP-TermProject\CrossRabit\Debug\CrossFriends.exe
