@@ -5,21 +5,26 @@
 #include "MainGame_State.h"
 #include "Title_State.h"
 #include "End_State.h"
-#include "ClientStruct.h"
+#include "DataStruct.h"
 
 #define SERVERIP   "127.0.0.1"
 #define SERVERPORT 9000
 #define BUFSIZE    128
 
-Title_State title;
-MainGame_State* main_game = nullptr;
-End_State* end;
+void err_quit(char* );
+void err_display(char* );
+bool recvFixedVar(SOCKET& , int& , char []);
+int recvn(SOCKET , char* , int , int );
+DWORD WINAPI ProcessClient(LPVOID);
 
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 GLvoid TimerFunction(int value);
 GLvoid keyboard(unsigned char key, int x, int y);
 
+Title_State title;
+MainGame_State* main_game = nullptr;
+End_State* end;
 int state_mode = 0;
 
 loadOBJ models[26];
@@ -30,6 +35,7 @@ MapData tmpMap;
 
 void ModelLoad() {
 	shader1 = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
+
 	// Hero
 	models[0] = loadOBJ("Resources/rabit.obj", shader1->ID);
 
@@ -100,19 +106,12 @@ int main(int argc, char** argv)
 	retval = connect(sock, (SOCKADDR*)&serveraddr, sizeof(serveraddr));
 	if (retval == SOCKET_ERROR) err_quit((char*)"connect()");
 
-
-	// 통신 스레드 생성
-	// 전용 소켓
-	SOCKET client_sock;
-	SOCKADDR_IN clientaddr;
-	int addrlen;
-
 	HANDLE hThread;
 
-	hThread = CreateThread(NULL, 0, ProcessClient, (LPVOID)client_sock, 0, NULL);
+	hThread = CreateThread(NULL, 0, ProcessClient, (LPVOID)sock, 0, NULL);
 
 	if (hThread == NULL)
-		closesocket(client_sock);
+		closesocket(sock);
 	else
 		CloseHandle(hThread);
 
@@ -316,20 +315,18 @@ int recvn(SOCKET s, char* buf, int len, int flags)
 DWORD WINAPI ProcessClient(LPVOID arg)
 {
 	SOCKET client_sock = (SOCKET)arg;
-	SOCKADDR_IN clientaddr;
-
-	int addrlen = sizeof(clientaddr);
-	getpeername(client_sock, (SOCKADDR*)&clientaddr, &addrlen);
 
 	// 데이터 통신에 사용할 변수
 	char buf[BUFSIZE + 1];
 	int len = 0;
 
 	//서버와 데이터 통신
-
 	while (recvFixedVar(client_sock, len, buf)) {
 		// if(마지막 데이터)
 			// 업데이트 해라
+		memcpy(&tmpMap, buf, sizeof(MapData));
+		std::cout << "tag: " << tmpMap.tag 
+			<< "(x, y, z): " << tmpMap.x << ", " << tmpMap.y << ", " << tmpMap.z << std::endl;
 		ZeroMemory(&buf, sizeof(buf));
 	}
 
