@@ -1,7 +1,7 @@
 #include "End_State.h"
 
 extern loadOBJ models[26];
-extern Shader* shader1;
+extern Shader* fontShader;
 
 End_State::End_State() {
 	std::cout << "enter endstate" << std::endl;
@@ -19,8 +19,8 @@ End_State::~End_State() {
 }
 
 void End_State::Display() {
-	shader1->use();
-	shader1->setVec3("obj_color", glm::vec3(1.0, 1.0, 0.0));
+	fontShader->use();
+	fontShader->setVec3("obj_color", glm::vec3(1.0, 1.0, 0.0));
 	draw_score(400, cur_score);
 	draw_score(200, best_score);
 	draw_score(80, mid_score);
@@ -78,7 +78,7 @@ void End_State::draw_score(float y_pos, int score) {
 void End_State::first_number(float y_pos)
 {
 	loadOBJ first;
-	shader1->use();
+	fontShader->use();
 
 	switch (num[2]) {
 	case 0:
@@ -143,7 +143,7 @@ void End_State::second_number(float y_pos)
 {
 	loadOBJ second;
 
-	shader1->use();
+	fontShader->use();
 
 	switch (num[1]) {
 	case 0:
@@ -207,7 +207,7 @@ void End_State::third_number(float y_pos)
 {
 	loadOBJ third;
 
-	shader1->use();
+	fontShader->use();
 
 	switch (num[0]) {
 	case 0:

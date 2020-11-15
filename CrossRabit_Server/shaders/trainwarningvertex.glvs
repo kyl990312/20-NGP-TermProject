@@ -1,0 +1,16 @@
+#version 330 core
+
+layout(location = 1) in vec3 vertexColor;
+layout(location = 0) in vec3 vertexPosition_modelspace;
+
+
+uniform mat4 transform;
+uniform mat4 projectionTransform;
+uniform mat4 viewTransform;
+
+out vec3 fragmentColor;
+
+void main(){
+gl_Position = projectionTransform* viewTransform * transform * vec4(vertexPosition_modelspace, 1.0);
+   fragmentColor = vertexColor;
+}

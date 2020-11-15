@@ -28,12 +28,9 @@ public:
 
 	int map_count = 23;
 	MyState** states = new MyState * [map_count];
-	bool timerCheck = false;
 	bool start = false;
-	Shader* shader;
 
 	//hero
-	Shader* hero_shader;
 	kyrHero hero;
 	MyPos cur_state_obs_pos[3];
 	MyPos next_state_obs_pos[3];

@@ -54,6 +54,7 @@ MyRoad::MyRoad() {
 			 remove_truck(i);
 	 }
 	 if (moving) {
+		 
 	 }
  }
 

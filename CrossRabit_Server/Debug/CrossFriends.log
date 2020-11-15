@@ -1,0 +1,9 @@
+﻿  End_State.cpp
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\End_State.cpp(64,2): warning C4065: switch문에 'default'가 있으나 'case' 레이블이 없습니다.
+  cross_rabits.cpp
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\MyRoad.h(9,28): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\MyRiver.h(9,28): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework_particle.h(19,59): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+E:\Git\20-NGP-TermProject\CrossRabit\Sources\firework_particle.h(19,86): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  코드를 생성하고 있습니다...
+  CrossFriends.vcxproj -> E:\Git\20-NGP-TermProject\CrossRabit\Debug\CrossFriends.exe

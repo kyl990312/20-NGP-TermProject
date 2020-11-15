@@ -1,6 +1,8 @@
 #include "MainGame_State.h"
 // this is main game state
 
+extern Shader* shader1;
+
 MainGame_State::MainGame_State() {
 	//test
 	PlaySound(TEXT("Resources/Spongebob.wav"), NULL, SND_FILENAME | SND_NODEFAULT | SND_ASYNC | SND_LOOP);
@@ -19,7 +21,7 @@ MainGame_State::~MainGame_State() {
 
 void MainGame_State::Display() {
 	for (int i = 0; i < map_count; i++) {
-		states[i]->draw(projection, view, *shader);
+		states[i]->draw(projection, view, *shader1);
 		if (states[i]->check_removing()) {
 			delete states[i];
 			int create_state_random = rand() % 5;
@@ -43,7 +45,7 @@ void MainGame_State::Display() {
 	}
 
 	// hero draw
-	hero.draw(projection, view, *hero_shader);
+	hero.draw(projection, view, *shader1);
 }
 
 void MainGame_State::update() {

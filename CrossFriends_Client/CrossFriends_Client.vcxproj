@@ -19,18 +19,46 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Common.cpp" />
+    <ClCompile Include="cross_rabits.cpp" />
+    <ClCompile Include="EndScene.cpp" />
     <ClCompile Include="GameManager.cpp" />
-    <ClCompile Include="Sources\cross_rabits.cpp" />
-    <ClCompile Include="Sources\GameObject.cpp" />
-    <ClCompile Include="Sources\loadOBJ.cpp" />
-    <ClCompile Include="Sources\Scene.cpp" />
+    <ClCompile Include="Hero.cpp" />
+    <ClCompile Include="loadOBJ.cpp" />
+    <ClCompile Include="Log.cpp" />
+    <ClCompile Include="MainScene.cpp" />
+    <ClCompile Include="MapLine.cpp" />
+    <ClCompile Include="Obstacle.cpp" />
+    <ClCompile Include="River.cpp" />
+    <ClCompile Include="Road.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="TitleScene.cpp" />
+    <ClCompile Include="Trail.cpp" />
+    <ClCompile Include="Train.cpp" />
+    <ClCompile Include="Tree.cpp" />
+    <ClCompile Include="Truck.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Common.h" />
+    <ClInclude Include="EndScene.h" />
     <ClInclude Include="GameManager.h" />
-    <ClInclude Include="Sources\GameObject.h" />
-    <ClInclude Include="Sources\loadObj.h" />
-    <ClInclude Include="Sources\Scene.h" />
-    <ClInclude Include="Sources\shader.h" />
+    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Global.h" />
+    <ClInclude Include="Hero.h" />
+    <ClInclude Include="loadObj.h" />
+    <ClInclude Include="Log.h" />
+    <ClInclude Include="MainScene.h" />
+    <ClInclude Include="MapLine.h" />
+    <ClInclude Include="Obstacle.h" />
+    <ClInclude Include="River.h" />
+    <ClInclude Include="Road.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="shader.h" />
+    <ClInclude Include="TitleScene.h" />
+    <ClInclude Include="Trail.h" />
+    <ClInclude Include="Train.h" />
+    <ClInclude Include="Tree.h" />
+    <ClInclude Include="Truck.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

@@ -2,17 +2,18 @@
 
 extern loadOBJ models[26];
 extern Shader* shader1;
+extern Shader* fontShader;
 
 void Title_State::Display() {
 	shader1->use();
 	// lightning
 	draw_rabit();
 
-	font_shader->use();
-	font_shader->setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
-	font_shader->setVec3("lightColor", glm::vec3(0.5f, 0.5f, 0.5f));
-	font_shader->setVec3("lightPos", glm::vec3(0, 800, 2000));
-	font_shader->setVec3("obj_color", glm::vec3(1.0, 0.6, 0.0));
+	fontShader->use();
+	fontShader->setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
+	fontShader->setVec3("lightColor", glm::vec3(0.5f, 0.5f, 0.5f));
+	fontShader->setVec3("lightPos", glm::vec3(0, 800, 2000));
+	fontShader->setVec3("obj_color", glm::vec3(1.0, 0.6, 0.0));
 	draw_font();
 
 	for (int i = 0; i < 4; i++)

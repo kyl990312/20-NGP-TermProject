@@ -8,7 +8,6 @@ MyTrain::MyTrain(MyPos road_pos) {
 	speed = rand()% 100 + 150;
 	size = 50.0f;
 	direction = 1;
-
 }
 
 void MyTrain::draw(glm::mat4 projection, glm::mat4 view, glm::mat4 model, Shader shader) {

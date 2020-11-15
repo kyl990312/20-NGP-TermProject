@@ -19,7 +19,6 @@ public:
 	int best_score;
 	int mid_score;
 	int last_score;
-	Shader* shader1 = nullptr;
 	int num[3] = { 0, };
 
 public:

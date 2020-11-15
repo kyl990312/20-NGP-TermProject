@@ -4,7 +4,7 @@ extern loadOBJ models[26];
 extern Shader* shader1;
 
 MyCommon::MyCommon() {
-	std::cout << "creating River..." << std::endl;
+	std::cout << "creating Common..." << std::endl;
 	// init pos
 	// only its z_pos will change in MyCommon()
 	pos = { 0.0f,0.0f,0.0f };
@@ -25,7 +25,7 @@ MyCommon::MyCommon() {
 	collision_pos[2] = trees[2]->pos;
 	obs_cnt = 3;
 	tag = 2;
-	std::cout << "complete creating River!" << std::endl;
+	std::cout << "complete creating Common!" << std::endl;
 }
 
 void MyCommon::draw(glm::mat4 projection, glm::mat4 view, Shader shader) {
@@ -55,7 +55,6 @@ void MyCommon::move() {
 }
 
 bool MyCommon::check_removing() {
-
 	// check its position_y.
 	// if it out off the screen, request removing to state_class
 	if (pos.z > 600) {

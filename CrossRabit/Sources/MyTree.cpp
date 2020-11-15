@@ -22,6 +22,7 @@ void MyTree::draw(glm::mat4 projection, glm::mat4 view, glm::mat4 model, Shader 
 }
 
 void MyTree::move(MyPos road_pos) {
+
 }
 
 bool MyTree::check_removing() {

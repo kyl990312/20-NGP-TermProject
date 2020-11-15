@@ -1,6 +1,7 @@
 #include "MyHero.h"
 
 extern loadOBJ models[26];
+extern Shader* shader1;
 
 void kyrHero::Jump(int tag, MyPos* obs_pos, int obs_cnt1)
 {
@@ -200,8 +201,7 @@ void kyrHero::Die() {
 
 void kyrHero::soul_draw(glm::mat4 projection, glm::mat4 view, Shader shader){
 
-	loadOBJ soul_obj("Resources/ghost.obj", shader.ID);
-	soul_obj.load(projection, view);
+	models[Model].load(projection, view);
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(soul_pos.x+current_pos.x, soul_pos.y+current_pos.y, current_pos.z));
 	model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
