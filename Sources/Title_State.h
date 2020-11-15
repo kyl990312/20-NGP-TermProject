@@ -26,9 +26,9 @@ public:
 public:
 	void Display();
 	void update();
-	void keyboard(unsigned char key, int x, int y);
+	void mouse(int button, int state, int x, int y);
 	void draw_font();
 	void draw_rabit();
-	void draw_background();
+	void draw_startbutton();
 };
 

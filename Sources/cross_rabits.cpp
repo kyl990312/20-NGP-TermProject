@@ -10,10 +10,11 @@ GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 GLvoid TimerFunction(int value);
 GLvoid keyboard(unsigned char key, int x, int y);
+GLvoid mouse(int button, int state, int x, int y);
 
 int state_mode = 0;
 
-loadOBJ models[26];
+loadOBJ models[27];
 Shader *shader1;
 
 void ModelLoad() {
@@ -55,6 +56,7 @@ void ModelLoad() {
 	models[23] = loadOBJ("Resources/title_font.obj", shader1->ID);
 	models[24] = loadOBJ("Resources/title_plane.obj", shader1->ID);
 	models[25] = loadOBJ("Resources/ghost.obj", shader1->ID);
+	models[26] = loadOBJ("Resources/start_button.obj", shader1->ID);
 
 	shader1->setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
 	shader1->setVec3("lightColor", glm::vec3(0.5f, 0.5f, 0.5f));
@@ -83,6 +85,7 @@ int main(int argc, char** argv)
 	glutDisplayFunc(drawScene);
 	glutTimerFunc(10, TimerFunction, 1);
 	glutKeyboardFunc(keyboard);
+	glutMouseFunc(mouse);
 	glutReshapeFunc(Reshape);
 	glutMainLoop();
 
@@ -152,15 +155,6 @@ GLvoid TimerFunction(int value)
 
 GLvoid keyboard(unsigned char key, int x, int y) {
 	switch (state_mode) {
-	case 0:
-		title.keyboard(key, x, y);
-		state_mode = title.next_state;
-		if (state_mode == 1) {
-			main_game = new MainGame_State;
-			main_game->shader = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
-			main_game->hero_shader = new Shader("shaders/hero_vertexshader.glvs", "shaders/hero_fragmentshader.glfs");
-		}
-		break;
 	case 1:
 		main_game->keyboard(key, x, y);
 		break;
@@ -170,5 +164,17 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		delete end->shader1;
 		delete end;
 		break;
+	}
+}
+
+GLvoid mouse(int button, int state, int x, int y) {
+	if (state_mode == 0){
+		title.mouse(button, state, x, y);
+		state_mode = title.next_state;
+		if (state_mode == 1) {
+			main_game = new MainGame_State;
+			main_game->shader = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
+			main_game->hero_shader = new Shader("shaders/hero_vertexshader.glvs", "shaders/hero_fragmentshader.glfs");
+		}
 	}
 }

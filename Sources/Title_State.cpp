@@ -1,6 +1,6 @@
 #include "Title_State.h"
 
-extern loadOBJ models[26];
+extern loadOBJ models[27];
 extern Shader* shader1;
 
 void Title_State::Display() {
@@ -14,6 +14,7 @@ void Title_State::Display() {
 	font_shader->setVec3("lightPos", glm::vec3(0, 800, 2000));
 	font_shader->setVec3("obj_color", glm::vec3(1.0, 0.6, 0.0));
 	draw_font();
+	draw_startbutton();
 
 	for (int i = 0; i < 4; i++)
 		firework_particle[i].draw();
@@ -24,11 +25,11 @@ void Title_State::update() {
 	obj_pos.z = 50*sin(glm::radians(font_sin_angle));
 }
 
-void Title_State::keyboard(unsigned char key, int x, int y) {
-	switch (key) {
-	default:
+void Title_State::mouse(int button, int state, int x, int y) {
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN
+		&& x < 550 && x > 410
+		&& y < 600 && y >470) {
 		next_state = 1;
-		break;
 	}
 }
 
@@ -61,4 +62,24 @@ void Title_State::draw_rabit()
 	models[0].setTransform(model);
 
 	models[0].draw();
+}
+
+void Title_State::draw_startbutton()
+{
+	models[26].load(projection, view);
+	glm::mat4 model = glm::mat4(1.0f);
+	glm::mat4 translation = glm::mat4(1.0f);
+	glm::mat4 scaling = glm::mat4(1.0f);
+
+	// transform
+	translation = glm::translate(translation, glm::vec3(0, -300, 0));
+	scaling = glm::scale(scaling, glm::vec3(3.5f, 4.0f, 4.0f));
+	
+	model = translation * scaling;
+	model = glm::rotate(model, glm::radians(60.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(6.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(-30.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	models[26].setTransform(model);
+
+	models[26].draw();
 }
