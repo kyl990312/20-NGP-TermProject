@@ -14,7 +14,7 @@ GLvoid mouse(int button, int state, int x, int y);
 
 int state_mode = 0;
 
-loadOBJ models[27];
+loadOBJ models[28];
 Shader *shader1;
 
 void ModelLoad() {
@@ -82,6 +82,7 @@ int main(int argc, char** argv)
 
 	title.shader = new Shader("shaders/hero_vertexshader.glvs", "shaders/hero_fragmentshader.glfs");
 	title.font_shader = new Shader("shaders/font_vertexshader.glvs", "shaders/font_fragmentshader.glfs");
+	title.startbutton_shader = new Shader("shaders/startbutton_vertexshader.glvs", "shaders/startbutton_fragmentshader.glfs");
 	glutDisplayFunc(drawScene);
 	glutTimerFunc(10, TimerFunction, 1);
 	glutKeyboardFunc(keyboard);
@@ -91,6 +92,7 @@ int main(int argc, char** argv)
 
 	delete title.shader;
 	delete title.font_shader;
+	delete title.startbutton_shader;
 }
 
 GLvoid drawScene()

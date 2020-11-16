@@ -16,12 +16,14 @@ public:
 	MyPos obj_pos = { 0.0f,0.0f,0.0f };
 	Shader* shader;
 	Shader* font_shader;
+	Shader* startbutton_shader;
 
 	firework firework_particle[4];
 
 	float font_sin_angle = 0.0f;
 	int next_state = 0;
-	
+
+	bool ready_state = 0;
 
 public:
 	void Display();
