@@ -1,0 +1,11 @@
+﻿  cross_rabits.cpp
+D:\document\3-2\Network GP\termProject\20-NGP-TermProject\Sources\MyRoad.h(9,28): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\document\3-2\Network GP\termProject\20-NGP-TermProject\Sources\MyRiver.h(9,28): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\document\3-2\Network GP\termProject\20-NGP-TermProject\Sources\firework_particle.h(19,59): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\document\3-2\Network GP\termProject\20-NGP-TermProject\Sources\firework_particle.h(19,86): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  코드를 생성하고 있습니다.
+  2 of 567 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
+  코드를 생성했습니다.
+  CrossFriends.vcxproj -> D:\document\3-2\Network GP\termProject\20-NGP-TermProject\Release\CrossFriends.exe
