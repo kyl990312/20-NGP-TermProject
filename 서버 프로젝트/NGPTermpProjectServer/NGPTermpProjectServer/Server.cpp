@@ -7,8 +7,12 @@
 #include<iostream>
 #include "DataStruct.h"
 
+
 #define SERVERPORT 9000
 #define BUFSIZE    512
+
+// Scene
+int currentScene = Scene::Title;
 
 void sendFixedVar(SOCKET&, size_t, char[]);
 
@@ -84,25 +88,37 @@ int main(int argc, char* argv[])
     SOCKADDR_IN clientaddr;
     int addrlen;
 
-    HANDLE hThread;
 
     while (1) {
-        // accept()
-        addrlen = sizeof(clientaddr);
-        client_sock = accept(listen_sock, (SOCKADDR*)&clientaddr, &addrlen);
-        if (client_sock == INVALID_SOCKET) {
-            err_display((char*)"accept()");
+        switch (currentScene) {
+        case Scene::Title:
+        {
+            // accept()
+            addrlen = sizeof(clientaddr);
+            client_sock = accept(listen_sock, (SOCKADDR*)&clientaddr, &addrlen);
+            if (client_sock == INVALID_SOCKET) {
+                err_display((char*)"accept()");
+                break;
+            }
+
+            // 스레드 생성
+            MultipleArg arg = { client_sock, clientCnt++ };
+            HANDLE hThread = CreateThread(NULL, 0, ProcessClient, (LPVOID)&arg, 0, NULL);
+
+            if (hThread == NULL)
+                closesocket(client_sock);
+            else
+                CloseHandle(hThread);
+        }
+            break;
+        case Scene::MainGame:
+            break;
+        case Scene::End:
+            
             break;
         }
 
-        // 스레드 생성
-        MultipleArg arg{ client_sock, clientCnt++ };
-        hThread = CreateThread(NULL, 0, ProcessClient, (LPVOID)&arg, 0, NULL);
 
-        if (hThread == NULL)
-            closesocket(client_sock);
-        else
-            CloseHandle(hThread);
     }
 
     // closesocket()

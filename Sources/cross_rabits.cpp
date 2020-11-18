@@ -2,84 +2,60 @@
 #pragma comment(lib, "ws2_32")
 #include <winsock2.h>
 #include <stdlib.h>
-#include "MainGame_State.h"
-#include "Title_State.h"
-#include "End_State.h"
+#include <vector>
 #include "DataStruct.h"
+#include "shader.h"
+#include "loadObj.h"
 
 #define SERVERIP   "127.0.0.1"
 #define SERVERPORT 9000
 #define BUFSIZE    128
 
+#define SCR_WIDTH 800
+#define SCR_HEIGHT 600
+
+
+// Server-Client Process
 void err_quit(char* );
 void err_display(char* );
 bool recvFixedVar(SOCKET& , int& , char []);
 int recvn(SOCKET , char* , int , int );
 DWORD WINAPI ProcessClient(LPVOID);
+void ResetObjectDatas(int vectorSize);
+void StoreMapData(int len, char* buf);
 
+// gameProceess
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 GLvoid TimerFunction(int value);
 GLvoid keyboard(unsigned char key, int x, int y);
 GLvoid mouse(int button, int state, int x, int y);
 
-Title_State title;
-MainGame_State* main_game = nullptr;
-End_State* end;
-int state_mode = 0;
+void ModelLoad();
+void DrawObject(int modelIdx, glm::vec3 position, glm::vec3 rotation, glm::vec3 size);
+void TitleRender();
+void MainGameRender();
+void EndRender();
+
+std::vector<ObjectData> objectDatas;
+HeroData heroData;
+
+int currentScene = 0;
 
 loadOBJ models[27];
 Shader* shader1;
+Shader* fontShader;
+Shader* startbuttonShader;
+
+glm::mat4 projection = glm::ortho(-300 * (float)SCR_WIDTH / (float)SCR_HEIGHT, 300 * (float)SCR_WIDTH / (float)SCR_HEIGHT, (float)-400, (float)400, (float)-600, (float)600);
+glm::vec3 cameraPos = glm::vec3(8.0f, 45.0f, 40);
+glm::vec3 cameraDirection = cameraDirection = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::mat4 view = glm::lookAt(cameraPos, cameraDirection, cameraUp);
+
 
 // 맵 데이터 받아보기
-MapData tmpMap;
-
-void ModelLoad() {
-	shader1 = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
-
-	// Hero
-	models[0] = loadOBJ("Resources/rabit.obj", shader1->ID);
-
-	// box
-	models[1] = loadOBJ("Resources/box.obj", shader1->ID);
-
-	// 숫자
-	models[2] = loadOBJ("Resources/number_0.obj", shader1->ID);
-	models[3] = loadOBJ("Resources/number_1.obj", shader1->ID);
-	models[4] = loadOBJ("Resources/number_2.obj", shader1->ID);
-	models[5] = loadOBJ("Resources/number_3.obj", shader1->ID);
-	models[6] = loadOBJ("Resources/number_4.obj", shader1->ID);
-	models[7] = loadOBJ("Resources/number_5.obj", shader1->ID);
-	models[8] = loadOBJ("Resources/number_6.obj", shader1->ID);
-	models[9] = loadOBJ("Resources/number_7.obj", shader1->ID);
-	models[10] = loadOBJ("Resources/number_8.obj", shader1->ID);
-	models[11] = loadOBJ("Resources/number_9.obj", shader1->ID);
-
-	// State
-	models[12] = loadOBJ("Resources/common.obj", shader1->ID);
-	models[13] = loadOBJ("Resources/road.obj", shader1->ID);
-	models[14] = loadOBJ("Resources/river.obj", shader1->ID);
-	models[15] = loadOBJ("Resources/trail.obj", shader1->ID);
-
-	// obj in state
-	models[16] = loadOBJ("Resources/car.obj", shader1->ID);
-	models[17] = loadOBJ("Resources/truck.obj", shader1->ID);
-	models[18] = loadOBJ("Resources/train.obj", shader1->ID);
-	models[19] = loadOBJ("Resources/tree.obj", shader1->ID);
-	models[20] = loadOBJ("Resources/log.obj", shader1->ID);
-
-	// 기타
-	models[21] = loadOBJ("Resources/snow.obj", shader1->ID);
-	models[22] = loadOBJ("Resources/soul_cube.obj", shader1->ID);
-	models[23] = loadOBJ("Resources/title_font.obj", shader1->ID);
-	models[24] = loadOBJ("Resources/title_plane.obj", shader1->ID);
-	models[25] = loadOBJ("Resources/ghost.obj", shader1->ID);
-	models[26] = loadOBJ("Resources/start_button.obj", shader1->ID);
-
-	shader1->setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
-	shader1->setVec3("lightColor", glm::vec3(0.5f, 0.5f, 0.5f));
-	shader1->setVec3("lightPos", glm::vec3(0, 800, 2000));
-}
+ObjectData tmpMap;
 
 int main(int argc, char** argv)
 {
@@ -131,10 +107,6 @@ int main(int argc, char** argv)
 	else
 		std::cout << "GLEW Initialized" << std::endl;
 	ModelLoad();
-
-	title.shader = new Shader("shaders/hero_vertexshader.glvs", "shaders/hero_fragmentshader.glfs");
-	title.font_shader = new Shader("shaders/font_vertexshader.glvs", "shaders/font_fragmentshader.glfs");
-	title.startbutton_shader = new Shader("shaders/startbutton_vertexshader.glvs", "shaders/startbutton_fragmentshader.glfs");
 	
 	// 콜백
 	glutDisplayFunc(drawScene);
@@ -144,9 +116,6 @@ int main(int argc, char** argv)
 	glutReshapeFunc(Reshape);
 	glutMainLoop();
 
-	delete title.shader;
-	delete title.font_shader;
-	delete title.startbutton_shader;
 
 	// closesocket()
 	closesocket(listen_sock);
@@ -160,12 +129,14 @@ GLvoid drawScene()
 {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	switch (state_mode) {
-	case 0:
-	case 2:
+	switch (currentScene) {
+	case Scene::Title:
+		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
+		break;
+	case Scene::MainGame:
 		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
 		break;
-	case 1:
+	case Scene::End:
 		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
 		break;
 	}
@@ -173,15 +144,15 @@ GLvoid drawScene()
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
-	switch (state_mode) {
-	case 0:
-		title.Display();
+	switch (currentScene) {
+	case Scene::Title:
+		
 		break;
-	case 1:
-		main_game->Display();
+	case Scene::MainGame:
+		
 		break;
-	case 2:
-		end->Display();
+	case Scene::End:
+		break;
 	}
 	glutSwapBuffers();
 }
@@ -193,23 +164,15 @@ GLvoid Reshape(int w, int h) {
 
 GLvoid TimerFunction(int value)
 {
-	switch (state_mode) {
-	case 0:
-		title.update();
+	switch (currentScene) {
+	case Scene::Title:
+		
 		break;
-	case 1:
-		main_game->update();
-		state_mode = main_game->next_state;
-		if (state_mode != 1) {
-			delete main_game->shader;
-			delete main_game->hero_shader;
-			delete main_game;
-			end = new End_State;
-			end->shader1 = new Shader("shaders/number_vertexshader.glvs", "shaders/number_fragmentshader.glfs");
-		}
+	case Scene::MainGame:
+		
 		break;
-	case 2:
-		end->update();
+	case Scene::End:
+		
 		break;
 	}
 	glutTimerFunc(10, TimerFunction, 1);
@@ -217,29 +180,25 @@ GLvoid TimerFunction(int value)
 }
 
 GLvoid keyboard(unsigned char key, int x, int y) {
-	switch (state_mode) {
-	case 1:
-		main_game->keyboard(key, x, y);
+	switch (currentScene) {
+	case Scene::Title:
+		
 		break;
-	case 2:
-		end->keyboard(key, x, y);
-		state_mode = end->next_state;
-		delete end->shader1;
-		delete end;
+	case Scene::MainGame:
+		
+
+		break;
+	case Scene::End:
+		
 		break;
 	}
 }
 
+// title 버튼 처리
 GLvoid mouse(int button, int state, int x, int y) {
-	if (state_mode == 0) {
-		title.mouse(button, state, x, y);
-		state_mode = title.next_state;
-		if (state_mode == 1) {
-			main_game = new MainGame_State;
-			main_game->shader = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
-			main_game->hero_shader = new Shader("shaders/hero_vertexshader.glvs", "shaders/hero_fragmentshader.glfs");
-		}
-	}
+	//if (state_mode == 0) {
+	//	title.mouse(button, state, x, y);
+	//}
 }
 
 // 소켓 함수 오류 출력 후 종료
@@ -327,14 +286,29 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 	// 데이터 통신에 사용할 변수
 	char buf[BUFSIZE + 1];
 	int len = 0;
-
+	ResetObjectDatas(3);
 	//서버와 데이터 통신
 	while (recvFixedVar(client_sock, len, buf)) {
+		switch (currentScene)
+		{
+		case Scene::Title:
+			
+			//if(다음씬으로 넘어갈때)
+				//ResetObjects(필요한오브젝트개수);
+			break;
+		case  Scene::MainGame:
+
+			//if(다음씬으로 넘어갈때)
+				//ResetObjects(필요한오브젝트개수);
+			break;
+		case Scene::End:
+			break;
+		}
 		// if(마지막 데이터)
 			// 업데이트 해라
-		memcpy(&tmpMap, buf, sizeof(MapData));
+		memcpy(&tmpMap, buf, sizeof(ObjectData));
 		std::cout << "tag: " << tmpMap.tag 
-			<< "(x, y, z): " << tmpMap.x << ", " << tmpMap.y << ", " << tmpMap.z << std::endl;
+			<< "(x, y, z): " << tmpMap.positionX << ", " << tmpMap.positionY << ", " << tmpMap.positionZ << std::endl;
 		ZeroMemory(&buf, sizeof(buf));
 	}
 
@@ -342,4 +316,111 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 	closesocket(client_sock);
 
 	return 0;
+}
+
+void ModelLoad() {
+	shader1 = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
+	fontShader = new Shader("shaders/vertexshader.glvs", "shaders/font_fragmentshader.glfs");
+	// fragmentshader->startbutton_fragmentshader
+	startbuttonShader = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
+
+	// Hero
+	models[0] = loadOBJ("Resources/rabit.obj", shader1->ID);
+
+	// box
+	models[1] = loadOBJ("Resources/box.obj", shader1->ID);
+
+	// 숫자
+	models[2] = loadOBJ("Resources/number_0.obj", shader1->ID);
+	models[3] = loadOBJ("Resources/number_1.obj", shader1->ID);
+	models[4] = loadOBJ("Resources/number_2.obj", shader1->ID);
+	models[5] = loadOBJ("Resources/number_3.obj", shader1->ID);
+	models[6] = loadOBJ("Resources/number_4.obj", shader1->ID);
+	models[7] = loadOBJ("Resources/number_5.obj", shader1->ID);
+	models[8] = loadOBJ("Resources/number_6.obj", shader1->ID);
+	models[9] = loadOBJ("Resources/number_7.obj", shader1->ID);
+	models[10] = loadOBJ("Resources/number_8.obj", shader1->ID);
+	models[11] = loadOBJ("Resources/number_9.obj", shader1->ID);
+
+	// State
+	models[12] = loadOBJ("Resources/common.obj", shader1->ID);
+	models[13] = loadOBJ("Resources/road.obj", shader1->ID);
+	models[14] = loadOBJ("Resources/river.obj", shader1->ID);
+	models[15] = loadOBJ("Resources/trail.obj", shader1->ID);
+
+	// obj in state
+	models[16] = loadOBJ("Resources/car.obj", shader1->ID);
+	models[17] = loadOBJ("Resources/truck.obj", shader1->ID);
+	models[18] = loadOBJ("Resources/train.obj", shader1->ID);
+	models[19] = loadOBJ("Resources/tree.obj", shader1->ID);
+	models[20] = loadOBJ("Resources/log.obj", shader1->ID);
+
+	// 기타
+	models[21] = loadOBJ("Resources/snow.obj", shader1->ID);
+	models[22] = loadOBJ("Resources/soul_cube.obj", shader1->ID);
+	models[23] = loadOBJ("Resources/title_font.obj", shader1->ID);
+	models[24] = loadOBJ("Resources/title_plane.obj", shader1->ID);
+	models[25] = loadOBJ("Resources/ghost.obj", shader1->ID);
+	models[26] = loadOBJ("Resources/start_button.obj", startbuttonShader->ID);
+
+	shader1->setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
+	shader1->setVec3("lightColor", glm::vec3(0.5f, 0.5f, 0.5f));
+	shader1->setVec3("lightPos", glm::vec3(0, 800, 2000));
+}
+
+void ResetObjectDatas(int vectorSize) {
+	objectDatas.clear();
+	objectDatas.resize(vectorSize);
+
+	for (int i = 0; i < vectorSize; ++i) {
+		objectDatas.emplace_back(ObjectData());
+	}
+}
+
+void StoreMapData(int len,char* buf) {
+	for (int i = 0; i < len / sizeof(ObjectData); ++i) 
+		memcpy(&buf, buf + i, sizeof(objectDatas));
+}
+
+void DrawObject(int modelIdx, glm::vec3 position, glm::vec3 rotation, glm::vec3 size) {
+	models[modelIdx].load(projection, view);
+
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(position.x, position.y, position.z));
+	model = glm::rotate(model, glm::radians(position.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(position.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(position.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	model = glm::scale(model, size);
+
+	// transform
+	models[modelIdx].setTransform(model);
+
+	models[modelIdx].draw();
+}
+
+void TitleRender() {
+	// set shader 
+
+	// draw object
+	
+	//set shader
+
+	// draw font
+
+	// set shader
+	startbuttonShader->use();
+	// draw startButton
+}
+
+void MainGameRender() {
+	// set shader
+
+	// draw all objects
+	
+	// draw all heros
+}
+
+void EndRender() {
+	//set shader
+	// draw numbers
 }
