@@ -13,3 +13,9 @@ typedef struct HeroData {
 	float lookatX, lookatY, lookatZ;
 	bool alive;
 }HeroData;
+
+enum Scene {
+	Title,
+	MainGame,
+	End
+};
