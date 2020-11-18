@@ -7,7 +7,6 @@
 #include<iostream>
 #include "DataStruct.h"
 
-#include "MainGame_State.h"
 
 #define SERVERPORT 9000
 #define BUFSIZE    512
@@ -89,11 +88,11 @@ int main(int argc, char* argv[])
     SOCKADDR_IN clientaddr;
     int addrlen;
 
-    HANDLE hThread;
 
     while (1) {
         switch (currentScene) {
         case Scene::Title:
+        {
             // accept()
             addrlen = sizeof(clientaddr);
             client_sock = accept(listen_sock, (SOCKADDR*)&clientaddr, &addrlen);
@@ -103,21 +102,23 @@ int main(int argc, char* argv[])
             }
 
             // 스레드 생성
-            MultipleArg arg{ client_sock, clientCnt++ };
-            hThread = CreateThread(NULL, 0, ProcessClient, (LPVOID)&arg, 0, NULL);
+            MultipleArg arg = { client_sock, clientCnt++ };
+            HANDLE hThread = CreateThread(NULL, 0, ProcessClient, (LPVOID)&arg, 0, NULL);
 
-
+            if (hThread == NULL)
+                closesocket(client_sock);
+            else
+                CloseHandle(hThread);
+        }
             break;
         case Scene::MainGame:
             break;
         case Scene::End:
+            
             break;
         }
 
-        if (hThread == NULL)
-            closesocket(client_sock);
-        else
-            CloseHandle(hThread);
+
     }
 
     // closesocket()

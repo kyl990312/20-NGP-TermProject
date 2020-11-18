@@ -312,7 +312,8 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 void ModelLoad() {
 	shader1 = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
 	fontShader = new Shader("shaders/vertexshader.glvs", "shaders/font_fragmentshader.glfs");
-	startbuttonShader = new Shader("shaders/startbutton_vertexshader.glvs", "shaders/startbutton_fragmentshader.glfs");
+	// fragmentshader->startbutton_fragmentshader
+	startbuttonShader = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
 
 	// Hero
 	models[0] = loadOBJ("Resources/rabit.obj", shader1->ID);
@@ -351,6 +352,7 @@ void ModelLoad() {
 	models[23] = loadOBJ("Resources/title_font.obj", shader1->ID);
 	models[24] = loadOBJ("Resources/title_plane.obj", shader1->ID);
 	models[25] = loadOBJ("Resources/ghost.obj", shader1->ID);
+	models[26] = loadOBJ("Resources/start_button.obj", startbuttonShader->ID);
 
 	shader1->setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
 	shader1->setVec3("lightColor", glm::vec3(0.5f, 0.5f, 0.5f));
