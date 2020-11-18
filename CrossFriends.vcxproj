@@ -149,43 +149,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Sources\cross_rabits.cpp" />
-    <ClCompile Include="Sources\End_State.cpp" />
-    <ClCompile Include="Sources\firework.cpp" />
     <ClCompile Include="Sources\loadOBJ.cpp" />
-    <ClCompile Include="Sources\MainGame_State.cpp" />
-    <ClCompile Include="Sources\Mycommon.cpp" />
-    <ClCompile Include="Sources\MyHero.cpp" />
-    <ClCompile Include="Sources\MyLog.cpp" />
-    <ClCompile Include="Sources\MyObstacles.cpp" />
-    <ClCompile Include="Sources\MyRiver.cpp" />
-    <ClCompile Include="Sources\MyRoad.cpp" />
-    <ClCompile Include="Sources\MyState.cpp" />
-    <ClCompile Include="Sources\MyTrail.cpp" />
-    <ClCompile Include="Sources\MyTrain.cpp" />
-    <ClCompile Include="Sources\MyTree.cpp" />
-    <ClCompile Include="Sources\MyTruck.cpp" />
-    <ClCompile Include="Sources\Title_State.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\DataStruct.h" />
-    <ClInclude Include="Sources\End_State.h" />
-    <ClInclude Include="Sources\firework_particle.h" />
     <ClInclude Include="Sources\loadObj.h" />
-    <ClInclude Include="Sources\MainGame_State.h" />
-    <ClInclude Include="Sources\MyCommon.h" />
-    <ClInclude Include="Sources\MyHeader.h" />
-    <ClInclude Include="Sources\MyHero.h" />
-    <ClInclude Include="Sources\MyLog.h" />
-    <ClInclude Include="Sources\MyObstacles.h" />
-    <ClInclude Include="Sources\MyRiver.h" />
-    <ClInclude Include="Sources\MyRoad.h" />
-    <ClInclude Include="Sources\MyState.h" />
-    <ClInclude Include="Sources\MyTrail.h" />
-    <ClInclude Include="Sources\MyTrain.h" />
-    <ClInclude Include="Sources\MyTree.h" />
-    <ClInclude Include="Sources\MyTruck.h" />
     <ClInclude Include="Sources\shader.h" />
-    <ClInclude Include="Sources\Title_State.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
