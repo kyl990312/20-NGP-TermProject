@@ -40,7 +40,7 @@ void EndRender();
 std::vector<ObjectData> objectDatas;
 HeroData heroData;
 
-int currentScene = 0;
+int currentScene = 1;
 
 loadOBJ models[27];
 Shader* shader1;
@@ -53,13 +53,10 @@ glm::vec3 cameraDirection = cameraDirection = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::mat4 view = glm::lookAt(cameraPos, cameraDirection, cameraUp);
 
-
-// 맵 데이터 받아보기
-ObjectData tmpMap;
-
 int main(int argc, char** argv)
 {
 	int retval;
+	objectDatas.reserve(200);
 
 	// 윈속 초기화
 	WSADATA wsa;
@@ -106,6 +103,7 @@ int main(int argc, char** argv)
 	}
 	else
 		std::cout << "GLEW Initialized" << std::endl;
+
 	ModelLoad();
 	
 	// 콜백
@@ -132,9 +130,11 @@ GLvoid drawScene()
 	switch (currentScene) {
 	case Scene::Title:
 		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
+		MainGameRender();
 		break;
 	case Scene::MainGame:
 		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
+		MainGameRender();
 		break;
 	case Scene::End:
 		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
@@ -286,10 +286,13 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 	// 데이터 통신에 사용할 변수
 	char buf[BUFSIZE + 1];
 	int len = 0;
-	ResetObjectDatas(3);
+	// 맵 데이터 받아보기
+
+
 	//서버와 데이터 통신
 	while (recvFixedVar(client_sock, len, buf)) {
-		switch (currentScene)
+		
+		/*switch (currentScene)
 		{
 		case Scene::Title:
 			
@@ -303,14 +306,22 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 			break;
 		case Scene::End:
 			break;
-		}
+		}*/
+
 		// if(마지막 데이터)
 			// 업데이트 해라
+		ObjectData tmpMap;	
 		memcpy(&tmpMap, buf, sizeof(ObjectData));
-		std::cout << "tag: " << tmpMap.tag 
-			<< "(x, y, z): " << tmpMap.positionX << ", " << tmpMap.positionY << ", " << tmpMap.positionZ << std::endl;
+		objectDatas.emplace_back(tmpMap);
 		ZeroMemory(&buf, sizeof(buf));
 	}
+
+	// test
+	for (const ObjectData& obj : objectDatas) {
+		std::cout << obj.tag << std::endl;
+	}
+
+	std::cout << "통신 끝" << std::endl;
 
 	// closesocket()
 	closesocket(client_sock);
@@ -361,22 +372,24 @@ void ModelLoad() {
 	models[23] = loadOBJ("Resources/title_font.obj", shader1->ID);
 	models[24] = loadOBJ("Resources/title_plane.obj", shader1->ID);
 	models[25] = loadOBJ("Resources/ghost.obj", shader1->ID);
-	models[26] = loadOBJ("Resources/start_button.obj", startbuttonShader->ID);
+	//models[26] = loadOBJ("Resources/start_button.obj", startbuttonShader->ID);
 
 	shader1->setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
 	shader1->setVec3("lightColor", glm::vec3(0.5f, 0.5f, 0.5f));
 	shader1->setVec3("lightPos", glm::vec3(0, 800, 2000));
 }
 
+// 필요 확인
 void ResetObjectDatas(int vectorSize) {
 	objectDatas.clear();
-	objectDatas.resize(vectorSize);
+	//objectDatas.resize(vectorSize);
 
-	for (int i = 0; i < vectorSize; ++i) {
-		objectDatas.emplace_back(ObjectData());
-	}
+	//for (int i = 0; i < vectorSize; ++i) {
+	//	objectDatas.emplace_back(ObjectData());
+	//}
 }
 
+// 필요 확인
 void StoreMapData(int len,char* buf) {
 	for (int i = 0; i < len / sizeof(ObjectData); ++i) 
 		memcpy(&buf, buf + i, sizeof(objectDatas));
@@ -398,9 +411,10 @@ void DrawObject(int modelIdx, glm::vec3 position, glm::vec3 rotation, glm::vec3 
 	models[modelIdx].draw();
 }
 
+// 필요 확인
 void TitleRender() {
 	// set shader 
-
+	shader1->use();
 	// draw object
 	
 	//set shader
@@ -414,12 +428,19 @@ void TitleRender() {
 
 void MainGameRender() {
 	// set shader
+	shader1->use();
 
 	// draw all objects
-	
+	for (const ObjectData& obj : objectDatas) {
+		//DrawObject(int modelIdx, glm::vec3 position, glm::vec3 rotation, glm::vec3 size);
+		DrawObject(obj.tag, glm::vec3(obj.positionX, obj.positionY, obj.positionZ)
+			, glm::vec3(obj.rotationX, obj.rotationY, obj.rotationZ)
+			, glm::vec3(obj.sizeX, obj.sizeY, obj.sizeZ));
+	}
 	// draw all heros
 }
 
+// 필요 확인
 void EndRender() {
 	//set shader
 	// draw numbers

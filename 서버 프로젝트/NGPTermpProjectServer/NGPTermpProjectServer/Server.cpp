@@ -23,7 +23,7 @@ struct MultipleArg {
     int clientCount;
 };
 
-MapData mapdatas[10];
+ObjectData mapdatas[10];
 
 // 소켓 함수 오류 출력 후 종료
 void err_quit(char* msg)
@@ -137,17 +137,28 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 
     int addrlen = sizeof(clientaddr);
     getpeername(client_sock, (SOCKADDR*)&clientaddr, &addrlen);
+    std::cout << "클라이언트 접속" << std::endl;
 
     for (int i = 0; i < 10; ++i) {
-        mapdatas[i].tag = 'a' + i;
-        mapdatas[i].x = i;
-        mapdatas[i].y = i;
-        mapdatas[i].z = i;
+        mapdatas[i].tag = ModelIdx::Num0;
+
+        mapdatas[i].positionX = 10 + i;
+        mapdatas[i].positionY = 10 + i;
+        mapdatas[i].positionZ = 10 + i;
+
+
+        mapdatas[i].rotationX = 0;
+        mapdatas[i].rotationY = 0; 
+        mapdatas[i].rotationZ = 0;
+
+        mapdatas[i].sizeX = 1;
+        mapdatas[i].sizeY = 1; 
+        mapdatas[i].sizeZ = 1;
     }
 
     // 클라이언트와 데이터 통신
-    for (const MapData& mapdata : mapdatas) {
-        sendFixedVar(client_sock, sizeof(MapData), (char*)&mapdata);
+    for (const ObjectData& mapdata : mapdatas) {
+        sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
     }
 
     // closesocket()

@@ -6,7 +6,7 @@ typedef struct ObjectData {
 	float positionX, positionY, positionZ; // position
 	float rotationX, rotationY, rotationZ;
 	float sizeX, sizeY, sizeZ;
-	char tag; // 오브젝트 종류
+	int tag; // 오브젝트 종류
 }ObjectData;
 
 #pragma pack(1)  

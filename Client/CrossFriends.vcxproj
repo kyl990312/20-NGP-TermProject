@@ -148,8 +148,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Sources\cross_rabits.cpp" />
     <ClCompile Include="Sources\loadOBJ.cpp" />
+    <ClCompile Include="Sources\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\DataStruct.h" />
