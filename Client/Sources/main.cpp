@@ -55,40 +55,13 @@ glm::mat4 view = glm::lookAt(cameraPos, cameraDirection, cameraUp);
 
 int main(int argc, char** argv)
 {
-	int retval;
 	objectDatas.reserve(200);
-
-	// 윈속 초기화
-	WSADATA wsa;
-	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
-		return 1;
-
-	// socket()
-	// 대기 소켓
-	SOCKET listen_sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (listen_sock == INVALID_SOCKET) err_quit((char*)"socket()");
-
-	// socket()
-	SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (sock == INVALID_SOCKET) err_quit((char*)"socket()");
-
-	// connect()
-	SOCKADDR_IN serveraddr;
-	ZeroMemory(&serveraddr, sizeof(serveraddr));
-	serveraddr.sin_family = AF_INET;
-	serveraddr.sin_addr.s_addr = inet_addr(SERVERIP);
-	serveraddr.sin_port = htons(SERVERPORT);
-	retval = connect(sock, (SOCKADDR*)&serveraddr, sizeof(serveraddr));
-	if (retval == SOCKET_ERROR) err_quit((char*)"connect()");
 
 	HANDLE hThread;
 
-	hThread = CreateThread(NULL, 0, ProcessClient, (LPVOID)sock, 0, NULL);
+	hThread = CreateThread(NULL, 0, ProcessClient, NULL, 0, NULL);
 
-	if (hThread == NULL)
-		closesocket(sock);
-	else
-		CloseHandle(hThread);
+	CloseHandle(hThread);
 
 	srand((unsigned int)time(NULL));
 	glutInit(&argc, argv);
@@ -114,12 +87,6 @@ int main(int argc, char** argv)
 	glutReshapeFunc(Reshape);
 	glutMainLoop();
 
-
-	// closesocket()
-	closesocket(listen_sock);
-
-	// 윈속 종료
-	WSACleanup();
 	return 0;
 }
 
@@ -281,16 +248,32 @@ int recvn(SOCKET s, char* buf, int len, int flags)
 
 DWORD WINAPI ProcessClient(LPVOID arg)
 {
-	SOCKET client_sock = (SOCKET)arg;
+	int retval;
+
+	// 윈속 초기화
+	WSADATA wsa;
+	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+		return 1;
+
+	// socket()
+	SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (sock == INVALID_SOCKET) err_quit((char*)"socket()");
+
+	// connect()
+	SOCKADDR_IN serveraddr;
+	ZeroMemory(&serveraddr, sizeof(serveraddr));
+	serveraddr.sin_family = AF_INET;
+	serveraddr.sin_addr.s_addr = inet_addr(SERVERIP);
+	serveraddr.sin_port = htons(SERVERPORT);
+	retval = connect(sock, (SOCKADDR*)&serveraddr, sizeof(serveraddr));
+	if (retval == SOCKET_ERROR) err_quit((char*)"connect()");
 
 	// 데이터 통신에 사용할 변수
 	char buf[BUFSIZE + 1];
 	int len = 0;
-	// 맵 데이터 받아보기
-
 
 	//서버와 데이터 통신
-	while (recvFixedVar(client_sock, len, buf)) {
+	while (recvFixedVar(sock, len, buf)) {
 		
 		/*switch (currentScene)
 		{
@@ -324,7 +307,10 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 	std::cout << "통신 끝" << std::endl;
 
 	// closesocket()
-	closesocket(client_sock);
+	closesocket(sock);
+
+	// 윈속 종료
+	WSACleanup();
 
 	return 0;
 }
