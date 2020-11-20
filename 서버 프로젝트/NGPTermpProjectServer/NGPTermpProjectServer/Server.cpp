@@ -140,7 +140,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
     std::cout << "클라이언트 접속" << std::endl;
 
     for (int i = 0; i < 10; ++i) {
-        mapdatas[i].tag = ModelIdx::Num0;
+        mapdatas[i].tag = ModelIdx::Hero;
 
         mapdatas[i].positionX = 10 + i;
         mapdatas[i].positionY = 10 + i;

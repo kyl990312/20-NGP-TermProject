@@ -94,6 +94,7 @@ GLvoid drawScene()
 {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	switch (currentScene) {
 	case Scene::Title:
 		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
@@ -365,21 +366,6 @@ void ModelLoad() {
 	shader1->setVec3("lightPos", glm::vec3(0, 800, 2000));
 }
 
-// 필요 확인
-void ResetObjectDatas(int vectorSize) {
-	objectDatas.clear();
-	//objectDatas.resize(vectorSize);
-
-	//for (int i = 0; i < vectorSize; ++i) {
-	//	objectDatas.emplace_back(ObjectData());
-	//}
-}
-
-// 필요 확인
-void StoreMapData(int len,char* buf) {
-	for (int i = 0; i < len / sizeof(ObjectData); ++i) 
-		memcpy(&buf, buf + i, sizeof(objectDatas));
-}
 
 void DrawObject(int modelIdx, glm::vec3 position, glm::vec3 rotation, glm::vec3 size) {
 	models[modelIdx].load(projection, view);
