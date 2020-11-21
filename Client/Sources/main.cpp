@@ -21,8 +21,6 @@ void err_display(char* );
 bool recvFixedVar(SOCKET& , int& , char []);
 int recvn(SOCKET , char* , int , int );
 DWORD WINAPI ProcessClient(LPVOID);
-void ResetObjectDatas(int vectorSize);
-void StoreMapData(int len, char* buf);
 
 // gameProceess
 GLvoid drawScene();
@@ -409,7 +407,21 @@ void MainGameRender() {
 			, glm::vec3(obj.rotationX, obj.rotationY, obj.rotationZ)
 			, glm::vec3(obj.sizeX, obj.sizeY, obj.sizeZ));
 	}
+
 	// draw all heros
+	if (heroData.alive) {
+		models[ModelIdx::Hero].load(projection, view);
+
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(heroData.x, heroData.y, heroData.z));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(-heroData.rotaionAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+
+		// transform
+		models[ModelIdx::Hero].setTransform(model);
+
+		models[ModelIdx::Hero].draw();
+	}
 }
 
 // 필요 확인
