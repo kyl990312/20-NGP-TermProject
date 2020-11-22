@@ -23,6 +23,11 @@ MyCommon::MyCommon() {
 	collision_pos[0] = trees[0]->pos;
 	collision_pos[1] = trees[1]->pos;
 	collision_pos[2] = trees[2]->pos;
+	obsRotation[0] = { 0.0f,90.0f,0.0f };
+	obsSize[0] = { 1.f,1.f,1.f };
+	obsTags[0] = 19;
+	obsTags[1] = 19;
+	obsTags[2] = 19;
 	obs_cnt = 3;
 	tag = 2;
 	std::cout << "complete creating River!" << std::endl;

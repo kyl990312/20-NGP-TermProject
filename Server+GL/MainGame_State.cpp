@@ -151,3 +151,51 @@ void MainGame_State::hero_update() {
 	hero.update(cur_state_tag, cur_state_obs_pos, cur_state_obs_cnt);
 	hero.cur_mapState_posZ = states[cur_state_idx]->pos.z;
 }
+
+void MainGame_State::GetMapDatas(ObjectData* mapDatas)
+{
+	// set MapDatas
+	for (int i = 0; i < map_count; ++i) {
+		mapDatas[i].positionX = states[i]->pos.x;
+		mapDatas[i].positionY = states[i]->pos.y;
+		mapDatas[i].positionZ = states[i]->pos.z;
+		mapDatas[i].rotationX = 0.0f;
+		mapDatas[i].rotationY = 0.0f;
+		mapDatas[i].rotationZ = 0.0f;
+		mapDatas[i].sizeX = 1.f;
+		mapDatas[i].sizeY = 1.f;
+		mapDatas[i].sizeZ = 1.f;
+		switch (states[i]->tag) {
+		case MapState::Common:
+			mapDatas[i].tag = ModelIdx::COMMON;
+			break;
+		case MapState::River:
+			mapDatas[i].tag = ModelIdx::RIVER;
+			break;
+		case MapState::Road:
+			mapDatas[i].tag = ModelIdx::ROAD;
+			break;
+		case MapState::Trail:
+			mapDatas[i].tag = ModelIdx::TAIL;
+			break;
+		}
+	}
+
+	// set ObstacleDatas
+	int idx = 23;
+	for (int i = 0; i < map_count; ++i) {
+		for (int j = 0; j < states[i]->obs_cnt; ++j) {
+			mapDatas[idx].positionX = states[i]->collision_pos[j].x;
+			mapDatas[idx].positionY = states[i]->collision_pos[j].y;
+			mapDatas[idx].positionZ = states[i]->collision_pos[j].z;
+			mapDatas[idx].rotationX = states[i]->obsRotation[0].x;
+			mapDatas[idx].rotationY = states[i]->obsRotation[0].y;
+			mapDatas[idx].rotationZ = states[i]->obsRotation[0].z;
+			mapDatas[idx].sizeX = states[i]->obsSize[0].x;
+			mapDatas[idx].sizeX = states[i]->obsSize[0].y;
+			mapDatas[idx].sizeX = states[i]->obsSize[0].z;
+			mapDatas[idx].tag = states[i]->obsTags[j];
+			idx++;
+		}
+	}
+}

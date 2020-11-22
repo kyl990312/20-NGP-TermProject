@@ -8,10 +8,14 @@ MyTruck::MyTruck(MyPos road_pos, float state_speed) {
 	speed = state_speed;
 	size = 50.0f; 
 	direction = 1;
-	if (speed < 20)
+	if (speed < 20) {
 		obj = models[17];
-	else
+		tag = 17;
+	}
+	else {
 		obj = models[16];
+		tag = 16;
+	}
 }
 
 void MyTruck::draw(glm::mat4 projection, glm::mat4 view, glm::mat4 model, Shader shader) {
@@ -42,4 +46,6 @@ bool MyTruck::check_removing() {
 	return false;
 }
 
-MyTruck::~MyTruck() {};
+MyTruck::~MyTruck() {}
+
+;

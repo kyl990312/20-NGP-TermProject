@@ -10,6 +10,7 @@ public:
 	float speed;
 	float size;
 	float direction;
+	int tag;
 public:
 	MyPos pos;
 	MyTruck(MyPos road_pos, float speed);

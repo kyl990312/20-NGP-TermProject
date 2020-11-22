@@ -12,9 +12,6 @@ MyTrail::MyTrail() {
 
 	// init trains
 	CreateTrain(0);
-	
-	// let's once make only 1 truck
-	//CreateTruck(0);
 
 	// init remaining variables
 	moving = false;
@@ -24,6 +21,9 @@ MyTrail::MyTrail() {
 	moving_degree = 0;
 	collision_pos[1] = { -800,-800,-800 };
 	collision_pos[2] = { -800,-800,-800 };
+	obsRotation[0] = {0.0f,90.0f,0.0f};
+	obsSize[0] = {1.f,1.f,1.f};
+	obsTags[0] = 18;
 	obs_cnt = 1;
 	tag = 3;
 	std::cout << "complete creating trail!" << std::endl;

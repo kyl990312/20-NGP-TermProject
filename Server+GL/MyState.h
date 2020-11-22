@@ -12,6 +12,9 @@ public:
 	MyPos collision_pos[3];
 	int obs_cnt;
 	int tag = 0;
+	glm::vec3 obsRotation[3];
+	glm::vec3 obsSize[3];
+	int obsTags[3];
 
 public:
 	// current state's position

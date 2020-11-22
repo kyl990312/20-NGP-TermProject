@@ -12,6 +12,7 @@
 #include "MyCommon.h"
 #include "MyTree.h"
 #include "MyHero.h"
+#include"DataStruct.h"
 #define _CRT_NONSTDC_NO_WARNINGS
 #pragma comment(lib, "winmm.lib")
 
@@ -45,6 +46,7 @@ public:
 	int pass_state_cnt = 0;
 
 	bool back_music = true;
+	
 public:
 	MainGame_State();
 	~MainGame_State();
@@ -53,5 +55,6 @@ public:
 	void init_map();
 	void keyboard(unsigned char key, int x, int y);
 	void hero_update();
+	void GetMapDatas(ObjectData* mapDatas);
 };
 

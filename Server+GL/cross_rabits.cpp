@@ -23,8 +23,9 @@ struct MultipleArg {
 	SOCKET clientsock;
 	int clientCount;
 };
-ObjectData mapdatas[10];
-int currentScene = Scene::Title;
+ObjectData mapdatas[70];
+HeroData heroDatas[3];
+int currentScene = Scene::MainGame;
 
 // GL
 Title_State title;
@@ -35,8 +36,6 @@ GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 GLvoid TimerFunction(int value);
 GLvoid keyboard(unsigned char key, int x, int y);
-
-int state_mode = 0;
 
 loadOBJ models[26];
 Shader* shader1;
@@ -119,6 +118,8 @@ int main(int argc, char** argv)
 	title.shader = shader1;
 	title.font_shader = fontShader;
 
+	main_game = new MainGame_State;
+
 	glutDisplayFunc(drawScene);
 	glutTimerFunc(10, TimerFunction, 1);
 	glutKeyboardFunc(keyboard);
@@ -132,7 +133,7 @@ GLvoid drawScene()
 {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	switch (state_mode) {
+	switch (currentScene) {
 	case 0:
 	case 2:
 		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
@@ -145,12 +146,13 @@ GLvoid drawScene()
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
-	switch (state_mode) {
+	switch (currentScene) {
 	case 0:
 		title.Display();
 		break;
 	case 1:
-		main_game->Display();
+		if(main_game!=NULL)
+			main_game->Display();
 		break;
 	case 2:
 		end->Display();
@@ -165,14 +167,15 @@ GLvoid Reshape(int w, int h) {
 
 GLvoid TimerFunction(int value)
 {
-	switch (state_mode) {
+	switch (currentScene) {
 	case 0:
 		title.update();
 		break;
 	case 1:
 		main_game->update();
-		state_mode = main_game->next_state;
-		if (state_mode != 1) {
+		main_game->GetMapDatas(mapdatas);
+		currentScene = main_game->next_state;
+		if (currentScene != 1) {
 
 			delete main_game;
 			end = new End_State;
@@ -188,12 +191,12 @@ GLvoid TimerFunction(int value)
 }
 
 GLvoid keyboard(unsigned char key, int x, int y) {
-	switch (state_mode) {
+	switch (currentScene) {
 	case 0:
 		title.keyboard(key, x, y);
-		state_mode = title.next_state;
-		if (state_mode == 1) {
-			main_game = new MainGame_State;
+		currentScene = title.next_state;
+		if (currentScene == 1) {
+			//main_game = new MainGame_State;
 		}
 		break;
 	case 1:
@@ -201,7 +204,7 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		break;
 	case 2:
 		end->keyboard(key, x, y);
-		state_mode = end->next_state;
+		currentScene = end->next_state;
 		delete end;
 		break;
 	}
@@ -293,6 +296,7 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 		}
 		break;
 		case Scene::MainGame:
+			
 			break;
 		case Scene::End:
 
@@ -319,21 +323,33 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 	getpeername(client_sock, (SOCKADDR*)&clientaddr, &addrlen);
 	std::cout << "클라이언트 접속" << std::endl;
 
-	for (int i = 0; i < 10; ++i) {
-		mapdatas[i].tag = ModelIdx::Hero;
+	//for (int i = 0; i < 10; ++i) {
+	//	mapdatas[i].tag = ModelIdx::Hero;
 
-		mapdatas[i].positionX = 10 + i;
-		mapdatas[i].positionY = 10 + i;
-		mapdatas[i].positionZ = 10 + i;
+	//	mapdatas[i].positionX = 10 + i;
+	//	mapdatas[i].positionY = 10 + i;
+	//	mapdatas[i].positionZ = 10 + i;
 
 
-		mapdatas[i].rotationX = 0;
-		mapdatas[i].rotationY = 0;
-		mapdatas[i].rotationZ = 0;
+	//	mapdatas[i].rotationX = 0;
+	//	mapdatas[i].rotationY = 0;
+	//	mapdatas[i].rotationZ = 0;
 
-		mapdatas[i].sizeX = 1;
-		mapdatas[i].sizeY = 1;
-		mapdatas[i].sizeZ = 1;
+	//	mapdatas[i].sizeX = 1;
+	//	mapdatas[i].sizeY = 1;
+	//	mapdatas[i].sizeZ = 1;
+	//}
+
+	switch (currentScene) {
+	case Scene::Title:
+		break;
+	case Scene::MainGame:
+		if (main_game != NULL) {
+			main_game->GetMapDatas(mapdatas);
+		}
+		break;
+	case Scene::End:
+		break;
 	}
 
 	// 클라이언트와 데이터 통신
