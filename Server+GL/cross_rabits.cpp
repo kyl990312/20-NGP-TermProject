@@ -3,8 +3,8 @@
 #include <winsock2.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include<fstream>
-#include<iostream>
+#include <fstream>
+#include <iostream>
 #include "DataStruct.h"
 #include "MainGame_State.h"
 #include "Title_State.h"
@@ -35,16 +35,19 @@ GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 GLvoid TimerFunction(int value);
 GLvoid keyboard(unsigned char key, int x, int y);
+GLvoid mouse(int button, int state, int x, int y);
 
 int state_mode = 0;
 
-loadOBJ models[26];
+loadOBJ models[27];
 Shader* shader1;
 Shader* fontShader;
+Shader* startbutton_shader;
 
 void ModelLoad() {
 	shader1 = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
 	fontShader = new Shader("shaders/vertexshader.glvs", "shaders/font_fragmentshader.glfs");
+	startbutton_shader = new Shader("shaders/startbutton_vertexshader.glvs", "shaders/startbutton_fragmentshader.glfs");
 
 	// Hero
 	models[0] = loadOBJ("Resources/rabit.obj", shader1->ID);
@@ -83,6 +86,7 @@ void ModelLoad() {
 	models[23] = loadOBJ("Resources/title_font.obj", fontShader->ID);
 	models[24] = loadOBJ("Resources/title_plane.obj", shader1->ID);
 	models[25] = loadOBJ("Resources/ghost.obj", shader1->ID);
+	models[26] = loadOBJ("Resources/start_button.obj", shader1->ID);
 
 	shader1->setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
 	shader1->setVec3("lightColor", glm::vec3(0.5f, 0.5f, 0.5f));
@@ -92,7 +96,6 @@ void ModelLoad() {
 	fontShader->setVec3("lightColor", glm::vec3(0.5f, 0.5f, 0.5f));
 	fontShader->setVec3("lightPos", glm::vec3(0, 800, 2000));
 	fontShader->setVec3("obj_color", glm::vec3(1.0, 0.6, 0.0));
-
 }
 
 int main(int argc, char** argv)
@@ -122,6 +125,7 @@ int main(int argc, char** argv)
 	glutDisplayFunc(drawScene);
 	glutTimerFunc(10, TimerFunction, 1);
 	glutKeyboardFunc(keyboard);
+	glutMouseFunc(mouse);
 	glutReshapeFunc(Reshape);
 	glutMainLoop();
 
@@ -173,10 +177,8 @@ GLvoid TimerFunction(int value)
 		main_game->update();
 		state_mode = main_game->next_state;
 		if (state_mode != 1) {
-
 			delete main_game;
 			end = new End_State;
-
 		}
 		break;
 	case 2:
@@ -204,6 +206,18 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		state_mode = end->next_state;
 		delete end;
 		break;
+	}
+}
+
+GLvoid mouse(int button, int state, int x, int y) {
+	if (state_mode == 0) {
+		title.mouse(button, state, x, y);
+		state_mode = title.next_state;
+		if (state_mode == 1) {
+			main_game = new MainGame_State;
+			main_game->shader = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
+			main_game->hero_shader = new Shader("shaders/hero_vertexshader.glvs", "shaders/hero_fragmentshader.glfs");
+		}
 	}
 }
 
@@ -298,8 +312,6 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 
 			break;
 		}
-
-
 	}
 
 	// closesocket()
@@ -325,7 +337,6 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 		mapdatas[i].positionX = 10 + i;
 		mapdatas[i].positionY = 10 + i;
 		mapdatas[i].positionZ = 10 + i;
-
 
 		mapdatas[i].rotationX = 0;
 		mapdatas[i].rotationY = 0;

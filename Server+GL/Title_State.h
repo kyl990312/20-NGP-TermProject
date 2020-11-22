@@ -21,12 +21,14 @@ public:
 
 	float font_sin_angle = 0.0f;
 	int next_state = 0;
-
+	bool ready_state = 0;
 
 public:
 	void Display();
 	void update();
 	void keyboard(unsigned char key, int x, int y);
+	void mouse(int button, int state, int x, int y);
 	void draw_font();
 	void draw_rabit();
+	void draw_startbutton();
 };
