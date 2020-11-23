@@ -18,7 +18,7 @@
 // Server-Client Process
 void err_quit(char* );
 void err_display(char* );
-bool recvFixedVar(SOCKET& , int& , char []);
+bool recvFixedVar(SOCKET& , size_t , char*);
 int recvn(SOCKET , char* , int , int );
 DWORD WINAPI ProcessClient(LPVOID);
 
@@ -38,7 +38,7 @@ void EndRender();
 std::vector<ObjectData> objectDatas;
 HeroData heroData;
 
-int currentScene = 1;
+int currentScene = Scene::Title;
 
 loadOBJ models[27];
 Shader* shader1;
@@ -56,10 +56,10 @@ int main(int argc, char** argv)
 	objectDatas.reserve(200);
 
 	HANDLE hThread;
-
 	hThread = CreateThread(NULL, 0, ProcessClient, NULL, 0, NULL);
 
 	CloseHandle(hThread);
+
 
 	srand((unsigned int)time(NULL));
 	glutInit(&argc, argv);
@@ -96,7 +96,7 @@ GLvoid drawScene()
 	switch (currentScene) {
 	case Scene::Title:
 		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
-		MainGameRender();
+		TitleRender();
 		break;
 	case Scene::MainGame:
 		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
@@ -110,7 +110,7 @@ GLvoid drawScene()
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
-	switch (currentScene) {
+	/*switch (currentScene) {
 	case Scene::Title:
 		
 		break;
@@ -119,7 +119,7 @@ GLvoid drawScene()
 		break;
 	case Scene::End:
 		break;
-	}
+	}*/
 	glutSwapBuffers();
 }
 
@@ -194,9 +194,10 @@ void err_display(char* msg)
 	LocalFree(lpMsgBuf);
 }
 
-bool recvFixedVar(SOCKET& client_sock, int& len, char buf[])
+bool recvFixedVar(SOCKET& client_sock, size_t len, char* buf)
 {
 	int retval;
+
 	// 데이터 받기(고정 길이)
 	// 소켓, 데이터 저장할 버퍼, 수신 버퍼로부터 복사할 데이터 크기(BYTE), flag
 	retval = recvn(client_sock, (char*)&len, sizeof(int), 0);
@@ -270,14 +271,14 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 	// 데이터 통신에 사용할 변수
 	char buf[BUFSIZE + 1];
 	int len = 0;
+	ObjectData tmpMap;
 
 	//서버와 데이터 통신
 	while (recvFixedVar(sock, len, buf)) {
-		
 		/*switch (currentScene)
 		{
 		case Scene::Title:
-			
+
 			//if(다음씬으로 넘어갈때)
 				//ResetObjects(필요한오브젝트개수);
 			break;
@@ -289,10 +290,9 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 		case Scene::End:
 			break;
 		}*/
-
 		// if(마지막 데이터)
 			// 업데이트 해라
-		ObjectData tmpMap;	
+
 		memcpy(&tmpMap, buf, sizeof(ObjectData));
 		objectDatas.emplace_back(tmpMap);
 		ZeroMemory(&buf, sizeof(buf));
@@ -304,21 +304,16 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 	}
 
 	std::cout << "통신 끝" << std::endl;
-
-	// closesocket()
 	closesocket(sock);
 
-	// 윈속 종료
 	WSACleanup();
-
 	return 0;
 }
 
 void ModelLoad() {
 	shader1 = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
-	fontShader = new Shader("shaders/vertexshader.glvs", "shaders/font_fragmentshader.glfs");
-	// fragmentshader->startbutton_fragmentshader
-	startbuttonShader = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
+	fontShader = new Shader("shaders/font_vertexshader.glvs", "shaders/font_fragmentshader.glfs");
+	startbuttonShader = new Shader("shaders/startbutton_vertexshader.glvs", "shaders/startbutton_fragmentshader.glfs");
 
 	// Hero
 	models[0] = loadOBJ("Resources/rabit.obj", shader1->ID);
@@ -357,7 +352,7 @@ void ModelLoad() {
 	models[23] = loadOBJ("Resources/title_font.obj", shader1->ID);
 	models[24] = loadOBJ("Resources/title_plane.obj", shader1->ID);
 	models[25] = loadOBJ("Resources/ghost.obj", shader1->ID);
-	//models[26] = loadOBJ("Resources/start_button.obj", startbuttonShader->ID);
+	models[26] = loadOBJ("Resources/start_button.obj", shader1->ID);
 
 	shader1->setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
 	shader1->setVec3("lightColor", glm::vec3(0.5f, 0.5f, 0.5f));
@@ -370,9 +365,9 @@ void DrawObject(int modelIdx, glm::vec3 position, glm::vec3 rotation, glm::vec3 
 
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(position.x, position.y, position.z));
-	model = glm::rotate(model, glm::radians(position.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(position.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(position.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	model = glm::scale(model, size);
 
 	// transform
@@ -381,19 +376,27 @@ void DrawObject(int modelIdx, glm::vec3 position, glm::vec3 rotation, glm::vec3 
 	models[modelIdx].draw();
 }
 
-// 필요 확인
 void TitleRender() {
-	// set shader 
-	shader1->use();
-	// draw object
-	
-	//set shader
+	for (const ObjectData& obj : objectDatas) {
+		
+		shader1->use();
+		if (obj.tag == ModelIdx::StartButton) {
+			startbuttonShader->use();
+			startbuttonShader->setVec3("obj_color", glm::vec3(1.0, 0.5, 0.8));
+		}
+		if (obj.tag == ModelIdx::TitleFont) {
+			fontShader->use();
+			fontShader->setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
+			fontShader->setVec3("lightColor", glm::vec3(0.5f, 0.5f, 0.5f));
+			fontShader->setVec3("lightPos", glm::vec3(0, 800, 2000));
+			fontShader->setVec3("obj_color", glm::vec3(1.0, 0.6, 0.0));
+		}
 
-	// draw font
-
-	// set shader
-	startbuttonShader->use();
-	// draw startButton
+		DrawObject(obj.tag, glm::vec3(obj.positionX, obj.positionY, obj.positionZ)
+			, glm::vec3(obj.rotationX, obj.rotationY, obj.rotationZ)
+			, glm::vec3(obj.sizeX, obj.sizeY, obj.sizeZ));
+	}
+	//objectDatas.clear();
 }
 
 void MainGameRender() {
