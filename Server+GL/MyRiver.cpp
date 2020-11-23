@@ -23,7 +23,6 @@ MyRiver::MyRiver() {
 	collision_pos[1] = logs[1]->pos;
 	collision_pos[2] = logs[2]->pos;
 	obsRotation[0] = { 0.0f,90.0f,0.0f };
-	obsSize[0] = { 1.f,1.f,1.f };
 	obsTags[0] = 20;
 	obsTags[1] = 20;
 	obsTags[2] = 20;

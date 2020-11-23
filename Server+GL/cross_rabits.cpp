@@ -23,7 +23,7 @@ struct MultipleArg {
 	SOCKET clientsock;
 	int clientCount;
 };
-ObjectData mapdatas[70];
+ObjectData mapdatas[100];
 HeroData heroDatas[3];
 int currentScene = Scene::MainGame;
 
@@ -111,6 +111,12 @@ int main(int argc, char** argv)
 		std::cout << "GLEW Initialized" << std::endl;
 	ModelLoad();
 
+	// tag init
+	for (ObjectData data : mapdatas) {
+		data.tag = -1;
+	}
+
+	main_game = new MainGame_State;
 	// 통신
 	// 윈속 - 데이터 처리 스레드 분리 
 	HANDLE hThread = CreateThread(NULL, 0, ProcessServer, NULL, 0, NULL);
@@ -118,10 +124,9 @@ int main(int argc, char** argv)
 	title.shader = shader1;
 	title.font_shader = fontShader;
 
-	main_game = new MainGame_State;
 
 	glutDisplayFunc(drawScene);
-	glutTimerFunc(10, TimerFunction, 1);
+	glutTimerFunc(33, TimerFunction, 1);
 	glutKeyboardFunc(keyboard);
 	glutReshapeFunc(Reshape);
 	glutMainLoop();
@@ -173,14 +178,14 @@ GLvoid TimerFunction(int value)
 		break;
 	case 1:
 		main_game->update();
-		main_game->GetMapDatas(mapdatas);
-		currentScene = main_game->next_state;
-		if (currentScene != 1) {
-
+		//main_game;
+		/*if (currentScene != 1) {
+			currentScene = main_game->next_state;
 			delete main_game;
 			end = new End_State;
 
-		}
+		}*/
+
 		break;
 	case 2:
 		end->update();
@@ -200,7 +205,7 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		}
 		break;
 	case 1:
-		main_game->keyboard(key, x, y);
+		//main_game->keyboard(key, x, y);
 		break;
 	case 2:
 		end->keyboard(key, x, y);
@@ -242,7 +247,7 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 	int retval;
 	int clientCnt = 0;
 
-
+	std::cout << "ProcessServer" << std::endl;
 	// 윈속 초기화
 	WSADATA wsa;
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
@@ -275,7 +280,7 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 
 	while (1) {
 		switch (currentScene) {
-		case Scene::Title:
+		case Scene::MainGame:
 		{
 			// accept()
 			addrlen = sizeof(clientaddr);
@@ -286,6 +291,7 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 			}
 
 			// 스레드 생성
+			std::cout << "Create Thread" << std::endl;
 			MultipleArg arg = { client_sock, clientCnt++ };
 			HANDLE hThread = CreateThread(NULL, 0, ConversationWithClient, (LPVOID)&arg, 0, NULL);
 
@@ -295,7 +301,7 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 				CloseHandle(hThread);
 		}
 		break;
-		case Scene::MainGame:
+		case Scene::Title:
 			
 			break;
 		case Scene::End:
@@ -316,6 +322,7 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 
 DWORD WINAPI ConversationWithClient(LPVOID arg)
 {
+	std::cout << "ConversationWithClient" << std::endl;
 	SOCKET client_sock = ((MultipleArg*)arg)->clientsock;
 	SOCKADDR_IN clientaddr;
 
@@ -323,40 +330,40 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 	getpeername(client_sock, (SOCKADDR*)&clientaddr, &addrlen);
 	std::cout << "클라이언트 접속" << std::endl;
 
-	//for (int i = 0; i < 10; ++i) {
-	//	mapdatas[i].tag = ModelIdx::Hero;
+	while (1) {
+		//test
+		int cnt = 0;
+		for (const ObjectData& mapdata : mapdatas) {
+			if (mapdata.tag != -1) {
+				std::cout << cnt<<"."<<"Map tag = " << mapdata.tag << std::endl;
 
-	//	mapdatas[i].positionX = 10 + i;
-	//	mapdatas[i].positionY = 10 + i;
-	//	mapdatas[i].positionZ = 10 + i;
-
-
-	//	mapdatas[i].rotationX = 0;
-	//	mapdatas[i].rotationY = 0;
-	//	mapdatas[i].rotationZ = 0;
-
-	//	mapdatas[i].sizeX = 1;
-	//	mapdatas[i].sizeY = 1;
-	//	mapdatas[i].sizeZ = 1;
-	//}
-
-	switch (currentScene) {
-	case Scene::Title:
-		break;
-	case Scene::MainGame:
-		if (main_game != NULL) {
-			main_game->GetMapDatas(mapdatas);
+				std::cout <<cnt<<"."<< "Map Position = " << mapdata.positionX <<","<<mapdata.positionY<<","<<mapdata.positionZ << std::endl;
+				std::cout << cnt << "." << "Map Size = " << mapdata.sizeX <<","<<mapdata.sizeY<<","<<mapdata.sizeZ << std::endl;
+				std::cout << cnt << "." << "Map Roatation = " << mapdata.rotationX <<","<<mapdata.rotationY<<","<<mapdata.rotationZ << std::endl;
+				cnt++;
+			}
 		}
-		break;
-	case Scene::End:
-		break;
-	}
+		
 
-	// 클라이언트와 데이터 통신
-	for (const ObjectData& mapdata : mapdatas) {
-		sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
-	}
+		switch (currentScene) {
+		case Scene::Title:
+			break;
+		case Scene::MainGame:
 
+
+			// map data 전송
+			main_game->GetMapDatas(mapdatas);
+			for (const ObjectData& mapdata : mapdatas) {
+					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
+			}
+			break;
+		case Scene::End:
+			break;
+		}
+
+
+
+	}
 	// closesocket()
 	closesocket(client_sock);
 

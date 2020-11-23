@@ -35,10 +35,11 @@ void TitleRender();
 void MainGameRender();
 void EndRender();
 
-std::vector<ObjectData> objectDatas;
-HeroData heroData;
+//std::vector<ObjectData> objectDatas;
+ObjectData objectDatas[100];
+HeroData heroData[3];
 
-int currentScene = 1;
+int currentScene = Scene::MainGame;
 
 loadOBJ models[27];
 Shader* shader1;
@@ -53,7 +54,7 @@ glm::mat4 view = glm::lookAt(cameraPos, cameraDirection, cameraUp);
 
 int main(int argc, char** argv)
 {
-	objectDatas.reserve(200);
+	//objectDatas.reserve(200);
 
 	HANDLE hThread;
 
@@ -79,7 +80,7 @@ int main(int argc, char** argv)
 	
 	// 콜백
 	glutDisplayFunc(drawScene);
-	glutTimerFunc(10, TimerFunction, 1);
+	glutTimerFunc(33, TimerFunction, 1);
 	glutKeyboardFunc(keyboard);
 	glutMouseFunc(mouse);
 	glutReshapeFunc(Reshape);
@@ -95,31 +96,20 @@ GLvoid drawScene()
 
 	switch (currentScene) {
 	case Scene::Title:
-		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
-		MainGameRender();
-		break;
-	case Scene::MainGame:
 		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
 		MainGameRender();
 		break;
-	case Scene::End:
+	case Scene::MainGame:
 		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
+		MainGameRender();
+		break;
+	case Scene::End:
+		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
 		break;
 	}
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-
-	switch (currentScene) {
-	case Scene::Title:
-		
-		break;
-	case Scene::MainGame:
-		
-		break;
-	case Scene::End:
-		break;
-	}
 	glutSwapBuffers();
 }
 
@@ -247,6 +237,7 @@ int recvn(SOCKET s, char* buf, int len, int flags)
 
 DWORD WINAPI ProcessClient(LPVOID arg)
 {
+	std::cout << "ProcessClient" << std::endl;
 	int retval;
 
 	// 윈속 초기화
@@ -266,15 +257,16 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 	serveraddr.sin_port = htons(SERVERPORT);
 	retval = connect(sock, (SOCKADDR*)&serveraddr, sizeof(serveraddr));
 	if (retval == SOCKET_ERROR) err_quit((char*)"connect()");
+	std::cout << "connect" << std::endl;
 
 	// 데이터 통신에 사용할 변수
 	char buf[BUFSIZE + 1];
 	int len = 0;
 
 	//서버와 데이터 통신
-	while (recvFixedVar(sock, len, buf)) {
-		
-		/*switch (currentScene)
+	while (1) {
+		std::cout << "Conversation" << std::endl;
+		switch (currentScene)
 		{
 		case Scene::Title:
 			
@@ -282,28 +274,39 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 				//ResetObjects(필요한오브젝트개수);
 			break;
 		case  Scene::MainGame:
+		{			
+			// mapData 수신
+			//objectDatas.clear();
+			int idx = 0;
+			for(ObjectData& obj : objectDatas ) {
+				ObjectData tmpMap;
+				recvFixedVar(sock, len, buf);
+				memcpy(&tmpMap, buf, sizeof(ObjectData));
+				//objectDatas.emplace_back(tmpMap);
+				obj = tmpMap;
+				ZeroMemory(&buf, sizeof(buf));
+			}
+			//std::cout << objectDatas.size() << std::endl;
 
-			//if(다음씬으로 넘어갈때)
-				//ResetObjects(필요한오브젝트개수);
+			int cnt = 0;
+			for (const ObjectData& mapdata : objectDatas) {
+				if (mapdata.tag != -1) {
+					std::cout << cnt << "." << "Map tag = " << mapdata.tag << std::endl;
+
+					std::cout << cnt << "." << "Map Position = " << mapdata.positionX << "," << mapdata.positionY << "," << mapdata.positionZ << std::endl;
+					std::cout << cnt << "." << "Map Size = " << mapdata.sizeX << "," << mapdata.sizeY << "," << mapdata.sizeZ << std::endl;
+					std::cout << cnt << "." << "Map Roatation = " << mapdata.rotationX << "," << mapdata.rotationY << "," << mapdata.rotationZ << std::endl;
+					cnt++;
+				}
+			}
+		}
+
+			
 			break;
 		case Scene::End:
 			break;
-		}*/
-
-		// if(마지막 데이터)
-			// 업데이트 해라
-		ObjectData tmpMap;	
-		memcpy(&tmpMap, buf, sizeof(ObjectData));
-		objectDatas.emplace_back(tmpMap);
-		ZeroMemory(&buf, sizeof(buf));
+		}
 	}
-
-	// test
-	for (const ObjectData& obj : objectDatas) {
-		std::cout << obj.tag << std::endl;
-	}
-
-	std::cout << "통신 끝" << std::endl;
 
 	// closesocket()
 	closesocket(sock);
@@ -370,9 +373,9 @@ void DrawObject(int modelIdx, glm::vec3 position, glm::vec3 rotation, glm::vec3 
 
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(position.x, position.y, position.z));
-	model = glm::rotate(model, glm::radians(position.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(position.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(position.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	model = glm::scale(model, size);
 
 	// transform
@@ -403,25 +406,27 @@ void MainGameRender() {
 	// draw all objects
 	for (const ObjectData& obj : objectDatas) {
 		//DrawObject(int modelIdx, glm::vec3 position, glm::vec3 rotation, glm::vec3 size);
+		if (obj.tag == -1)
+			break;
 		DrawObject(obj.tag, glm::vec3(obj.positionX, obj.positionY, obj.positionZ)
 			, glm::vec3(obj.rotationX, obj.rotationY, obj.rotationZ)
 			, glm::vec3(obj.sizeX, obj.sizeY, obj.sizeZ));
 	}
 
-	// draw all heros
-	if (heroData.alive) {
-		models[ModelIdx::Hero].load(projection, view);
+	//// draw all heros
+	//if (heroData.alive) {
+	//	models[ModelIdx::Hero].load(projection, view);
 
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(heroData.x, heroData.y, heroData.z));
-		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(-heroData.rotaionAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+	//	glm::mat4 model = glm::mat4(1.0f);
+	//	model = glm::translate(model, glm::vec3(heroData.x, heroData.y, heroData.z));
+	//	model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	//	model = glm::rotate(model, glm::radians(-heroData.rotaionAngle), glm::vec3(0.0f, 1.0f, 0.0f));
 
-		// transform
-		models[ModelIdx::Hero].setTransform(model);
+	//	// transform
+	//	models[ModelIdx::Hero].setTransform(model);
 
-		models[ModelIdx::Hero].draw();
-	}
+	//	models[ModelIdx::Hero].draw();
+	//}
 }
 
 // 필요 확인

@@ -11,10 +11,18 @@ public:
 	float moving_degree;
 	MyPos collision_pos[3];
 	int obs_cnt;
-	int tag = 0;
-	glm::vec3 obsRotation[3];
-	glm::vec3 obsSize[3];
-	int obsTags[3];
+	int tag = -1;
+	glm::vec3 obsRotation[3] = {
+		{0.0f,0.0f,0.0f},
+		{0.0f,0.0f,0.0f},
+		{0.0f,0.0f,0.0f}
+	};
+	glm::vec3 obsSize[3] = {
+		{1.0f,1.0f,1.0f},
+		{1.0f,1.0f,1.0f},
+		{1.0f,1.0f,1.0f}
+	};;
+	int obsTags[3] = {-1,-1,-1};
 
 public:
 	// current state's position

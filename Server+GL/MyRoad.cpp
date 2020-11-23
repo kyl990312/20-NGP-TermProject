@@ -27,6 +27,7 @@ MyRoad::MyRoad() {
 	collision_pos[2] = { -800,-800,-800 };
 	obsRotation[0] = { 0.0f,90.0f,0.0f };
 	obsSize[0] = { 1.f,1.f,1.f };
+	obsSize[1] = { 1.f,1.f,1.f };
 	obs_cnt = 2;
 	std::cout << "complete creating road!" << std::endl;
 }

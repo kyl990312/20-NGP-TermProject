@@ -3,7 +3,7 @@
 
 MainGame_State::MainGame_State() {
 	//test
-	PlaySound(TEXT("Resources/Spongebob.wav"), NULL, SND_FILENAME | SND_NODEFAULT | SND_ASYNC | SND_LOOP);
+	//PlaySound(TEXT("Resources/Spongebob.wav"), NULL, SND_FILENAME | SND_NODEFAULT | SND_ASYNC | SND_LOOP);
 	init_map();
 }
 
@@ -187,15 +187,46 @@ void MainGame_State::GetMapDatas(ObjectData* mapDatas)
 		for (int j = 0; j < states[i]->obs_cnt; ++j) {
 			mapDatas[idx].positionX = states[i]->collision_pos[j].x;
 			mapDatas[idx].positionY = states[i]->collision_pos[j].y;
-			mapDatas[idx].positionZ = states[i]->collision_pos[j].z;
+			mapDatas[idx].positionZ = states[i]->pos.z;
 			mapDatas[idx].rotationX = states[i]->obsRotation[0].x;
 			mapDatas[idx].rotationY = states[i]->obsRotation[0].y;
 			mapDatas[idx].rotationZ = states[i]->obsRotation[0].z;
-			mapDatas[idx].sizeX = states[i]->obsSize[0].x;
-			mapDatas[idx].sizeX = states[i]->obsSize[0].y;
-			mapDatas[idx].sizeX = states[i]->obsSize[0].z;
+			mapDatas[idx].sizeX = states[i]->obsSize[j].x;
+			mapDatas[idx].sizeY = states[i]->obsSize[j].y;
+			mapDatas[idx].sizeZ = states[i]->obsSize[j].z;
 			mapDatas[idx].tag = states[i]->obsTags[j];
 			idx++;
 		}
 	}
+
+	for (; idx < 100; ++idx) {
+		mapDatas[idx].tag = -1;
+		mapDatas[idx].positionX = 0.0f;
+		mapDatas[idx].positionY = 0.0f;
+		mapDatas[idx].positionZ = 0.0f;
+		mapDatas[idx].rotationX = 0.0f;
+		mapDatas[idx].rotationY = 0.0f;
+		mapDatas[idx].rotationZ = 0.0f;
+		mapDatas[idx].sizeX = 0.0f;
+		mapDatas[idx].sizeY = 0.0f;
+		mapDatas[idx].sizeZ = 0.0f;
+	}
+}
+
+void MainGame_State::Init()
+{
+	//test
+	//PlaySound(TEXT("Resources/Spongebob.wav"), NULL, SND_FILENAME | SND_NODEFAULT | SND_ASYNC | SND_LOOP);
+	init_map();
+}
+
+void MainGame_State::DeleteAll()
+{
+	for (int i = 0; i < map_count; i++) {
+		if (states[i] != NULL)
+			delete states[i];
+	}
+
+	if (states != NULL)
+		delete states;
 }

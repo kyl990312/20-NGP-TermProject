@@ -56,5 +56,7 @@ public:
 	void keyboard(unsigned char key, int x, int y);
 	void hero_update();
 	void GetMapDatas(ObjectData* mapDatas);
+	void Init();
+	void DeleteAll();
 };
 

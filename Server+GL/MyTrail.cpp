@@ -21,6 +21,7 @@ MyTrail::MyTrail() {
 	moving_degree = 0;
 	collision_pos[1] = { -800,-800,-800 };
 	collision_pos[2] = { -800,-800,-800 };
+	collision_pos[0] = trains[0]->pos;
 	obsRotation[0] = {0.0f,90.0f,0.0f};
 	obsSize[0] = {1.f,1.f,1.f};
 	obsTags[0] = 18;
