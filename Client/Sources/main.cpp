@@ -14,6 +14,8 @@
 #define SCR_WIDTH 800
 #define SCR_HEIGHT 600
 
+#define HERO_CNT 1
+
 
 // Server-Client Process
 void err_quit(char* );
@@ -40,7 +42,7 @@ ObjectData objectDatas[100];
 HeroData heroData[3];
 
 int currentScene = Scene::MainGame;
-char key;
+char m_key = '\0';
 
 loadOBJ models[27];
 Shader* shader1;
@@ -143,14 +145,22 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		break;
 	case Scene::MainGame:
 		switch (key) {
-		case 'w' | 'W':
+		case 'w':
+		case 'W':
+			m_key = 'w';
 			break;
-		case 'a'|'A':
+		case 'a':
+		case 'A':
+			m_key = 'a';
 			break;
-		case 'd' |'D':
+		case 'd': 
+		case 'D':
+			m_key = 'd';
 			break;
-		}
-		
+		default:
+			m_key = '\0';
+			break;
+		}		
 
 		break;
 	case Scene::End:
@@ -274,7 +284,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 
 	//서버와 데이터 통신
 	while (1) {
-		std::cout << "Conversation" << std::endl;
 		switch (currentScene)
 		{
 		case Scene::Title:
@@ -283,10 +292,24 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 				//ResetObjects(필요한오브젝트개수);
 			break;
 		case  Scene::MainGame:
-		{			
+		{	
+			// keyData 전송
+			send(sock, &m_key, sizeof(char), 0);
+			if (m_key != '\0')
+				std::cout << m_key << std::endl;
+			m_key = '\0';
+
+			// heroData 수신
+			for (HeroData& data : heroData) {
+				HeroData tmpMap;
+				recvFixedVar(sock, len, buf);
+				memcpy(&tmpMap, buf, sizeof(HeroData));
+				data = tmpMap;
+				ZeroMemory(&buf, sizeof(buf));
+			}
+
 			// mapData 수신
 			//objectDatas.clear();
-			int idx = 0;
 			for(ObjectData& obj : objectDatas ) {
 				ObjectData tmpMap;
 				recvFixedVar(sock, len, buf);
@@ -420,6 +443,12 @@ void MainGameRender() {
 		DrawObject(obj.tag, glm::vec3(obj.positionX, obj.positionY, obj.positionZ)
 			, glm::vec3(obj.rotationX, obj.rotationY, obj.rotationZ)
 			, glm::vec3(obj.sizeX, obj.sizeY, obj.sizeZ));
+	}
+
+	for (const HeroData hero : heroData) {
+		DrawObject(ModelIdx::Hero, glm::vec3(hero.x, hero.y, hero.z), 
+			glm::vec3(0.0f, hero.rotaionAngle, 0.0f), 
+			glm::vec3(1.0f, 1.0f, 1.0f));
 	}
 
 	//// draw all heros

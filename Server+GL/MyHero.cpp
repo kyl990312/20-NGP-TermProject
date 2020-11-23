@@ -143,7 +143,7 @@ void kyrHero::draw(glm::mat4 projection, glm::mat4 view, Shader shader) {
 	//shader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 0.9f));
 	//shader.setVec3("lightPos", glm::vec3(0, 800, 2000));
 
-	// apply transform matix
+	// apply transform matix(
 	models[0].setTransform(model);
 
 	// draw obj

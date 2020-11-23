@@ -44,22 +44,25 @@ void MainGame_State::Display() {
 	}
 
 	// hero draw
-	hero.draw(projection, view, *hero_shader);
+	for(int i = 0 ; i<1;++i)
+		hero[i].draw(projection, view, *hero_shader);
 }
 
 void MainGame_State::update() {
 	if (start) {
 		// map moving
-		if (hero._state != HeroState::Die) {
+		if (hero[0]._state != HeroState::Die) {
 			for (int i = 0; i < map_count; i++) {
 				states[i]->move();
 				states[i]->pos.z += 5 * elapsedTimeSec * SPEED;
 			}
 		}
+		
 		//hero
-		hero_update();
+		for(int i = 0 ; i <1; ++i)
+			hero_update(i);
 	}
-	if (hero._state == HeroState::Die) {
+	if (hero[0]._state == HeroState::Die) {
 		if (back_music) {
 			PlaySound(TEXT("Resources/fail2.wav"), NULL, SND_FILENAME | SND_NODEFAULT | SND_ASYNC);
 			back_music = false;
@@ -72,45 +75,45 @@ void MainGame_State::update() {
 }
 
 void MainGame_State::keyboard(unsigned char key, int x, int y) {
-	if (hero._state == HeroState::Idle || hero._state == HeroState::Float) {
+	if (hero[x]._state == HeroState::Idle || hero[x]._state == HeroState::Float) {
 		//PlaySound(TEXT("./jump2.wav"), NULL, SND_FILENAME | SND_NODEFAULT | SND_ASYNC);
 		switch (key) {
 		case 'w':
 		case 'W':
 			// move hero to front
-			hero.direction_angle = 0.0f;
+			hero[x].direction_angle = 0.0f;
 			// this is needed to move hero to side when collide with tree
-			cur_state_idx = (cur_state_idx + 1) % map_count;
+			cur_state_idx[x] = (cur_state_idx[x] + 1) % map_count;
 			pass_state_cnt += 1;
 			break;
 		case 'd':
 		case 'D':
 			//move hero to rihgt
-			hero.direction_angle = 90.0f;
+			hero[x].direction_angle = 90.0f;
 			break;
 		case 'a':
 		case 'A':
 			// move hero to left
-			hero.direction_angle = -90.0f;
+			hero[x].direction_angle = -90.0f;
 			break;
 		default:
 			return;
 		}
-		hero._state = HeroState::Jump;
+		hero[x]._state = HeroState::Jump;
 		start = true;
 	}
 }
 
 void MainGame_State::init_map() {
 	states[0] = new MyCommon;
-	if (fabs(states[0]->collision_pos[0].x - hero.current_pos.x) < 50) {
-		hero.current_pos.x += 50;
+	if (fabs(states[0]->collision_pos[0].x - hero[0].current_pos.x) < 50) {
+		hero[0].current_pos.x += 50;
 	}
-	if (fabs(states[0]->collision_pos[1].x - hero.current_pos.x) < 50) {
-		hero.current_pos.x += 50;
+	if (fabs(states[0]->collision_pos[1].x - hero[0].current_pos.x) < 50) {
+		hero[0].current_pos.x += 50;
 	}
-	if (fabs(states[0]->collision_pos[2].x - hero.current_pos.x) < 50) {
-		hero.current_pos.x += 50;
+	if (fabs(states[0]->collision_pos[2].x - hero[0].current_pos.x) < 50) {
+		hero[0].current_pos.x += 50;
 	}
 	//create states
 	for (int i = 1; i < map_count; i++) {
@@ -136,21 +139,21 @@ void MainGame_State::init_map() {
 	}
 }
 
-void MainGame_State::hero_update() {
+void MainGame_State::hero_update(int idx) {
 	// get current state's obstacles pos
-	cur_state_obs_pos[0] = states[cur_state_idx]->collision_pos[0];
-	cur_state_obs_pos[1] = states[cur_state_idx]->collision_pos[1];
-	cur_state_obs_pos[2] = states[cur_state_idx]->collision_pos[2];
+	cur_state_obs_pos[idx][0] = states[cur_state_idx[idx]]->collision_pos[0];
+	cur_state_obs_pos[idx][1] = states[cur_state_idx[idx]]->collision_pos[1];
+	cur_state_obs_pos[idx][2] = states[cur_state_idx[idx]]->collision_pos[2];
 	// get current state's obstacles count
-	cur_state_obs_cnt = states[cur_state_idx]->obs_cnt;
+	cur_state_obs_cnt[idx] = states[cur_state_idx[idx]]->obs_cnt;
 	// get current state's tag
-	cur_state_tag = states[cur_state_idx]->tag;
-	if (hero._state == HeroState::Float) {
+	cur_state_tag[idx] = states[cur_state_idx[idx]]->tag;
+	if (hero[idx]._state == HeroState::Float) {
 		// when hero is on the log run this code
-		hero.log_speed = states[cur_state_idx]->get_obs_speed(0);
+		hero[idx].log_speed = states[cur_state_idx[idx]]->get_obs_speed(0);
 	}
-	hero.update(cur_state_tag, cur_state_obs_pos, cur_state_obs_cnt);
-	hero.cur_mapState_posZ = states[cur_state_idx]->pos.z;
+	hero[idx].update(cur_state_tag[idx], cur_state_obs_pos[idx], cur_state_obs_cnt[idx]);
+	hero[idx].cur_mapState_posZ = states[cur_state_idx[idx]]->pos.z;
 }
 
 void MainGame_State::GetMapDatas(ObjectData* mapDatas)
@@ -211,6 +214,24 @@ void MainGame_State::GetMapDatas(ObjectData* mapDatas)
 		mapDatas[idx].sizeX = 0.0f;
 		mapDatas[idx].sizeY = 0.0f;
 		mapDatas[idx].sizeZ = 0.0f;
+	}
+}
+
+void MainGame_State::GetHeroDatas(HeroData* herodatas)
+{
+	for (int i = 0; i < 1; ++i) {
+		herodatas[i].x = hero[i].current_pos.x;
+		herodatas[i].y = hero[i].current_pos.y;
+		herodatas[i].z = hero[i].current_pos.z;
+
+		herodatas[i].rotaionAngle = 180 - hero[i].direction_angle;
+
+		bool alive;
+		if (hero[i]._state != HeroState::Die)
+			alive = true;
+		else
+			alive = false;
+		herodatas[i].alive = alive;
 	}
 }
 

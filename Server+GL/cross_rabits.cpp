@@ -17,6 +17,7 @@
 
 // 통신
 void sendFixedVar(SOCKET&, size_t, char[]);
+char key;
 
 DWORD WINAPI ProcessServer(LPVOID);
 DWORD WINAPI ConversationWithClient(LPVOID);
@@ -217,7 +218,7 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		}
 		break;
 	case 1:
-		main_game->keyboard(key, x, y);
+		//main_game->keyboard(key, x, y);
 		break;
 	case 2:
 		end->keyboard(key, x, y);
@@ -341,6 +342,7 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 	int addrlen = sizeof(clientaddr);
 	getpeername(client_sock, (SOCKADDR*)&clientaddr, &addrlen);
 	std::cout << "클라이언트 접속" << std::endl;
+	int id = 0;				// 나중에 클라이언트 고유인덱스 붙여줘야함!!!
 
 	while (1) {
 		//test
@@ -361,6 +363,18 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 		case Scene::Title:
 			break;
 		case Scene::MainGame:
+			// key 입력 받기
+			recv(client_sock, &key, sizeof(char), 0);
+			if (key != '\0' || key != NULL) {
+				main_game->keyboard(key, id, 0);
+				std::cout << key << std::endl;
+			}
+
+			// hero data 전송
+			main_game->GetHeroDatas(heroDatas);
+			for (const HeroData data : heroDatas) {
+				sendFixedVar(client_sock, sizeof(HeroData), (char*) & data);
+			}
 
 			// map data 전송
 			main_game->GetMapDatas(mapdatas);

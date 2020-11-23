@@ -35,14 +35,11 @@ public:
 
 	//hero
 	Shader* hero_shader = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
-	kyrHero hero;
-	MyPos cur_state_obs_pos[3];
-	MyPos next_state_obs_pos[3];
-	int cur_state_tag;
-	int next_state_tag;
-	int cur_state_obs_cnt;
-	int next_state_obs_cnt;
-	int cur_state_idx = 0;
+	kyrHero hero[3];
+	MyPos cur_state_obs_pos[3][3];
+	int cur_state_tag[3];
+	int cur_state_obs_cnt[3];
+	int cur_state_idx[3] = { 0 };
 	int pass_state_cnt = 0;
 
 	bool back_music = true;
@@ -54,8 +51,9 @@ public:
 	void update();
 	void init_map();
 	void keyboard(unsigned char key, int x, int y);
-	void hero_update();
+	void hero_update(int idx);
 	void GetMapDatas(ObjectData* mapDatas);
+	void GetHeroDatas(HeroData* herodatas);
 	void Init();
 	void DeleteAll();
 };
