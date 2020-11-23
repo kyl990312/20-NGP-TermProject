@@ -11,3 +11,5 @@ struct MyPos {
 struct MyBoundingBox {
 	float right, top, front, left, bottom, back;
 };
+
+#define SPEED 10

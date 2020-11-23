@@ -1,6 +1,7 @@
 #include "MyHero.h"
 
 extern loadOBJ models[26];
+extern float elapsedTimeSec;
 
 void kyrHero::Jump(int tag, MyPos* obs_pos, int obs_cnt1)
 {
@@ -9,19 +10,19 @@ void kyrHero::Jump(int tag, MyPos* obs_pos, int obs_cnt1)
 	switch ((int)direction_angle) {
 	case 0:
 		// directon == front
-		current_pos.z -= 10;
+		current_pos.z -= 10 * SPEED * elapsedTimeSec;
 		break;
 	case 90:
 		// direction == right
-		current_pos.x += 10;
+		current_pos.x += 10 * SPEED * elapsedTimeSec;
 		break;
 	case -90:
 		// direction == left
-		current_pos.x -= 10;
+		current_pos.x -= 10 * SPEED * elapsedTimeSec;
 		break;
 	}
 	// hero is jumping : frame : 5 , height : 30
-	jump_DeltaX += 1.f;		// 0 ~ 5
+	jump_DeltaX += 1.f * elapsedTimeSec* SPEED;		// 0 ~ 5
 	// 0 ~ 30  : 20, 30, 30, 20, 0
 	current_pos.y = -5.f * jump_DeltaX * (jump_DeltaX - 5.f); 
 
@@ -68,7 +69,7 @@ void kyrHero::Jump(int tag, MyPos* obs_pos, int obs_cnt1)
 	// Check where hero Land (except Landing at Log)
 	if (current_pos.y <= 0) {
 		if (tag == MapState::River) {
-			current_pos.y -= 10;
+			current_pos.y -= 10 * elapsedTimeSec;
 			if (current_pos.y < -50)
 				_state = HeroState::Die;
 			return;
@@ -85,7 +86,7 @@ void kyrHero::Float()
 {
 	std::cout << "Float" << std::endl;
 	// move along the log
-	current_pos.x += log_speed;
+	current_pos.x += log_speed * elapsedTimeSec * SPEED;
 
 	// Check hero included in screen range
 	MyPos hero_view_pos = { current_pos.x * cos(glm::radians(10.0f)) - current_pos.z * sin(glm::radians(10.0f)),0.0f,current_pos.x * sin(glm::radians(10.0f)) + current_pos.z * cos(glm::radians(10.0f)) };
@@ -157,7 +158,7 @@ void kyrHero::update(int tag, MyPos* obs_pos1, int obs_cnt1) {
 		
 	if (_state != HeroState::Die)
 		// move backward following map
-		current_pos.z += 5;
+		current_pos.z += 5 * elapsedTimeSec * SPEED;
 	MyPos hero_view_pos = { current_pos.x * cos(glm::radians(10.0f)) - current_pos.z * sin(glm::radians(10.0f)),0.0f,current_pos.x * sin(glm::radians(10.0f)) + current_pos.z * cos(glm::radians(10.0f)) };
 
 	switch (_state)
@@ -194,7 +195,7 @@ void kyrHero::update(int tag, MyPos* obs_pos1, int obs_cnt1) {
 }
 
 void kyrHero::Die() {
-	soul_pos.y += 5;
+	soul_pos.y += 5 * elapsedTimeSec * SPEED;
 	soul_pos.x = 20*sin(glm::radians(soul_pos.y));
 }
 

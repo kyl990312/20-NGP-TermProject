@@ -13,6 +13,8 @@
 #define SERVERPORT 9000
 #define BUFSIZE    512
 
+#define MAX_CLIENT 1
+
 // 통신
 void sendFixedVar(SOCKET&, size_t, char[]);
 
@@ -42,8 +44,8 @@ Shader* shader1;
 Shader* fontShader;
 
 // frame
-float elpasedTime;
-int m_time = 0;
+int prevTime = 0;
+float elapsedTimeSec = 0;
 
 void ModelLoad() {
 	shader1 = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
@@ -177,7 +179,10 @@ GLvoid Reshape(int w, int h) {
 GLvoid TimerFunction(int value)
 {
 	// calc elapsedTime
-	//int currnetTime = 
+	int currentTime = glutGet(GLUT_ELAPSED_TIME);	
+	int elapsedTime = currentTime - prevTime;
+	prevTime = currentTime;
+	elapsedTimeSec = (float)elapsedTime / 1000.f;
 
 	switch (currentScene) {
 	case 0:
@@ -212,7 +217,7 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		}
 		break;
 	case 1:
-		//main_game->keyboard(key, x, y);
+		main_game->keyboard(key, x, y);
 		break;
 	case 2:
 		end->keyboard(key, x, y);
@@ -357,12 +362,14 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 			break;
 		case Scene::MainGame:
 
-
 			// map data 전송
 			main_game->GetMapDatas(mapdatas);
 			for (const ObjectData& mapdata : mapdatas) {
 					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
 			}
+
+			// client key입력 수신
+
 			break;
 		case Scene::End:
 			break;

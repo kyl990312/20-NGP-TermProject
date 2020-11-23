@@ -1,6 +1,7 @@
 #include "MyLog.h"
 
 extern loadOBJ models[26];
+extern float elapsedTimeSec;
 
 MyLog::MyLog(MyPos road_pos, float speed_state) {
 	// pos init
@@ -25,7 +26,7 @@ void MyLog::draw(glm::mat4 projection, glm::mat4 view, glm::mat4 model, Shader s
 }
 
 void MyLog::move(MyPos road_pos) {
-	pos.x += speed * direction;
+	pos.x += speed * elapsedTimeSec * direction * SPEED;
 }
 
 bool MyLog::check_removing() {

@@ -1,6 +1,7 @@
 #include "MyTrain.h"
 
 extern loadOBJ models[26];
+extern float elapsedTimeSec;
 
 MyTrain::MyTrain(MyPos road_pos) {
 	// pos init
@@ -13,7 +14,7 @@ MyTrain::MyTrain(MyPos road_pos) {
 
 void MyTrain::draw(glm::mat4 projection, glm::mat4 view, glm::mat4 model, Shader shader) {
 	//loadOBJ obj(obj_path, shader.ID);
-	//shader.use();
+	shader.use();
 	models[18].load(projection, view);
 
 	// change road's positoin 
@@ -25,7 +26,7 @@ void MyTrain::draw(glm::mat4 projection, glm::mat4 view, glm::mat4 model, Shader
 }
 
 void MyTrain::move(MyPos road_pos) {
-	pos.x += speed * direction;
+	pos.x += speed * elapsedTimeSec * direction * SPEED;
 }
 
 bool MyTrain::check_removing() {

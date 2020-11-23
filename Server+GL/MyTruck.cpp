@@ -1,6 +1,7 @@
 #include "MyTruck.h"
 
 extern loadOBJ models[26];
+extern float elapsedTimeSec;
 
 MyTruck::MyTruck(MyPos road_pos, float state_speed) {
 	// pos init
@@ -35,7 +36,7 @@ void MyTruck::draw(glm::mat4 projection, glm::mat4 view, glm::mat4 model, Shader
 }
 
 void MyTruck::move(MyPos road_pos) {
-	pos.x += speed*direction;
+	pos.x += speed * elapsedTimeSec *direction * SPEED;
 }
 
 bool MyTruck::check_removing() {

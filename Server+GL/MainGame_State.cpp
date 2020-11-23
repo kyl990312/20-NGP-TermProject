@@ -1,5 +1,6 @@
 #include "MainGame_State.h"
 // this is main game state
+extern float elapsedTimeSec;
 
 MainGame_State::MainGame_State() {
 	//test
@@ -43,7 +44,7 @@ void MainGame_State::Display() {
 	}
 
 	// hero draw
-	//hero.draw(projection, view, *hero_shader);
+	hero.draw(projection, view, *hero_shader);
 }
 
 void MainGame_State::update() {
@@ -52,11 +53,11 @@ void MainGame_State::update() {
 		if (hero._state != HeroState::Die) {
 			for (int i = 0; i < map_count; i++) {
 				states[i]->move();
-				states[i]->pos.z += 5;
+				states[i]->pos.z += 5 * elapsedTimeSec * SPEED;
 			}
 		}
 		//hero
-		//hero_update();
+		hero_update();
 	}
 	if (hero._state == HeroState::Die) {
 		if (back_music) {
