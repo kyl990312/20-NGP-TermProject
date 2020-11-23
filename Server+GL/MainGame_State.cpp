@@ -43,7 +43,7 @@ void MainGame_State::Display() {
 	}
 
 	// hero draw
-	hero.draw(projection, view, *hero_shader);
+	//hero.draw(projection, view, *hero_shader);
 }
 
 void MainGame_State::update() {
@@ -56,7 +56,7 @@ void MainGame_State::update() {
 			}
 		}
 		//hero
-		hero_update();
+		//hero_update();
 	}
 	if (hero._state == HeroState::Die) {
 		if (back_music) {

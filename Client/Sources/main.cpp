@@ -40,6 +40,7 @@ ObjectData objectDatas[100];
 HeroData heroData[3];
 
 int currentScene = Scene::MainGame;
+char key;
 
 loadOBJ models[27];
 Shader* shader1;
@@ -131,7 +132,7 @@ GLvoid TimerFunction(int value)
 		
 		break;
 	}
-	glutTimerFunc(10, TimerFunction, 1);
+	glutTimerFunc(33, TimerFunction, 1);
 	glutPostRedisplay();
 }
 
@@ -141,6 +142,14 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		
 		break;
 	case Scene::MainGame:
+		switch (key) {
+		case 'w' | 'W':
+			break;
+		case 'a'|'A':
+			break;
+		case 'd' |'D':
+			break;
+		}
 		
 
 		break;
@@ -288,7 +297,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 			}
 			//std::cout << objectDatas.size() << std::endl;
 
-			int cnt = 0;
+		/*	int cnt = 0;
 			for (const ObjectData& mapdata : objectDatas) {
 				if (mapdata.tag != -1) {
 					std::cout << cnt << "." << "Map tag = " << mapdata.tag << std::endl;
@@ -298,7 +307,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 					std::cout << cnt << "." << "Map Roatation = " << mapdata.rotationX << "," << mapdata.rotationY << "," << mapdata.rotationZ << std::endl;
 					cnt++;
 				}
-			}
+			}*/
 		}
 
 			

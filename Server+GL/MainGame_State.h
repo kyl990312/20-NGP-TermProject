@@ -16,6 +16,8 @@
 #define _CRT_NONSTDC_NO_WARNINGS
 #pragma comment(lib, "winmm.lib")
 
+#define SPEED 5
+
 class MainGame_State
 {
 public:
@@ -30,7 +32,7 @@ public:
 	int map_count = 23;
 	MyState** states = new MyState * [map_count];
 	bool timerCheck = false;
-	bool start = false;
+	bool start = true;
 	Shader* shader =  new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
 
 	//hero

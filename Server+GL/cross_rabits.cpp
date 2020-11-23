@@ -41,6 +41,10 @@ loadOBJ models[26];
 Shader* shader1;
 Shader* fontShader;
 
+// frame
+float elpasedTime;
+int m_time = 0;
+
 void ModelLoad() {
 	shader1 = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
 	fontShader = new Shader("shaders/vertexshader.glvs", "shaders/font_fragmentshader.glfs");
@@ -172,6 +176,9 @@ GLvoid Reshape(int w, int h) {
 
 GLvoid TimerFunction(int value)
 {
+	// calc elapsedTime
+	//int currnetTime = 
+
 	switch (currentScene) {
 	case 0:
 		title.update();
@@ -332,7 +339,7 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 
 	while (1) {
 		//test
-		int cnt = 0;
+		/*int cnt = 0;
 		for (const ObjectData& mapdata : mapdatas) {
 			if (mapdata.tag != -1) {
 				std::cout << cnt<<"."<<"Map tag = " << mapdata.tag << std::endl;
@@ -342,7 +349,7 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 				std::cout << cnt << "." << "Map Roatation = " << mapdata.rotationX <<","<<mapdata.rotationY<<","<<mapdata.rotationZ << std::endl;
 				cnt++;
 			}
-		}
+		}*/
 		
 
 		switch (currentScene) {
