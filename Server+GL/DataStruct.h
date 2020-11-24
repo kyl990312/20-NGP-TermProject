@@ -1,7 +1,7 @@
 #pragma once
 //ตฅภฬลอ struct
 
-#pragma pack(1)  
+#pragma pack(1)
 typedef struct ObjectData {
 	float positionX, positionY, positionZ; // position
 	float rotationX, rotationY, rotationZ;
@@ -15,6 +15,14 @@ typedef struct HeroData {
 	float rotaionAngle;
 	bool alive;
 }HeroData;
+
+#pragma pack(1)  
+typedef struct MouseData {
+	int button = 0;
+	int state = 0;
+	int MouseX = 0;
+	int MouseY = 0;
+}MouseData;
 
 enum Scene {
 	Title,

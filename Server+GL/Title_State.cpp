@@ -5,7 +5,6 @@ extern Shader* shader1;
 extern Shader* fontShader;
 extern Shader* startbutton_shader;
 
-
 void Title_State::Display() {
 	shader1->use();
 	// lightning
@@ -40,11 +39,6 @@ void Title_State::keyboard(unsigned char key, int x, int y) {
 }
 
 void Title_State::mouse(int button, int state, int x, int y) {
-	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN
-		&& x < 550 && x > 410
-		&& y < 600 && y >470) {
-		ready_state = 1;
-	}
 }
 
 void Title_State::draw_font() {
@@ -93,10 +87,50 @@ void Title_State::draw_startbutton()
 	model = glm::rotate(model, glm::radians(6.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, glm::radians(-30.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
-	if (ready_state == 1)
-		startbutton_shader->setVec3("obj_color", glm::vec3(1.0, 0.5, 0.8));
+	//if (ready_state == 1)
+	//	startbutton_shader->setVec3("obj_color", glm::vec3(1.0, 0.5, 0.8));
 	models[26].load(projection, view);
 
 	models[26].setTransform(model);
 	models[26].draw();
+}
+
+void Title_State::TitleDatas(ObjectData mapdatas[]) {
+	ObjectData tmpMap;
+
+	tmpMap.tag = ModelIdx::Hero;
+	tmpMap.positionX = 300.0f;
+	tmpMap.positionY = 0.f;
+	tmpMap.positionZ = obj_pos.z;
+	tmpMap.rotationX = 0.0f;
+	tmpMap.rotationY = 0.0f;
+	tmpMap.rotationZ = 0.0f;
+	tmpMap.sizeX = 3.0f;
+	tmpMap.sizeY = 3.0f;
+	tmpMap.sizeZ = 3.0f;
+	mapdatas[0] = tmpMap;
+
+	tmpMap.tag = ModelIdx::TitleFont;
+	tmpMap.positionX = 0.f;
+	tmpMap.positionY = 0.f;
+	tmpMap.positionZ = obj_pos.z;
+	tmpMap.rotationX = 0.0f;
+	tmpMap.rotationY = 0.0f;
+	tmpMap.rotationZ = 0.0f;
+	tmpMap.sizeX = 1.0f;
+	tmpMap.sizeY = 1.0f;
+	tmpMap.sizeZ = 1.0f;
+	mapdatas[1] = tmpMap;
+
+	tmpMap.tag = ModelIdx::StartButton;
+	tmpMap.positionX = 10.0f;
+	tmpMap.positionY = -300.0f;
+	tmpMap.positionZ = 10.0f;
+	tmpMap.rotationX = 60.0f;
+	tmpMap.rotationY = 6.0f;
+	tmpMap.rotationZ = -27.0f;
+	tmpMap.sizeX = 3.5f;
+	tmpMap.sizeY = 4.0f;
+	tmpMap.sizeZ = 4.0f;
+	mapdatas[2] = tmpMap;
 }

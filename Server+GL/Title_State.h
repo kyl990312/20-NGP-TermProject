@@ -2,6 +2,7 @@
 #include "loadObj.h"
 #include "MyHeader.h"
 #include"firework_particle.h"
+#include "DataStruct.h"
 
 #include <math.h>
 class Title_State
@@ -16,12 +17,13 @@ public:
 	MyPos obj_pos = { 0.0f,0.0f,0.0f };
 	Shader* shader;
 	Shader* font_shader;
+	Shader* startbutton_shader;
 
 	firework firework_particle[4];
 
 	float font_sin_angle = 0.0f;
 	int next_state = 0;
-	bool ready_state = 0;
+	int clientCnt = 0;
 
 public:
 	void Display();
@@ -31,4 +33,5 @@ public:
 	void draw_font();
 	void draw_rabit();
 	void draw_startbutton();
+	void TitleDatas(ObjectData[]);
 };
