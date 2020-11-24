@@ -3,8 +3,8 @@
 #include <winsock2.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include<fstream>
-#include<iostream>
+#include <fstream>
+#include <iostream>
 #include "DataStruct.h"
 #include "MainGame_State.h"
 #include "Title_State.h"
@@ -28,10 +28,13 @@ struct MultipleArg {
 };
 ObjectData mapdatas[100];
 HeroData heroDatas[3];
-int currentScene = Scene::MainGame;
+
+//MouseData MData;
+int currentScene = Scene::Title;
+HANDLE hThread[3];
 
 // GL
-Title_State title;
+Title_State* title_game = nullptr;
 MainGame_State* main_game = nullptr;
 End_State* end;
 
@@ -39,10 +42,17 @@ GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 GLvoid TimerFunction(int value);
 GLvoid keyboard(unsigned char key, int x, int y);
+GLvoid mouse(int button, int state, int x, int y);
 
-loadOBJ models[26];
+int state_mode = 0;
+int clientCnt = 0;
+bool ready_check[3] = {false, false, false};
+bool startSignal = false;
+
+loadOBJ models[27];
 Shader* shader1;
 Shader* fontShader;
+Shader* startbutton_shader;
 
 // frame
 int prevTime = 0;
@@ -51,6 +61,7 @@ float elapsedTimeSec = 0;
 void ModelLoad() {
 	shader1 = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
 	fontShader = new Shader("shaders/vertexshader.glvs", "shaders/font_fragmentshader.glfs");
+	startbutton_shader = new Shader("shaders/startbutton_vertexshader.glvs", "shaders/startbutton_fragmentshader.glfs");
 
 	// Hero
 	models[0] = loadOBJ("Resources/rabit.obj", shader1->ID);
@@ -89,6 +100,7 @@ void ModelLoad() {
 	models[23] = loadOBJ("Resources/title_font.obj", fontShader->ID);
 	models[24] = loadOBJ("Resources/title_plane.obj", shader1->ID);
 	models[25] = loadOBJ("Resources/ghost.obj", shader1->ID);
+	models[26] = loadOBJ("Resources/start_button.obj", startbutton_shader->ID);
 
 	shader1->setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
 	shader1->setVec3("lightColor", glm::vec3(0.5f, 0.5f, 0.5f));
@@ -99,6 +111,10 @@ void ModelLoad() {
 	fontShader->setVec3("lightPos", glm::vec3(0, 800, 2000));
 	fontShader->setVec3("obj_color", glm::vec3(1.0, 0.6, 0.0));
 
+	startbutton_shader->setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
+	startbutton_shader->setVec3("lightColor", glm::vec3(0.5f, 0.5f, 0.5f));
+	startbutton_shader->setVec3("lightPos", glm::vec3(0, 800, 2000));
+	startbutton_shader->setVec3("obj_color", glm::vec3(0.8, 0.6, 0.0));
 }
 
 int main(int argc, char** argv)
@@ -124,21 +140,25 @@ int main(int argc, char** argv)
 	}
 
 	main_game = new MainGame_State;
+	title_game = new Title_State;
+
 	// 통신
 	// 윈속 - 데이터 처리 스레드 분리 
-	HANDLE hThread = CreateThread(NULL, 0, ProcessServer, NULL, 0, NULL);
+	HANDLE hThread0 = CreateThread(NULL, 0, ProcessServer, NULL, 0, NULL);
 
-	title.shader = shader1;
-	title.font_shader = fontShader;
+	title_game->shader = shader1;
+	title_game->font_shader = fontShader;
+	title_game->startbutton_shader = startbutton_shader;
 
 
 	glutDisplayFunc(drawScene);
 	glutTimerFunc(33, TimerFunction, 1);
 	glutKeyboardFunc(keyboard);
+	glutMouseFunc(mouse);
 	glutReshapeFunc(Reshape);
 	glutMainLoop();
 
-	CloseHandle(hThread);
+	CloseHandle(hThread0);
 }
 
 GLvoid drawScene()
@@ -160,7 +180,7 @@ GLvoid drawScene()
 
 	switch (currentScene) {
 	case 0:
-		title.Display();
+		title_game->Display();
 		break;
 	case 1:
 		if(main_game!=NULL)
@@ -177,6 +197,11 @@ GLvoid Reshape(int w, int h) {
 	glViewport(0, 0, w, h);
 }
 
+
+int recvn(SOCKET s, char* buf, int len, int flags);
+void recvFixedVar(SOCKET& client_sock, size_t len, char buf[]);
+
+
 GLvoid TimerFunction(int value)
 {
 	// calc elapsedTime
@@ -186,10 +211,15 @@ GLvoid TimerFunction(int value)
 	elapsedTimeSec = (float)elapsedTime / 1000.f;
 
 	switch (currentScene) {
-	case 0:
-		title.update();
+	case Scene::Title:
+		title_game->update();
+		if (ready_check[0] == true && ready_check[1] == true && ready_check[2] == true) {
+			std::cout << "들어옴" << std::endl;
+			startSignal = true;
+			//currentScene = Scene::MainGame;
+		}
 		break;
-	case 1:
+	case Scene::MainGame:
 		main_game->update();
 		//main_game;
 		/*if (currentScene != 1) {
@@ -198,9 +228,13 @@ GLvoid TimerFunction(int value)
 			end = new End_State;
 
 		}*/
-
+		currentScene = main_game->next_state;
+		if (currentScene != 1) {
+			delete main_game;
+			end = new End_State;
+		}
 		break;
-	case 2:
+	case Scene::End:
 		end->update();
 		break;
 	}
@@ -211,11 +245,17 @@ GLvoid TimerFunction(int value)
 GLvoid keyboard(unsigned char key, int x, int y) {
 	switch (currentScene) {
 	case 0:
-		title.keyboard(key, x, y);
-		currentScene = title.next_state;
-		if (currentScene == 1) {
+		//title.keyboard(key, x, y);
+		//currentScene = title.next_state;
+		//if (currentScene == 1) {
 			//main_game = new MainGame_State;
-		}
+		//}
+
+		//title_game->keyboard(key, x, y);
+		//state_mode = title_game->next_state;
+		//if (state_mode == 1) {
+		//	main_game = new MainGame_State;
+		//}
 		break;
 	case 1:
 		//main_game->keyboard(key, x, y);
@@ -226,6 +266,10 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		delete end;
 		break;
 	}
+}
+
+GLvoid mouse(int button, int state, int x, int y) {
+	
 }
 
 // 소켓 함수 오류 출력 후 종료
@@ -261,6 +305,7 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 	int clientCnt = 0;
 
 	std::cout << "ProcessServer" << std::endl;
+
 	// 윈속 초기화
 	WSADATA wsa;
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
@@ -286,32 +331,44 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 	if (retval == SOCKET_ERROR) err_quit((char*)"listen()");
 
 	// 전용 소켓
-	SOCKET client_sock;
-	SOCKADDR_IN clientaddr;
-	int addrlen;
-
+	
 
 	while (1) {
 		switch (currentScene) {
 		case Scene::MainGame:
 		{
-			// accept()
-			addrlen = sizeof(clientaddr);
-			client_sock = accept(listen_sock, (SOCKADDR*)&clientaddr, &addrlen);
+			if (hThread[0] != NULL)
+				std::cout << "스레드 0 생성" << std::endl;
+			if (hThread[1] != NULL)
+				std::cout << "스레드 1 생성" << std::endl;
+			if (hThread[2] != NULL)
+				std::cout << "스레드 2 생성" << std::endl;
+
+			// accept() 
+			SOCKADDR_IN clientaddr;
+			int addrlen = sizeof(clientaddr);
+			SOCKET client_sock = accept(listen_sock, (SOCKADDR*)&clientaddr, &addrlen);
 			if (client_sock == INVALID_SOCKET) {
 				err_display((char*)"accept()");
 				break;
 			}
 
-			// 스레드 생성
-			std::cout << "Create Thread" << std::endl;
-			MultipleArg arg = { client_sock, clientCnt++ };
-			HANDLE hThread = CreateThread(NULL, 0, ConversationWithClient, (LPVOID)&arg, 0, NULL);
+			int clientCount = clientCnt;
 
-			if (hThread == NULL)
+			// 스레드 생성
+			/*std::cout << "Create Thread" << std::endl;
+			MultipleArg arg = { client_sock, clientCnt++ };
+			HANDLE hThread = CreateThread(NULL, 0, ConversationWithClient, (LPVOID)&arg, 0, NULL);*/
+
+			MultipleArg arg = { client_sock, clientCount };
+			hThread[clientCount] = CreateThread(NULL, 0, ConversationWithClient, (LPVOID)&arg, 0, NULL);
+
+			if (hThread[clientCount] == NULL)
 				closesocket(client_sock);
 			else
-				CloseHandle(hThread);
+				CloseHandle(hThread[clientCount]);
+
+			clientCnt++;
 		}
 		break;
 		case Scene::Title:
@@ -321,8 +378,6 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 
 			break;
 		}
-
-
 	}
 
 	// closesocket()
@@ -332,6 +387,8 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 	WSACleanup();
 	return 0;
 }
+
+
 
 DWORD WINAPI ConversationWithClient(LPVOID arg)
 {
@@ -343,6 +400,9 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 	getpeername(client_sock, (SOCKADDR*)&clientaddr, &addrlen);
 	std::cout << "클라이언트 접속" << std::endl;
 	int id = 0;				// 나중에 클라이언트 고유인덱스 붙여줘야함!!!
+
+	bool ready = false;
+	int cnt = ((MultipleArg*)arg)->clientCount;
 
 	while (1) {
 		//test
@@ -357,10 +417,26 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 				cnt++;
 			}
 		}*/
-		
-
 		switch (currentScene) {
 		case Scene::Title:
+			// ready 받기
+			recvFixedVar(client_sock, sizeof(bool), (char*)&ready);
+
+			if (ready == true) {
+				ready_check[cnt] = true;
+				std::cout << cnt << " - "
+					<< ready_check[cnt] << std::endl;
+			}
+
+			// start signal
+			sendFixedVar(client_sock, sizeof(bool), (char*)&startSignal);
+
+			// 맵 데이터 넘겨주기
+			title_game->TitleDatas(mapdatas);
+			for (const ObjectData& mapdata : mapdatas) {
+				sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
+			}
+
 			break;
 		case Scene::MainGame:
 			// key 입력 받기
@@ -373,13 +449,13 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 			// hero data 전송
 			main_game->GetHeroDatas(heroDatas);
 			for (const HeroData data : heroDatas) {
-				sendFixedVar(client_sock, sizeof(HeroData), (char*) & data);
+				sendFixedVar(client_sock, sizeof(HeroData), (char*)&data);
 			}
 
 			// map data 전송
 			main_game->GetMapDatas(mapdatas);
 			for (const ObjectData& mapdata : mapdatas) {
-					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
+				sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
 			}
 
 			// client key입력 수신
@@ -388,9 +464,6 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 		case Scene::End:
 			break;
 		}
-
-
-
 	}
 	// closesocket()
 	closesocket(client_sock);
@@ -415,4 +488,51 @@ void sendFixedVar(SOCKET& sock, size_t readSize, char buf[])
 		err_display((char*)"send()");
 		return;
 	}
+}
+
+int recvn(SOCKET s, char* buf, int len, int flags)
+{
+	int received;
+	// 받은 데이터를 저장할 버퍼
+	char* ptr = buf;
+	// 수신 버퍼로부터 복사할 데이터 크기(BYTE)
+	int left = len;
+
+	while (left > 0) {
+		// 소켓, 받은 데이터를 저장할 버퍼, 수신 버퍼로부터 복사할 데이터 크기(BYTE), flag(0) 
+		// 받은 바이트 수 or 0(연결 종료) or SOKET_ERROR
+		received = recv(s, ptr, left, flags);
+		if (received == SOCKET_ERROR)
+			return SOCKET_ERROR;
+		else if (received == 0)
+			break;
+		left -= received;
+		ptr += received;
+	}
+
+	return (len - left);
+}
+
+void recvFixedVar(SOCKET& client_sock, size_t len, char buf[])
+{
+	int retval;
+
+	// 데이터 받기(고정 길이)
+	// 소켓, 데이터 저장할 버퍼, 수신 버퍼로부터 복사할 데이터 크기(BYTE), flag
+	retval = recvn(client_sock, (char*)&len, sizeof(int), 0);
+	if (retval == SOCKET_ERROR) {
+		err_display((char*)"recv()");
+		return;
+	}
+	else if (retval == 0)
+		return;
+
+	// 데이터 받기(가변 길이)
+	retval = recvn(client_sock, buf, len, 0);
+	if (retval == SOCKET_ERROR) {
+		err_display((char*)"recv()");
+		return;
+	}
+	else if (retval == 0)
+		return;
 }
