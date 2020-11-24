@@ -331,11 +331,10 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 	if (retval == SOCKET_ERROR) err_quit((char*)"listen()");
 
 	// 전용 소켓
-	
 
 	while (1) {
 		switch (currentScene) {
-		case Scene::MainGame:
+		case Scene::Title:
 		{
 			if (hThread[0] != NULL)
 				std::cout << "스레드 0 생성" << std::endl;
@@ -371,7 +370,7 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 			clientCnt++;
 		}
 		break;
-		case Scene::Title:
+		case Scene::MainGame:
 			
 			break;
 		case Scene::End:
