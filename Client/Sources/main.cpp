@@ -360,7 +360,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 				}
 				// Client 개수 받아오기
 				recvFixedVar(sock, sizeof(int), (char*)&recvScene);
-
 			}
 				break;
 			case  Scene::MainGame:

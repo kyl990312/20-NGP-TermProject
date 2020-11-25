@@ -147,6 +147,7 @@
     <ClCompile Include="DataStruct.h" />
     <ClCompile Include="End_State.cpp" />
     <ClCompile Include="firework.cpp" />
+    <ClCompile Include="FirstState.cpp" />
     <ClCompile Include="loadOBJ.cpp" />
     <ClCompile Include="MainGame_State.cpp" />
     <ClCompile Include="Model.cpp" />
@@ -165,6 +166,7 @@
   <ItemGroup>
     <ClInclude Include="End_State.h" />
     <ClInclude Include="firework_particle.h" />
+    <ClInclude Include="FirstState.h" />
     <ClInclude Include="loadObj.h" />
     <ClInclude Include="MainGame_State.h" />
     <ClInclude Include="Model.h" />
