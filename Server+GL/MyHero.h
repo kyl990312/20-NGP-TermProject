@@ -32,6 +32,8 @@ public:
 	float log_speed = 0;
 	//bool fall_into_river = false;
 	HeroState _state = HeroState::Idle;
+	MyPos prevPosition = { 0.0f,0.0f,0.0f };
+	MyPos otherHero[2];
 
 public:
 	bool check_collision(MyPos obs_pos,int obs_tag);
@@ -43,5 +45,7 @@ public:
 	void update(int tag, MyPos* obs_pos, int obs_cnt1);
 	void draw(glm::mat4 projection, glm::mat4 view, Shader shader);
 	void soul_draw(glm::mat4 projection, glm::mat4 view,Shader shader);
+	bool CheckCollistionWithHero(MyPos position, float size);
+
 };
 

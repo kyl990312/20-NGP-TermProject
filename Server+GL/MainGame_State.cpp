@@ -1,4 +1,5 @@
 #include "MainGame_State.h"
+#include"FirstState.h"
 // this is main game state
 extern float elapsedTimeSec;
 
@@ -13,8 +14,10 @@ MainGame_State::~MainGame_State() {
 	out << pass_state_cnt << '\n';
 	out.close();
 	for (int i = 0; i < map_count;++i) {
-		delete states[i];
+		if(states[i] != NULL)
+			delete states[i];
 	}
+	if(states != NULL)
 	delete states;
 }
 
@@ -51,7 +54,7 @@ void MainGame_State::Display() {
 void MainGame_State::update() {
 	if (start) {
 		// map moving
-		if (hero[0]._state != HeroState::Die) {
+		if (hero[0]._state != HeroState::Die || hero[1]._state != HeroState::Die || hero[2]._state != HeroState::Die) {
 			for (int i = 0; i < map_count; i++) {
 				states[i]->move();
 				states[i]->pos.z += 5 * elapsedTimeSec * SPEED;
@@ -59,10 +62,16 @@ void MainGame_State::update() {
 		}
 		
 		//hero
-		for(int i = 0 ; i <1; ++i)
+		for(int i = 0 ; i <3; ++i)
 			hero_update(i);
+		for (int i = 0; i < 3; ++i) {
+			hero[i].otherHero[0]=hero[(i+1)%3].current_pos;
+			hero[i].otherHero[1]=hero[(i+1)%3].current_pos;
+		}
+
+		//HeroCollide();
 	}
-	if (hero[0]._state == HeroState::Die) {
+	if (hero[0]._state == HeroState::Die && hero[1]._state == HeroState::Die && hero[2]._state == HeroState::Die) {
 		if (back_music) {
 			PlaySound(TEXT("Resources/fail2.wav"), NULL, SND_FILENAME | SND_NODEFAULT | SND_ASYNC);
 			back_music = false;
@@ -72,11 +81,12 @@ void MainGame_State::update() {
 			next_state = 2;
 		}
 	}
+
 }
 
 void MainGame_State::keyboard(unsigned char key, int x, int y) {
 	if (hero[x]._state == HeroState::Idle || hero[x]._state == HeroState::Float) {
-		//PlaySound(TEXT("./jump2.wav"), NULL, SND_FILENAME | SND_NODEFAULT | SND_ASYNC);
+		hero[x].prevPosition = hero[x].current_pos;
 		switch (key) {
 		case 'w':
 		case 'W':
@@ -105,16 +115,10 @@ void MainGame_State::keyboard(unsigned char key, int x, int y) {
 }
 
 void MainGame_State::init_map() {
-	states[0] = new MyCommon;
-	if (fabs(states[0]->collision_pos[0].x - hero[0].current_pos.x) < 50) {
-		hero[0].current_pos.x += 50;
+	for (int i = 0; i < 3; ++i) {
+		hero[i].current_pos.x = (i - 1) * 50.0f;
 	}
-	if (fabs(states[0]->collision_pos[1].x - hero[0].current_pos.x) < 50) {
-		hero[0].current_pos.x += 50;
-	}
-	if (fabs(states[0]->collision_pos[2].x - hero[0].current_pos.x) < 50) {
-		hero[0].current_pos.x += 50;
-	}
+	states[0] = new FirstState;
 	//create states
 	for (int i = 1; i < map_count; i++) {
 		int create_state_random = rand() % 7;
@@ -152,8 +156,8 @@ void MainGame_State::hero_update(int idx) {
 		// when hero is on the log run this code
 		hero[idx].log_speed = states[cur_state_idx[idx]]->get_obs_speed(0);
 	}
-	hero[idx].update(cur_state_tag[idx], cur_state_obs_pos[idx], cur_state_obs_cnt[idx]);
 	hero[idx].cur_mapState_posZ = states[cur_state_idx[idx]]->pos.z;
+	hero[idx].update(cur_state_tag[idx], cur_state_obs_pos[idx], cur_state_obs_cnt[idx]);
 }
 
 void MainGame_State::GetMapDatas(ObjectData* mapDatas)
@@ -219,7 +223,7 @@ void MainGame_State::GetMapDatas(ObjectData* mapDatas)
 
 void MainGame_State::GetHeroDatas(HeroData* herodatas)
 {
-	for (int i = 0; i < 1; ++i) {
+	for (int i = 0; i < 3; ++i) {
 		herodatas[i].x = hero[i].current_pos.x;
 		herodatas[i].y = hero[i].current_pos.y;
 		herodatas[i].z = hero[i].current_pos.z;
@@ -252,3 +256,4 @@ void MainGame_State::DeleteAll()
 	if (states != NULL)
 		delete states;
 }
+

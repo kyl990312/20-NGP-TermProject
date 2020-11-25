@@ -56,5 +56,5 @@ public:
 	void GetHeroDatas(HeroData* herodatas);
 	void Init();
 	void DeleteAll();
-};
+}; 
 

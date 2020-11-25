@@ -13,7 +13,7 @@
 #define SERVERPORT 9000
 #define BUFSIZE    512
 
-#define MAX_CLIENT 1
+#define MAX_CLIENT 3
 
 // 통신
 void sendFixedVar(SOCKET&, size_t, char[]);
@@ -125,7 +125,7 @@ int main(int argc, char** argv)
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(900, 700);
-	glutCreateWindow("Floating Window");
+	glutCreateWindow("Server");
 	glewExperimental = GL_TRUE;
 	if (glewInit() != GLEW_OK) {
 		std::cerr << "Unable to initialize GLEW" << std::endl;
@@ -146,10 +146,6 @@ int main(int argc, char** argv)
 	// 통신
 	// 윈속 - 데이터 처리 스레드 분리 
 	HANDLE hThread0 = CreateThread(NULL, 0, ProcessServer, NULL, 0, NULL);
-
-	title_game->shader = shader1;
-	title_game->font_shader = fontShader;
-	title_game->startbutton_shader = startbutton_shader;
 
 	glutDisplayFunc(drawScene);
 	glutTimerFunc(33, TimerFunction, 1);
@@ -214,7 +210,7 @@ GLvoid TimerFunction(int value)
 		if (WaitForSingleObject(hAllSend, INFINITE) == WAIT_OBJECT_0) {
 			ResetEvent(hAllUpdated);
 			title_game->update();
-			if (ready_check[0] == true && ready_check[1] == true //&& ready_check[2] == true
+			if (ready_check[0] == true && ready_check[1] == true && ready_check[2] == true
 				) {
 				startSignal = true;
 				currentScene = Scene::MainGame;
@@ -250,29 +246,7 @@ GLvoid TimerFunction(int value)
 }
 
 GLvoid keyboard(unsigned char key, int x, int y) {
-	switch (currentScene) {
-	case 0:
-		//title.keyboard(key, x, y);
-		//currentScene = title.next_state;
-		//if (currentScene == 1) {
-			//main_game = new MainGame_State;
-		//}
-
-		//title_game->keyboard(key, x, y);
-		//state_mode = title_game->next_state;
-		//if (state_mode == 1) {
-		//	main_game = new MainGame_State;
-		//}
-		break;
-	case 1:
-		//main_game->keyboard(key, x, y);
-		break;
-	case 2:
-		end->keyboard(key, x, y);
-		currentScene = end->next_state;
-		delete end;
-		break;
-	}
+	
 }
 
 // 소켓 함수 오류 출력 후 종료
@@ -427,7 +401,6 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 	int addrlen = sizeof(clientaddr);
 	getpeername(client_sock, (SOCKADDR*)&clientaddr, &addrlen);
 	std::cout << "클라이언트 접속" << std::endl;
-	int id = 0;				// 나중에 클라이언트 고유인덱스 붙여줘야함!!!
 
 	bool ready = false;
 	int cnt = ((MultipleArg*)arg)->clientCount;
@@ -460,13 +433,14 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 			if (WaitForSingleObject(hAllUpdated, INFINITE) == WAIT_OBJECT_0) {
 				ResetEvent(hAllSend);
 				// start signal
-				sendFixedVar(client_sock, sizeof(bool), (char*)&startSignal);
 
 				// 맵 데이터 넘겨주기
 				title_game->TitleDatas(mapdatas);
 				for (const ObjectData& mapdata : mapdatas) {
 					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
 				}
+
+				sendFixedVar(client_sock, sizeof(int), (char*)&currentScene);
 				SetEvent(hAllSend);
 			}
 			break;
@@ -474,12 +448,12 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 			// key 입력 받기
 			recv(client_sock, &key, sizeof(char), 0);
 			if (key != '\0' || key != NULL) {
-				main_game->keyboard(key, id, 0);
-				std::cout << key << std::endl;
+				main_game->keyboard(key, cnt, 0);
 			}
 
 			if (WaitForSingleObject(hAllUpdated, INFINITE) == WAIT_OBJECT_0) {
 				ResetEvent(hAllSend);
+
 				// hero data 전송
 				main_game->GetHeroDatas(heroDatas);
 				for (const HeroData data : heroDatas) {

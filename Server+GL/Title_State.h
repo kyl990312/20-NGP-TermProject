@@ -15,9 +15,7 @@ public:
 	glm::mat4 view = glm::lookAt(cameraPos, cameraDirection, cameraUp);
 
 	MyPos obj_pos = { 0.0f,0.0f,0.0f };
-	Shader* shader;
-	Shader* font_shader;
-	Shader* startbutton_shader;
+
 
 	firework firework_particle[4];
 

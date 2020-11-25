@@ -26,8 +26,13 @@ void kyrHero::Jump(int tag, MyPos* obs_pos, int obs_cnt1)
 	// 0 ~ 30  : 20, 30, 30, 20, 0
 	current_pos.y = -5.f * jump_DeltaX * (jump_DeltaX - 5.f); 
 
-
 	// Check Collsion
+	for (int i = 0; i < 2; ++i) {
+		if (CheckCollistionWithHero(otherHero[i],40)) {
+			current_pos = prevPosition;
+		}
+	}
+
 	switch (tag) {
 	case MapState::River:
 		for (int i = 0; i < obs_cnt1; i++) {
@@ -43,17 +48,7 @@ void kyrHero::Jump(int tag, MyPos* obs_pos, int obs_cnt1)
 	case MapState::Common:
 		for (int i = 0; i < obs_cnt1; i++) {
 			if (check_collision(obs_pos[i], tag)) {
-				switch ((int)direction_angle) {
-				case 0:
-					current_pos.x += 50;
-					break;
-				case -90:
-					current_pos.x += 10;
-					break;
-				case 90:
-					current_pos.x -= 10;
-					break;
-				}
+				current_pos = prevPosition;
 			}
 		}
 		break;
@@ -190,8 +185,7 @@ void kyrHero::update(int tag, MyPos* obs_pos1, int obs_cnt1) {
 		std::cout << "Die" << std::endl;
 		Die();
 		break;
-	}
-	
+	}	
 }
 
 void kyrHero::Die() {
@@ -209,5 +203,42 @@ void kyrHero::soul_draw(glm::mat4 projection, glm::mat4 view, Shader shader){
 
 	soul_obj.setTransform(model);
 	soul_obj.draw();
-
 }
+
+bool kyrHero::CheckCollistionWithHero(MyPos position, float size)
+{
+	float aMinX, aMinY, aMinZ, aMaxX, aMaxY, aMaxZ;
+	float bMinX, bMinY, bMinZ, bMaxX, bMaxY, bMaxZ;
+
+	aMinX = current_pos.x - size / 2;
+	aMinY = current_pos.y - size / 2;
+	aMinZ = current_pos.z - size / 2;
+	aMaxX = current_pos.x + size / 2;
+	aMaxY = current_pos.y + size / 2;
+	aMaxZ = current_pos.z + size / 2;
+
+	bMinX = position.x - size / 2;
+	bMinY = position.y - size / 2;
+	bMinZ = position.z - size / 2;
+	bMaxX = position.x + size / 2;
+	bMaxY = position.y + size / 2;
+	bMaxZ = position.z + size / 2;
+
+	if (aMinX > bMaxX)
+		return false;
+	if (aMaxX < bMinX)
+		return false;
+
+	if (aMinY > bMaxY)
+		return false;
+	if (aMaxY < bMinY)
+		return false;
+
+	if (aMinZ > bMaxZ)
+		return false;
+	if (aMaxZ < bMinZ)
+		return false;
+
+	return true;
+}
+

@@ -330,13 +330,13 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 			sendFixedVar(sock, sizeof(bool), (char*)&isReady);
 
 			// Client 개수 받아오기
-			recvFixedVar(sock, sizeof(bool), (char*)&startSignal);
 
 			for (ObjectData& obj : objectDatas) {
 				recvFixedVar(sock, len, buf);
 				memcpy(&obj, buf, sizeof(ObjectData));
 				ZeroMemory(&buf, sizeof(buf));
 			}
+			recvFixedVar(sock, sizeof(int), (char*)&currentScene);
 			break;
 		case  Scene::MainGame:
 		{	
