@@ -9,7 +9,7 @@
 
 #define SERVERIP   "127.0.0.1"
 #define SERVERPORT 9000
-#define BUFSIZE    128
+#define BUFSIZE    256
 
 #define SCR_WIDTH 800
 #define SCR_HEIGHT 600
@@ -18,13 +18,16 @@
 
 
 // Server-Client Process
-void err_quit(char* );
-void err_display(char* );
-void recvFixedVar(SOCKET& , size_t , char[]);
+void err_quit(char*);
+void err_display(char*);
+void recvFixedVar(SOCKET&, size_t, char[]);
 void sendFixedVar(SOCKET& sock, size_t readSize, char buf[]);
-int recvn(SOCKET , char* , int , int );
+int recvn(SOCKET, char*, int, int);
 DWORD WINAPI ProcessClient(LPVOID);
 HANDLE hAllDataStore;
+HANDLE hDraw;
+int recvScene;
+
 
 // gameProceess
 GLvoid drawScene();
@@ -84,7 +87,7 @@ int main(int argc, char** argv)
 		std::cout << "GLEW Initialized" << std::endl;
 
 	ModelLoad();
-	
+
 	// 콜백
 	glutDisplayFunc(drawScene);
 	glutTimerFunc(33, TimerFunction, 1);
@@ -103,14 +106,23 @@ GLvoid drawScene()
 	switch (currentScene) {
 	case Scene::Title:
 		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
-		if (startSignal == true)
-			currentScene = Scene::MainGame;
-		TitleRender();
+		if (WaitForSingleObject(hAllDataStore, INFINITE) == WAIT_OBJECT_0) {
+			TitleRender();
+			if (recvScene == Scene::MainGame) {
+				currentScene = Scene::MainGame;
+				std::cout << "게임 스테이트 바꿈" << std::endl;
+			}
+			ResetEvent(hAllDataStore);
+			SetEvent(hDraw);
+		}
 		break;
 	case Scene::MainGame:
-		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
-		if(WaitForSingleObject(hAllDataStore,INFINITE)== WAIT_OBJECT_0)
+		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
+		if (WaitForSingleObject(hAllDataStore, INFINITE) == WAIT_OBJECT_0) {
 			MainGameRender();
+			ResetEvent(hAllDataStore);
+			SetEvent(hDraw);
+		}
 		break;
 	case Scene::End:
 		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
@@ -132,13 +144,13 @@ GLvoid TimerFunction(int value)
 {
 	switch (currentScene) {
 	case Scene::Title:
-		
+
 		break;
 	case Scene::MainGame:
-		
+
 		break;
 	case Scene::End:
-		
+
 		break;
 	}
 	glutTimerFunc(33, TimerFunction, 1);
@@ -148,7 +160,7 @@ GLvoid TimerFunction(int value)
 GLvoid keyboard(unsigned char key, int x, int y) {
 	switch (currentScene) {
 	case Scene::Title:
-		
+
 		break;
 	case Scene::MainGame:
 		switch (key) {
@@ -160,18 +172,18 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		case 'A':
 			m_key = 'a';
 			break;
-		case 'd': 
+		case 'd':
 		case 'D':
 			m_key = 'd';
 			break;
 		default:
 			m_key = '\0';
 			break;
-		}		
+		}
 
 		break;
 	case Scene::End:
-		
+
 		break;
 	}
 }
@@ -285,7 +297,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 	hAllDataStore = CreateEvent(  // event object 생성
 		NULL,          // 상속 불가
 		TRUE,          // manual-reset mode로 생상
-		TRUE,         // non-signaled 상태로 생성
+		FALSE,         // non-signaled 상태로 생성
 		NULL           // 이름 없는 event
 	);
 	if (hAllDataStore == NULL) {
@@ -293,6 +305,16 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 		return -1;
 	}
 
+	hDraw = CreateEvent(  // event object 생성
+		NULL,          // 상속 불가
+		TRUE,          // manual-reset mode로 생상
+		TRUE,         // non-signaled 상태로 생성
+		NULL           // 이름 없는 event
+	);
+	if (hDraw == NULL) {
+		printf("Event object creation error \n");
+		return -1;
+	}
 
 	std::cout << "ProcessClient" << std::endl;
 	int retval;
@@ -323,66 +345,75 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 
 	//서버와 데이터 통신
 	while (1) {
-		switch (currentScene)
-		{
-		case Scene::Title:
-			// ready 보내기
-			sendFixedVar(sock, sizeof(bool), (char*)&isReady);
+		if (WaitForSingleObject(hDraw, INFINITE) == WAIT_OBJECT_0) {
+			switch (currentScene)
+			{
+			case Scene::Title: 
+			{
+				// ready 보내기
+				sendFixedVar(sock, sizeof(bool), (char*)&isReady);
 
-			// Client 개수 받아오기
-			recvFixedVar(sock, sizeof(bool), (char*)&startSignal);
-
-			for (ObjectData& obj : objectDatas) {
-				recvFixedVar(sock, len, buf);
-				memcpy(&obj, buf, sizeof(ObjectData));
-				ZeroMemory(&buf, sizeof(buf));
-			}
-			break;
-		case  Scene::MainGame:
-		{	
-			// keyData 전송
-			send(sock, &m_key, sizeof(char), 0);
-			if (m_key != '\0')
-				std::cout << m_key << std::endl;
-			m_key = '\0';
-
-			ResetEvent(hAllDataStore);
-			// heroData 수신
-			for (HeroData& data : heroData) {
-				HeroData tmpMap;
-				recvFixedVar(sock, len, buf);
-				memcpy(&tmpMap, buf, sizeof(HeroData));
-				data = tmpMap;
-				ZeroMemory(&buf, sizeof(buf));
-			}
-
-			// mapData 수신
-			//objectDatas.clear();
-			for(ObjectData& obj : objectDatas ) {
-				ObjectData tmpMap;
-				recvFixedVar(sock, len, buf);
-				memcpy(&tmpMap, buf, sizeof(ObjectData));
-				//objectDatas.emplace_back(tmpMap);
-				obj = tmpMap;
-				ZeroMemory(&buf, sizeof(buf));
-			}
-			SetEvent(hAllDataStore);
-			//std::cout << objectDatas.size() << std::endl;
-
-		/*	int cnt = 0;
-			for (const ObjectData& mapdata : objectDatas) {
-				if (mapdata.tag != -1) {
-					std::cout << cnt << "." << "Map tag = " << mapdata.tag << std::endl;
-
-					std::cout << cnt << "." << "Map Position = " << mapdata.positionX << "," << mapdata.positionY << "," << mapdata.positionZ << std::endl;
-					std::cout << cnt << "." << "Map Size = " << mapdata.sizeX << "," << mapdata.sizeY << "," << mapdata.sizeZ << std::endl;
-					std::cout << cnt << "." << "Map Roatation = " << mapdata.rotationX << "," << mapdata.rotationY << "," << mapdata.rotationZ << std::endl;
-					cnt++;
+				for (ObjectData& obj : objectDatas) {
+					recvFixedVar(sock, len, buf);
+					memcpy(&obj, buf, sizeof(ObjectData));
+					ZeroMemory(&buf, sizeof(buf));
 				}
-			}*/
-		}
-		case Scene::End:
+				// Client 개수 받아오기
+				recvFixedVar(sock, sizeof(int), (char*)&recvScene);
+
+			}
+				break;
+			case  Scene::MainGame:
+			{
+				// keyData 전송
+				send(sock, &m_key, sizeof(char), 0);
+				if (m_key != '\0')
+					std::cout << m_key << std::endl;
+				m_key = '\0';
+
+				// heroData 수신
+				// recvFixedVar(sock, sizeof(HeroData) * 3, (char*)heroData);
+
+				for (HeroData& data : heroData) {
+					HeroData tmpMap;
+					recvFixedVar(sock, len, buf);
+					memcpy(&tmpMap, buf, sizeof(HeroData));
+					data = tmpMap;
+					ZeroMemory(&buf, sizeof(buf));
+				}
+
+				// mapData 수신
+				//recvFixedVar(sock, sizeof(ObjectData)*100, (char*)objectDatas);
+
+				for (ObjectData& obj : objectDatas) {
+					ObjectData tmpMap;
+					recvFixedVar(sock, len, buf);
+					memcpy(&tmpMap, buf, sizeof(ObjectData));
+					//objectDatas.emplace_back(tmpMap);
+					obj = tmpMap;
+					ZeroMemory(&buf, sizeof(buf));
+				}
+
+				//std::cout << objectDatas.size() << std::endl;
+
+			/*	int cnt = 0;
+				for (const ObjectData& mapdata : objectDatas) {
+					if (mapdata.tag != -1) {
+						std::cout << cnt << "." << "Map tag = " << mapdata.tag << std::endl;
+
+						std::cout << cnt << "." << "Map Position = " << mapdata.positionX << "," << mapdata.positionY << "," << mapdata.positionZ << std::endl;
+						std::cout << cnt << "." << "Map Size = " << mapdata.sizeX << "," << mapdata.sizeY << "," << mapdata.sizeZ << std::endl;
+						std::cout << cnt << "." << "Map Roatation = " << mapdata.rotationX << "," << mapdata.rotationY << "," << mapdata.rotationZ << std::endl;
+						cnt++;
+					}
+				}*/
+			}
 			break;
+			case Scene::End:
+				break;
+			}
+			ResetEvent(hDraw);
+			SetEvent(hAllDataStore);
 		}
 	}
 	// test
@@ -390,8 +421,10 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 		std::cout << obj.tag << std::endl;
 	}
 	std::cout << "통신 끝" << std::endl;
-	
+
 	CloseHandle(hAllDataStore);
+	CloseHandle(hDraw);
+
 	closesocket(sock);
 
 	WSACleanup();
@@ -472,7 +505,7 @@ void TitleRender() {
 		shader1->use();
 		if (obj.tag == ModelIdx::StartButton) {
 			startbuttonShader->use();
-			if(isReady == true)
+			if (isReady == true)
 				startbuttonShader->setVec3("obj_color", glm::vec3(0.8, 0.6, 0.0));
 			else
 				startbuttonShader->setVec3("obj_color", glm::vec3(1.0, 0.5, 0.8));
@@ -506,8 +539,8 @@ void MainGameRender() {
 	}
 
 	for (const HeroData hero : heroData) {
-		DrawObject(ModelIdx::Hero, glm::vec3(hero.x, hero.y, hero.z), 
-			glm::vec3(0.0f, hero.rotaionAngle, 0.0f), 
+		DrawObject(ModelIdx::Hero, glm::vec3(hero.x, hero.y, hero.z),
+			glm::vec3(0.0f, hero.rotaionAngle, 0.0f),
 			glm::vec3(1.0f, 1.0f, 1.0f));
 	}
 

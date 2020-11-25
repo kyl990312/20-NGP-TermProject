@@ -31,8 +31,8 @@ HeroData heroDatas[3];
 
 int currentScene = Scene::Title;
 HANDLE hThread[3];
-HANDLE hAllUpdated;
-HANDLE hAllSend;
+HANDLE hAllUpdated[3];
+HANDLE hAllSend[3];
 
 
 // GL
@@ -211,20 +211,16 @@ GLvoid TimerFunction(int value)
 
 	switch (currentScene) {
 	case Scene::Title:
-		if (WaitForSingleObject(hAllSend, INFINITE) == WAIT_OBJECT_0) {
-			ResetEvent(hAllUpdated);
+		if (WaitForMultipleObjects(3, hAllSend, TRUE, INFINITE) == WAIT_OBJECT_0) {
 			title_game->update();
-			if (ready_check[0] == true && ready_check[1] == true //&& ready_check[2] == true
-				) {
-				startSignal = true;
-				currentScene = Scene::MainGame;
+			for (int i = 0; i < 3; ++i) {
+				SetEvent(hAllUpdated[i]);
+				ResetEvent(hAllSend[i]);
 			}
-			SetEvent(hAllUpdated);
 		}
 		break;
 	case Scene::MainGame:
-		if (WaitForSingleObject(hAllSend, INFINITE) == WAIT_OBJECT_0) {
-			ResetEvent(hAllUpdated);
+		if (WaitForMultipleObjects(3, hAllSend, TRUE, INFINITE) == WAIT_OBJECT_0) {
 			main_game->update();
 			//main_game;
 			/*if (currentScene != 1) {
@@ -233,12 +229,15 @@ GLvoid TimerFunction(int value)
 				end = new End_State;
 
 			}*/
-			currentScene = main_game->next_state;
+			/*currentScene = main_game->next_state;
 			if (currentScene != 1) {
 				delete main_game;
 				end = new End_State;
+			}*/
+			for (int i = 0; i < 3; ++i) {
+				SetEvent(hAllUpdated[i]);
+				ResetEvent(hAllSend[i]);
 			}
-			SetEvent(hAllUpdated);
 		}
 		break;
 	case Scene::End:
@@ -304,26 +303,28 @@ void err_display(char* msg)
 
 DWORD WINAPI ProcessServer(LPVOID arg)
 {
-	hAllUpdated = CreateEvent(  // event object 생성
-		NULL,          // 상속 불가
-		TRUE,          // manual-reset mode로 생상
-		FALSE,         // non-signaled 상태로 생성
-		NULL           // 이름 없는 event
-	);
-	if (hAllUpdated == NULL) {
-		printf("Event object creation error \n");
-		return -1;
-	}
+	for (int i = 0; i < 3; ++i) {
+		hAllUpdated[i] = CreateEvent(  // event object 생성
+			NULL,          // 상속 불가
+			TRUE,          // manual-reset mode로 생상
+			FALSE,         // non-signaled 상태로 생성
+			NULL           // 이름 없는 event
+		);
+		if (hAllUpdated[i] == NULL) {
+			printf("Event object creation error \n");
+			return -1;
+		}
 
-	hAllSend = CreateEvent(  // event object 생성
-		NULL,          // 상속 불가
-		TRUE,          // manual-reset mode로 생상
-		TRUE,         // non-signaled 상태로 생성
-		NULL           // 이름 없는 event
-	);
-	if (hAllSend == NULL) {
-		printf("Event object creation error \n");
-		return -1;
+		hAllSend[i] = CreateEvent(  // event object 생성
+			NULL,          // 상속 불가
+			TRUE,          // manual-reset mode로 생상
+			TRUE,         // signaled 상태로 생성
+			NULL           // 이름 없는 event
+		);
+		if (hAllSend[i] == NULL) {
+			printf("Event object creation error \n");
+			return -1;
+		}
 	}
 
 	int retval;
@@ -361,14 +362,6 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 		switch (currentScene) {
 		case Scene::Title:
 		{
-			// 디버깅
-			if (hThread[0] != NULL)
-				std::cout << "스레드 0 생성" << std::endl;
-			if (hThread[1] != NULL)
-				std::cout << "스레드 1 생성" << std::endl;
-			if (hThread[2] != NULL)
-				std::cout << "스레드 2 생성" << std::endl;
-
 			// accept() 
 			SOCKADDR_IN clientaddr;
 			int addrlen = sizeof(clientaddr);
@@ -381,10 +374,6 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 			int clientCount = clientCnt;
 
 			// 스레드 생성
-			/*std::cout << "Create Thread" << std::endl;
-			MultipleArg arg = { client_sock, clientCnt++ };
-			HANDLE hThread = CreateThread(NULL, 0, ConversationWithClient, (LPVOID)&arg, 0, NULL);*/
-
 			MultipleArg arg = { client_sock, clientCount };
 			hThread[clientCount] = CreateThread(NULL, 0, ConversationWithClient, (LPVOID)&arg, 0, NULL);
 
@@ -406,7 +395,10 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 	}
 
 	// close Event
-	CloseHandle(hAllUpdated);
+	for (int i = 0; i < 3; ++i) {
+		CloseHandle(hAllUpdated[i]);
+		CloseHandle(hAllSend[i]);
+	}
 
 	// closesocket()
 	closesocket(listen_sock);
@@ -447,51 +439,59 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 		}*/
 		switch (currentScene) {
 		case Scene::Title:
-			// ready 받기
-			recvFixedVar(client_sock, sizeof(bool), (char*)&ready);
+			if (WaitForSingleObject(hAllUpdated[cnt], INFINITE) == WAIT_OBJECT_0) {
+				// ready 받기
+				recvFixedVar(client_sock, sizeof(bool), (char*)&ready);
 
-			if (ready == true) {
-				ready_check[cnt] = true;
-				std::cout << cnt << " - "
-					<< ready_check[cnt] << std::endl;
-			}
+				if (ready == true)
+					ready_check[cnt] = true;
 
-
-			if (WaitForSingleObject(hAllUpdated, INFINITE) == WAIT_OBJECT_0) {
-				ResetEvent(hAllSend);
-				// start signal
-				sendFixedVar(client_sock, sizeof(bool), (char*)&startSignal);
+				if (ready_check[0] == true && ready_check[1] == true && ready_check[2] == true
+					) {
+					startSignal = true;
+					currentScene = Scene::MainGame;
+				}
 
 				// 맵 데이터 넘겨주기
 				title_game->TitleDatas(mapdatas);
 				for (const ObjectData& mapdata : mapdatas) {
 					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
 				}
-				SetEvent(hAllSend);
+
+				// start signal
+				sendFixedVar(client_sock, sizeof(int), (char*)&currentScene);
+
+				ResetEvent(hAllUpdated[cnt]);
+				SetEvent(hAllSend[cnt]);
 			}
 			break;
 		case Scene::MainGame:
-			// key 입력 받기
-			recv(client_sock, &key, sizeof(char), 0);
-			if (key != '\0' || key != NULL) {
-				main_game->keyboard(key, id, 0);
-				std::cout << key << std::endl;
-			}
+			if (WaitForSingleObject(hAllUpdated[cnt], INFINITE) == WAIT_OBJECT_0) {
+				// key 입력 받기
+				recv(client_sock, &key, sizeof(char), 0);
+				if (key != '\0' || key != NULL) {
+					main_game->keyboard(key, id, 0);
+					std::cout << key << std::endl;
+				}
 
-			if (WaitForSingleObject(hAllUpdated, INFINITE) == WAIT_OBJECT_0) {
-				ResetEvent(hAllSend);
 				// hero data 전송
 				main_game->GetHeroDatas(heroDatas);
 				for (const HeroData data : heroDatas) {
 					sendFixedVar(client_sock, sizeof(HeroData), (char*)&data);
 				}
+				//sendFixedVar(client_sock, sizeof(HeroData) * 3, (char*)&heroDatas);
+
 
 				// map data 전송
 				main_game->GetMapDatas(mapdatas);
 				for (const ObjectData& mapdata : mapdatas) {
 					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
 				}
-				SetEvent(hAllSend);
+				//sendFixedVar(client_sock, sizeof(ObjectData)*100, (char*)&mapdatas);
+
+				
+				ResetEvent(hAllUpdated[cnt]);
+				SetEvent(hAllSend[cnt]);
 			}
 			break;
 		case Scene::End:
