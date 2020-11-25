@@ -29,9 +29,11 @@ struct MultipleArg {
 ObjectData mapdatas[100];
 HeroData heroDatas[3];
 
-//MouseData MData;
 int currentScene = Scene::Title;
 HANDLE hThread[3];
+HANDLE hAllUpdated;
+HANDLE hAllSend;
+
 
 // GL
 Title_State* title_game = nullptr;
@@ -42,11 +44,10 @@ GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 GLvoid TimerFunction(int value);
 GLvoid keyboard(unsigned char key, int x, int y);
-GLvoid mouse(int button, int state, int x, int y);
 
 int state_mode = 0;
 int clientCnt = 0;
-bool ready_check[3] = {false, false, false};
+bool ready_check[3] = { false, false, false };
 bool startSignal = false;
 
 loadOBJ models[27];
@@ -150,11 +151,9 @@ int main(int argc, char** argv)
 	title_game->font_shader = fontShader;
 	title_game->startbutton_shader = startbutton_shader;
 
-
 	glutDisplayFunc(drawScene);
 	glutTimerFunc(33, TimerFunction, 1);
 	glutKeyboardFunc(keyboard);
-	glutMouseFunc(mouse);
 	glutReshapeFunc(Reshape);
 	glutMainLoop();
 
@@ -183,7 +182,7 @@ GLvoid drawScene()
 		title_game->Display();
 		break;
 	case 1:
-		if(main_game!=NULL)
+		if (main_game != NULL)
 			main_game->Display();
 		break;
 	case 2:
@@ -205,40 +204,48 @@ void recvFixedVar(SOCKET& client_sock, size_t len, char buf[]);
 GLvoid TimerFunction(int value)
 {
 	// calc elapsedTime
-	int currentTime = glutGet(GLUT_ELAPSED_TIME);	
+	int currentTime = glutGet(GLUT_ELAPSED_TIME);
 	int elapsedTime = currentTime - prevTime;
 	prevTime = currentTime;
 	elapsedTimeSec = (float)elapsedTime / 1000.f;
 
 	switch (currentScene) {
 	case Scene::Title:
-		title_game->update();
-		if (ready_check[0] == true && ready_check[1] == true && ready_check[2] == true) {
-			std::cout << "들어옴" << std::endl;
-			startSignal = true;
-			//currentScene = Scene::MainGame;
+		if (WaitForSingleObject(hAllSend, INFINITE) == WAIT_OBJECT_0) {
+			ResetEvent(hAllUpdated);
+			title_game->update();
+			if (ready_check[0] == true && ready_check[1] == true //&& ready_check[2] == true
+				) {
+				startSignal = true;
+				currentScene = Scene::MainGame;
+			}
+			SetEvent(hAllUpdated);
 		}
 		break;
 	case Scene::MainGame:
-		main_game->update();
-		//main_game;
-		/*if (currentScene != 1) {
-			currentScene = main_game->next_state;
-			delete main_game;
-			end = new End_State;
+		if (WaitForSingleObject(hAllSend, INFINITE) == WAIT_OBJECT_0) {
+			ResetEvent(hAllUpdated);
+			main_game->update();
+			//main_game;
+			/*if (currentScene != 1) {
+				currentScene = main_game->next_state;
+				delete main_game;
+				end = new End_State;
 
-		}*/
-		currentScene = main_game->next_state;
-		if (currentScene != 1) {
-			delete main_game;
-			end = new End_State;
+			}*/
+			currentScene = main_game->next_state;
+			if (currentScene != 1) {
+				delete main_game;
+				end = new End_State;
+			}
+			SetEvent(hAllUpdated);
 		}
 		break;
 	case Scene::End:
 		end->update();
 		break;
 	}
-	glutTimerFunc(10, TimerFunction, 1);
+	glutTimerFunc(33, TimerFunction, 1);
 	glutPostRedisplay();
 }
 
@@ -266,10 +273,6 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		delete end;
 		break;
 	}
-}
-
-GLvoid mouse(int button, int state, int x, int y) {
-	
 }
 
 // 소켓 함수 오류 출력 후 종료
@@ -301,6 +304,28 @@ void err_display(char* msg)
 
 DWORD WINAPI ProcessServer(LPVOID arg)
 {
+	hAllUpdated = CreateEvent(  // event object 생성
+		NULL,          // 상속 불가
+		TRUE,          // manual-reset mode로 생상
+		FALSE,         // non-signaled 상태로 생성
+		NULL           // 이름 없는 event
+	);
+	if (hAllUpdated == NULL) {
+		printf("Event object creation error \n");
+		return -1;
+	}
+
+	hAllSend = CreateEvent(  // event object 생성
+		NULL,          // 상속 불가
+		TRUE,          // manual-reset mode로 생상
+		TRUE,         // non-signaled 상태로 생성
+		NULL           // 이름 없는 event
+	);
+	if (hAllSend == NULL) {
+		printf("Event object creation error \n");
+		return -1;
+	}
+
 	int retval;
 	int clientCnt = 0;
 
@@ -336,6 +361,7 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 		switch (currentScene) {
 		case Scene::Title:
 		{
+			// 디버깅
 			if (hThread[0] != NULL)
 				std::cout << "스레드 0 생성" << std::endl;
 			if (hThread[1] != NULL)
@@ -371,13 +397,16 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 		}
 		break;
 		case Scene::MainGame:
-			
+
 			break;
 		case Scene::End:
 
 			break;
 		}
 	}
+
+	// close Event
+	CloseHandle(hAllUpdated);
 
 	// closesocket()
 	closesocket(listen_sock);
@@ -427,15 +456,19 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 					<< ready_check[cnt] << std::endl;
 			}
 
-			// start signal
-			sendFixedVar(client_sock, sizeof(bool), (char*)&startSignal);
 
-			// 맵 데이터 넘겨주기
-			title_game->TitleDatas(mapdatas);
-			for (const ObjectData& mapdata : mapdatas) {
-				sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
+			if (WaitForSingleObject(hAllUpdated, INFINITE) == WAIT_OBJECT_0) {
+				ResetEvent(hAllSend);
+				// start signal
+				sendFixedVar(client_sock, sizeof(bool), (char*)&startSignal);
+
+				// 맵 데이터 넘겨주기
+				title_game->TitleDatas(mapdatas);
+				for (const ObjectData& mapdata : mapdatas) {
+					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
+				}
+				SetEvent(hAllSend);
 			}
-
 			break;
 		case Scene::MainGame:
 			// key 입력 받기
@@ -445,20 +478,21 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 				std::cout << key << std::endl;
 			}
 
-			// hero data 전송
-			main_game->GetHeroDatas(heroDatas);
-			for (const HeroData data : heroDatas) {
-				sendFixedVar(client_sock, sizeof(HeroData), (char*)&data);
+			if (WaitForSingleObject(hAllUpdated, INFINITE) == WAIT_OBJECT_0) {
+				ResetEvent(hAllSend);
+				// hero data 전송
+				main_game->GetHeroDatas(heroDatas);
+				for (const HeroData data : heroDatas) {
+					sendFixedVar(client_sock, sizeof(HeroData), (char*)&data);
+				}
+
+				// map data 전송
+				main_game->GetMapDatas(mapdatas);
+				for (const ObjectData& mapdata : mapdatas) {
+					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
+				}
+				SetEvent(hAllSend);
 			}
-
-			// map data 전송
-			main_game->GetMapDatas(mapdatas);
-			for (const ObjectData& mapdata : mapdatas) {
-				sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
-			}
-
-			// client key입력 수신
-
 			break;
 		case Scene::End:
 			break;

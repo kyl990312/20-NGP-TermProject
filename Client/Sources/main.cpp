@@ -24,6 +24,7 @@ void recvFixedVar(SOCKET& , size_t , char[]);
 void sendFixedVar(SOCKET& sock, size_t readSize, char buf[]);
 int recvn(SOCKET , char* , int , int );
 DWORD WINAPI ProcessClient(LPVOID);
+HANDLE hAllDataStore;
 
 // gameProceess
 GLvoid drawScene();
@@ -108,7 +109,8 @@ GLvoid drawScene()
 		break;
 	case Scene::MainGame:
 		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
-		MainGameRender();
+		if(WaitForSingleObject(hAllDataStore,INFINITE)== WAIT_OBJECT_0)
+			MainGameRender();
 		break;
 	case Scene::End:
 		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
@@ -280,6 +282,18 @@ int recvn(SOCKET s, char* buf, int len, int flags)
 
 DWORD WINAPI ProcessClient(LPVOID arg)
 {
+	hAllDataStore = CreateEvent(  // event object 생성
+		NULL,          // 상속 불가
+		TRUE,          // manual-reset mode로 생상
+		TRUE,         // non-signaled 상태로 생성
+		NULL           // 이름 없는 event
+	);
+	if (hAllDataStore == NULL) {
+		printf("Event object creation error \n");
+		return -1;
+	}
+
+
 	std::cout << "ProcessClient" << std::endl;
 	int retval;
 
@@ -332,6 +346,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 				std::cout << m_key << std::endl;
 			m_key = '\0';
 
+			ResetEvent(hAllDataStore);
 			// heroData 수신
 			for (HeroData& data : heroData) {
 				HeroData tmpMap;
@@ -351,6 +366,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 				obj = tmpMap;
 				ZeroMemory(&buf, sizeof(buf));
 			}
+			SetEvent(hAllDataStore);
 			//std::cout << objectDatas.size() << std::endl;
 
 		/*	int cnt = 0;
@@ -375,6 +391,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 	}
 	std::cout << "통신 끝" << std::endl;
 	
+	CloseHandle(hAllDataStore);
 	closesocket(sock);
 
 	WSACleanup();
