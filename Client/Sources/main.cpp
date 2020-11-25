@@ -46,7 +46,7 @@ char m_key = '\0';
 int currentScene = Scene::Title;
 int clientCnt = 0;
 bool readyState = 0;
-bool ready = false;
+bool isReady = false;
 bool startSignal = false;
 
 loadOBJ models[27];
@@ -179,7 +179,7 @@ GLvoid mouse(int button, int state, int x, int y) {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN
 		&& x < 550 && x > 410
 		&& y < 600 && y > 470) {
-		ready = true;
+		isReady = true;
 	}
 }
 
@@ -313,7 +313,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 		{
 		case Scene::Title:
 			// ready 보내기
-			sendFixedVar(sock, sizeof(bool), (char*)&ready);
+			sendFixedVar(sock, sizeof(bool), (char*)&isReady);
 
 			// Client 개수 받아오기
 			recvFixedVar(sock, sizeof(bool), (char*)&startSignal);
@@ -455,7 +455,7 @@ void TitleRender() {
 		shader1->use();
 		if (obj.tag == ModelIdx::StartButton) {
 			startbuttonShader->use();
-			if(ready == true)
+			if(isReady == true)
 				startbuttonShader->setVec3("obj_color", glm::vec3(0.8, 0.6, 0.0));
 			else
 				startbuttonShader->setVec3("obj_color", glm::vec3(1.0, 0.5, 0.8));
