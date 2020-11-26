@@ -148,7 +148,6 @@ int main(int argc, char** argv)
 
 	glutDisplayFunc(drawScene);
 	glutTimerFunc(33, TimerFunction, 1);
-	glutKeyboardFunc(keyboard);
 	glutReshapeFunc(Reshape);
 	glutMainLoop();
 
@@ -241,10 +240,6 @@ GLvoid TimerFunction(int value)
 	}
 	glutTimerFunc(33, TimerFunction, 1);
 	glutPostRedisplay();
-}
-
-GLvoid keyboard(unsigned char key, int x, int y) {
-	
 }
 
 // 소켓 함수 오류 출력 후 종료
@@ -458,7 +453,12 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
 				}
 				//sendFixedVar(client_sock, sizeof(ObjectData)*100, (char*)&mapdatas);
-
+				
+				// 3명 다 죽으면 scene::end로 
+				if (heroDatas[0].alive == false && heroDatas[1].alive == false && heroDatas[2].alive == false) {
+					currentScene = Scene::End;
+				}
+				sendFixedVar(client_sock, sizeof(int), (char*)&currentScene);
 				
 				ResetEvent(hAllUpdated[cnt]);
 				SetEvent(hAllSend[cnt]);

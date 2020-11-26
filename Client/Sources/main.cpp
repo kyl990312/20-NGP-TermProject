@@ -120,12 +120,17 @@ GLvoid drawScene()
 		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
 		if (WaitForSingleObject(hAllDataStore, INFINITE) == WAIT_OBJECT_0) {
 			MainGameRender();
+			if (recvScene == Scene::End) {
+				currentScene = Scene::End;
+				std::cout << "게임 스테이트 바꿈" << std::endl;
+			}
 			ResetEvent(hAllDataStore);
 			SetEvent(hDraw);
 		}
 		break;
 	case Scene::End:
 		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
+		std::cout << "와! END!" << std::endl;
 		break;
 	}
 	glEnable(GL_DEPTH_TEST);
@@ -394,7 +399,9 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 				}
 
 				//std::cout << objectDatas.size() << std::endl;
-
+			
+				recvFixedVar(sock, sizeof(int), (char*)&recvScene);	
+				
 			/*	int cnt = 0;
 				for (const ObjectData& mapdata : objectDatas) {
 					if (mapdata.tag != -1) {
