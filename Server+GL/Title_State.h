@@ -16,9 +16,6 @@ public:
 
 	MyPos obj_pos = { 0.0f,0.0f,0.0f };
 
-
-	firework firework_particle[4];
-
 	float font_sin_angle = 0.0f;
 	int next_state = 0;
 	int clientCnt = 0;

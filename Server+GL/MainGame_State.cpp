@@ -68,8 +68,6 @@ void MainGame_State::update() {
 			hero[i].otherHero[0]=hero[(i+1)%3].current_pos;
 			hero[i].otherHero[1]=hero[(i+2)%3].current_pos;
 		}
-
-		//HeroCollide();
 	}
 	if (hero[0]._state == HeroState::Die && hero[1]._state == HeroState::Die && hero[2]._state == HeroState::Die) {
 		if (back_music) {
@@ -118,7 +116,8 @@ void MainGame_State::init_map() {
 	for (int i = 0; i < 3; ++i) {
 		hero[i].current_pos.x = (i - 1) * 50.0f;
 	}
-	states[0] = new FirstState;
+	states[0] = new MyCommon;
+	states[0]->obs_cnt = 0;
 	//create states
 	for (int i = 1; i < map_count; i++) {
 		int create_state_random = rand() % 7;
@@ -224,12 +223,21 @@ void MainGame_State::GetMapDatas(ObjectData* mapDatas)
 void MainGame_State::GetHeroDatas(HeroData* herodatas)
 {
 	for (int i = 0; i < 3; ++i) {
-		herodatas[i].x = hero[i].current_pos.x;
-		herodatas[i].y = hero[i].current_pos.y;
-		herodatas[i].z = hero[i].current_pos.z;
+		if (hero[i]._state == HeroState::Die) {
+			herodatas[i].x = hero[i].current_pos.x + hero[i].soul_pos.x;
+			herodatas[i].y = hero[i].current_pos.y + hero[i].soul_pos.y;
+			herodatas[i].z = hero[i].current_pos.z;
 
-		herodatas[i].rotaionAngle = 180 - hero[i].direction_angle;
+			herodatas[i].rotaionAngle = 0.f;
+		}
+		else {
+			herodatas[i].x = hero[i].current_pos.x;
+			herodatas[i].y = hero[i].current_pos.y;
+			herodatas[i].z = hero[i].current_pos.z;
 
+			herodatas[i].rotaionAngle = 180 - hero[i].direction_angle;
+
+		}
 		bool alive;
 		if (hero[i]._state != HeroState::Die)
 			alive = true;

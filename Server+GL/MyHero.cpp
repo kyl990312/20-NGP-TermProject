@@ -29,7 +29,12 @@ void kyrHero::Jump(int tag, MyPos* obs_pos, int obs_cnt1)
 	// Check Collsion
 	for (int i = 0; i < 2; ++i) {
 		if (CheckCollistionWithHero(otherHero[i],40)) {
-			current_pos = prevPosition;
+			if (direction_angle == 0) {
+				current_pos.x += 50.f;
+			}
+			else {
+				current_pos = prevPosition;
+			}
 		}
 	}
 
@@ -51,7 +56,12 @@ void kyrHero::Jump(int tag, MyPos* obs_pos, int obs_cnt1)
 	case MapState::Common:
 		for (int i = 0; i < obs_cnt1; i++) {
 			if (check_collision(obs_pos[i], tag)) {
-				current_pos = prevPosition;
+				if (direction_angle == 0) {
+					current_pos.x += 50.f;
+				}
+				else {
+					current_pos = prevPosition;
+				}
 			}
 		}
 		break;
@@ -155,9 +165,8 @@ void kyrHero::draw(glm::mat4 projection, glm::mat4 view, Shader shader) {
 
 void kyrHero::update(int tag, MyPos* obs_pos1, int obs_cnt1) {
 		
-	if (_state != HeroState::Die)
-		// move backward following map
-		current_pos.z += 5 * elapsedTimeSec * SPEED;
+	// move backward following map
+	current_pos.z += 5 * elapsedTimeSec * SPEED;
 	MyPos hero_view_pos = { current_pos.x * cos(glm::radians(10.0f)) - current_pos.z * sin(glm::radians(10.0f)),0.0f,current_pos.x * sin(glm::radians(10.0f)) + current_pos.z * cos(glm::radians(10.0f)) };
 
 	switch (_state)
@@ -195,6 +204,7 @@ void kyrHero::update(int tag, MyPos* obs_pos1, int obs_cnt1) {
 void kyrHero::Die() {
 	soul_pos.y += 5 * elapsedTimeSec * SPEED;
 	soul_pos.x = 20*sin(glm::radians(soul_pos.y));
+	soul_pos.z -= 5 * elapsedTimeSec * SPEED;
 }
 
 void kyrHero::soul_draw(glm::mat4 projection, glm::mat4 view, Shader shader){
