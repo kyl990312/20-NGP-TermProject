@@ -66,7 +66,7 @@ void MainGame_State::update() {
 			hero_update(i);
 		for (int i = 0; i < 3; ++i) {
 			hero[i].otherHero[0]=hero[(i+1)%3].current_pos;
-			hero[i].otherHero[1]=hero[(i+1)%3].current_pos;
+			hero[i].otherHero[1]=hero[(i+2)%3].current_pos;
 		}
 
 		//HeroCollide();

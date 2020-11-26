@@ -17,7 +17,6 @@
 
 // 통신
 void sendFixedVar(SOCKET&, size_t, char[]);
-char key;
 
 DWORD WINAPI ProcessServer(LPVOID);
 DWORD WINAPI ConversationWithClient(LPVOID);
@@ -396,6 +395,7 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 
 	bool ready = false;
 	int cnt = ((MultipleArg*)arg)->clientCount;
+	char key;
 
 	while (1) {
 		//test

@@ -28,6 +28,7 @@ public:
 	float size = 40.0f;
 	// jumping values
 	float jump_DeltaX = 0.0f;
+	float addedY = 0.0f;
 	MyPos soul_pos{ 0.0f,0.0f,400.0f };
 	float log_speed = 0;
 	//bool fall_into_river = false;

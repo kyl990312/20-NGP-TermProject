@@ -24,7 +24,7 @@ void kyrHero::Jump(int tag, MyPos* obs_pos, int obs_cnt1)
 	// hero is jumping : frame : 5 , height : 30
 	jump_DeltaX += 1.f * elapsedTimeSec* SPEED;		// 0 ~ 5
 	// 0 ~ 30  : 20, 30, 30, 20, 0
-	current_pos.y = -5.f * jump_DeltaX * (jump_DeltaX - 5.f); 
+	current_pos.y = -5.f * jump_DeltaX * (jump_DeltaX - 5.f) + addedY; 
 
 	// Check Collsion
 	for (int i = 0; i < 2; ++i) {
@@ -35,13 +35,16 @@ void kyrHero::Jump(int tag, MyPos* obs_pos, int obs_cnt1)
 
 	switch (tag) {
 	case MapState::River:
-		for (int i = 0; i < obs_cnt1; i++) {
-			// if True : Land on Log
-			if (check_collision(obs_pos[i], tag)) {
-				_state = HeroState::Float;
-				current_pos.z = cur_mapState_posZ;
-				current_pos.y = obs_pos->y + size / 2;
-				jump_DeltaX = 0;
+		if (direction_angle == 0.f) {
+			for (int i = 0; i < obs_cnt1; i++) {
+				// if True : Land on Log
+				if (check_collision(obs_pos[i], tag)) {
+					_state = HeroState::Float;
+					current_pos.z = cur_mapState_posZ;
+					current_pos.y = obs_pos->y + size / 2;
+					jump_DeltaX = 0;
+					addedY = current_pos.y + 5;
+				}
 			}
 		}
 		break;
@@ -72,6 +75,7 @@ void kyrHero::Jump(int tag, MyPos* obs_pos, int obs_cnt1)
 		// set hero's positionZ at map's positionZ
 		current_pos.z = cur_mapState_posZ;
 		current_pos.y = 0.f;		
+		addedY = 0.f;
 		_state = HeroState::Idle;
 		jump_DeltaX = 0;
 	}
