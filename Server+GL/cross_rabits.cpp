@@ -206,9 +206,9 @@ GLvoid TimerFunction(int value)
 
 	switch (currentScene) {
 	case Scene::Title:
-		if (WaitForMultipleObjects(3, hAllSend, TRUE, INFINITE) == WAIT_OBJECT_0) {
+		if (WaitForMultipleObjects(clientCnt, hAllSend, TRUE, INFINITE) == WAIT_OBJECT_0) {
 			title_game->update();
-			for (int i = 0; i < 3; ++i) {
+			for (int i = 0; i < clientCnt; ++i) {
 				SetEvent(hAllUpdated[i]);
 				ResetEvent(hAllSend[i]);
 			}
@@ -280,7 +280,7 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 		hAllUpdated[i] = CreateEvent(  // event object 생성
 			NULL,          // 상속 불가
 			TRUE,          // manual-reset mode로 생상
-			FALSE,         // non-signaled 상태로 생성
+			TRUE,         // non-signaled 상태로 생성
 			NULL           // 이름 없는 event
 		);
 		if (hAllUpdated[i] == NULL) {
@@ -291,7 +291,7 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 		hAllSend[i] = CreateEvent(  // event object 생성
 			NULL,          // 상속 불가
 			TRUE,          // manual-reset mode로 생상
-			TRUE,         // signaled 상태로 생성
+			FALSE,         // signaled 상태로 생성
 			NULL           // 이름 없는 event
 		);
 		if (hAllSend[i] == NULL) {
@@ -301,7 +301,6 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 	}
 
 	int retval;
-	int clientCnt = 0;
 
 	std::cout << "ProcessServer" << std::endl;
 
