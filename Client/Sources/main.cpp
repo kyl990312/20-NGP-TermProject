@@ -117,7 +117,7 @@ GLvoid drawScene()
 		}
 		break;
 	case Scene::MainGame:
-		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
+		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
 		if (WaitForSingleObject(hAllDataStore, INFINITE) == WAIT_OBJECT_0) {
 			MainGameRender();
 			ResetEvent(hAllDataStore);
@@ -125,7 +125,7 @@ GLvoid drawScene()
 		}
 		break;
 	case Scene::End:
-		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
+		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
 		break;
 	}
 	glEnable(GL_DEPTH_TEST);
@@ -538,9 +538,16 @@ void MainGameRender() {
 	}
 
 	for (const HeroData hero : heroData) {
-		DrawObject(ModelIdx::Hero, glm::vec3(hero.x, hero.y, hero.z),
-			glm::vec3(0.0f, hero.rotaionAngle, 0.0f),
-			glm::vec3(1.0f, 1.0f, 1.0f));
+		if (hero.alive) {
+			DrawObject(ModelIdx::Hero, glm::vec3(hero.x, hero.y, hero.z),
+				glm::vec3(0.0f, hero.rotaionAngle, 0.0f),
+				glm::vec3(1.0f, 1.0f, 1.0f));
+		}
+		else {
+			DrawObject(ModelIdx::Ghost, glm::vec3(hero.x, hero.y, hero.z),
+				glm::vec3(0.0f, hero.rotaionAngle, 0.0f),
+				glm::vec3(1.0f, 1.0f, 1.0f));
+		}
 	}
 
 	//// draw all heros
