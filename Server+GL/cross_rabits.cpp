@@ -48,6 +48,8 @@ int state_mode = 0;
 int clientCnt = 0;
 bool ready_check[3] = { false, false, false };
 bool startSignal = false;
+int score[3] = {};
+bool isRecvscore[3] = {};
 
 loadOBJ models[27];
 Shader* shader1;
@@ -235,7 +237,8 @@ GLvoid TimerFunction(int value)
 		}
 		break;
 	case Scene::End:
-		end->update();
+		//end->update();
+		
 		break;
 	}
 	glutTimerFunc(33, TimerFunction, 1);
@@ -356,7 +359,7 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 
 			break;
 		case Scene::End:
-
+			
 			break;
 		}
 	}
@@ -390,6 +393,8 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 	bool ready = false;
 	int cnt = ((MultipleArg*)arg)->clientCount;
 	char key;
+	
+	std::ofstream out("rank.txt", std::ios::app);
 
 	while (1) {
 		//test
@@ -446,28 +451,38 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 				}
 				//sendFixedVar(client_sock, sizeof(HeroData) * 3, (char*)&heroDatas);
 
-
 				// map data 전송
 				main_game->GetMapDatas(mapdatas);
 				for (const ObjectData& mapdata : mapdatas) {
 					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
 				}
 				//sendFixedVar(client_sock, sizeof(ObjectData)*100, (char*)&mapdatas);
-				
+
+				//cnt 전송- 죽었는지 안죽었는지 send
+				//sendFixedVar(client_sock, sizeof(int), (char*)&cnt);
+				sendFixedVar(client_sock, sizeof(bool), (char*)&heroDatas[cnt].alive);
+
 				// 3명 다 죽으면 scene::end로 
 				if (heroDatas[0].alive == false && heroDatas[1].alive == false && heroDatas[2].alive == false) {
 					currentScene = Scene::End;
 				}
 				sendFixedVar(client_sock, sizeof(int), (char*)&currentScene);
-				
+
 				ResetEvent(hAllUpdated[cnt]);
 				SetEvent(hAllSend[cnt]);
 			}
 			break;
 		case Scene::End:
+			if (isRecvscore[cnt] == false) {
+				recvFixedVar(client_sock, sizeof(int), (char*)&score[cnt]);
+				out << score[cnt] << std::endl;
+				
+				isRecvscore[cnt] = true;
+			}
 			break;
 		}
 	}
+
 	// closesocket()
 	closesocket(client_sock);
 

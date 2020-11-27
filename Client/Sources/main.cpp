@@ -49,9 +49,13 @@ char m_key = '\0';
 
 int currentScene = Scene::Title;
 int clientCnt = 0;
-bool readyState = 0;
+bool readyState = false;
 bool isReady = false;
 bool startSignal = false;
+bool isSendscore = false;
+int score = 0;
+
+bool isAlive = true;
 
 loadOBJ models[27];
 Shader* shader1;
@@ -130,7 +134,7 @@ GLvoid drawScene()
 		break;
 	case Scene::End:
 		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
-		std::cout << "와! END!" << std::endl;
+		EndRender();
 		break;
 	}
 	glEnable(GL_DEPTH_TEST);
@@ -172,6 +176,8 @@ GLvoid keyboard(unsigned char key, int x, int y) {
 		case 'w':
 		case 'W':
 			m_key = 'w';
+			if (isAlive == true)
+				++score;
 			break;
 		case 'a':
 		case 'A':
@@ -347,13 +353,14 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 	char buf[BUFSIZE + 1];
 	int len = 0;
 	//ready = false;
+	int clientCnt = 0;
 
 	//서버와 데이터 통신
 	while (1) {
 		if (WaitForSingleObject(hDraw, INFINITE) == WAIT_OBJECT_0) {
 			switch (currentScene)
 			{
-			case Scene::Title: 
+			case Scene::Title:
 			{
 				// ready 보내기
 				sendFixedVar(sock, sizeof(bool), (char*)&isReady);
@@ -366,7 +373,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 				// Client 개수 받아오기
 				recvFixedVar(sock, sizeof(int), (char*)&recvScene);
 			}
-				break;
+			break;
 			case  Scene::MainGame:
 			{
 				// keyData 전송
@@ -397,27 +404,37 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 					obj = tmpMap;
 					ZeroMemory(&buf, sizeof(buf));
 				}
+				
+				// 자신이 몇번째 클라이언트인지 받기
+				//recvFixedVar(sock, sizeof(int), (char*)&clientCnt);
+				recvFixedVar(sock, sizeof(bool), (char*)&isAlive);
 
 				//std::cout << objectDatas.size() << std::endl;
-			
-				recvFixedVar(sock, sizeof(int), (char*)&recvScene);	
-				
-			/*	int cnt = 0;
-				for (const ObjectData& mapdata : objectDatas) {
-					if (mapdata.tag != -1) {
-						std::cout << cnt << "." << "Map tag = " << mapdata.tag << std::endl;
 
-						std::cout << cnt << "." << "Map Position = " << mapdata.positionX << "," << mapdata.positionY << "," << mapdata.positionZ << std::endl;
-						std::cout << cnt << "." << "Map Size = " << mapdata.sizeX << "," << mapdata.sizeY << "," << mapdata.sizeZ << std::endl;
-						std::cout << cnt << "." << "Map Roatation = " << mapdata.rotationX << "," << mapdata.rotationY << "," << mapdata.rotationZ << std::endl;
-						cnt++;
-					}
-				}*/
+				recvFixedVar(sock, sizeof(int), (char*)&recvScene);
+
+				/*	int cnt = 0;
+					for (const ObjectData& mapdata : objectDatas) {
+						if (mapdata.tag != -1) {
+							std::cout << cnt << "." << "Map tag = " << mapdata.tag << std::endl;
+
+							std::cout << cnt << "." << "Map Position = " << mapdata.positionX << "," << mapdata.positionY << "," << mapdata.positionZ << std::endl;
+							std::cout << cnt << "." << "Map Size = " << mapdata.sizeX << "," << mapdata.sizeY << "," << mapdata.sizeZ << std::endl;
+							std::cout << cnt << "." << "Map Roatation = " << mapdata.rotationX << "," << mapdata.rotationY << "," << mapdata.rotationZ << std::endl;
+							cnt++;
+						}
+					}*/
 			}
 			break;
 			case Scene::End:
+				// 한번만 보내기
+				if (isSendscore == false) {
+					sendFixedVar(sock, sizeof(int), (char*)&score);
+					isSendscore = true;
+				}
 				break;
 			}
+
 			ResetEvent(hDraw);
 			SetEvent(hAllDataStore);
 		}
