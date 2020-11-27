@@ -42,14 +42,14 @@ End_State* end;
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 GLvoid TimerFunction(int value);
-GLvoid keyboard(unsigned char key, int x, int y);
+//GLvoid keyboard(unsigned char key, int x, int y);
 
 int state_mode = 0;
 int clientCnt = 0;
 bool ready_check[3] = { false, false, false };
 bool startSignal = false;
 int score[3] = {};
-bool isRecvscore[3] = {};
+bool isRecvscore[3] = {false, false, false};
 
 loadOBJ models[27];
 Shader* shader1;
