@@ -37,7 +37,7 @@ HANDLE hAllSend[3];
 // GL
 Title_State* title_game = nullptr;
 MainGame_State* main_game = nullptr;
-End_State* end;
+End_State* end_game;
 
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
@@ -48,6 +48,7 @@ int state_mode = 0;
 int clientCnt = 0;
 bool ready_check[3] = { false, false, false };
 bool startSignal = false;
+
 int score[3] = {};
 bool isRecvscore[3] = {false, false, false};
 
@@ -182,7 +183,7 @@ GLvoid drawScene()
 			main_game->Display();
 		break;
 	case 2:
-		end->Display();
+		end_game->Display();
 	}
 	glutSwapBuffers();
 }
@@ -238,7 +239,6 @@ GLvoid TimerFunction(int value)
 		break;
 	case Scene::End:
 		//end->update();
-		
 		break;
 	}
 	glutTimerFunc(33, TimerFunction, 1);
@@ -393,7 +393,7 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 	bool ready = false;
 	int cnt = ((MultipleArg*)arg)->clientCount;
 	char key;
-	
+
 	std::ofstream out("rank.txt", std::ios::app);
 
 	while (1) {
@@ -474,15 +474,22 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 			break;
 		case Scene::End:
 			if (isRecvscore[cnt] == false) {
+				isRecvscore[cnt] = true;
+				// 스코어 받기
 				recvFixedVar(client_sock, sizeof(int), (char*)&score[cnt]);
 				out << score[cnt] << std::endl;
 				
-				isRecvscore[cnt] = true;
+				// 랭킹데이터 처리
+				end_game->rankingData(mapdatas);
+			}
+
+			// rankingData처리한 데이터 정보 넘겨주기
+			for (const ObjectData& mapdata : mapdatas) {
+				sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
 			}
 			break;
 		}
 	}
-
 	// closesocket()
 	closesocket(client_sock);
 

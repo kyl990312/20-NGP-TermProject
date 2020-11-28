@@ -114,7 +114,7 @@ GLvoid drawScene()
 			TitleRender();
 			if (recvScene == Scene::MainGame) {
 				currentScene = Scene::MainGame;
-				std::cout << "게임 스테이트 바꿈" << std::endl;
+				std::cout << "게임 스테이트 Main으로 바꿈" << std::endl;
 			}
 			ResetEvent(hAllDataStore);
 			SetEvent(hDraw);
@@ -126,7 +126,7 @@ GLvoid drawScene()
 			MainGameRender();
 			if (recvScene == Scene::End) {
 				currentScene = Scene::End;
-				std::cout << "게임 스테이트 바꿈" << std::endl;
+				std::cout << "게임 스테이트 End로 바꿈" << std::endl;
 			}
 			ResetEvent(hAllDataStore);
 			SetEvent(hDraw);
@@ -134,7 +134,14 @@ GLvoid drawScene()
 		break;
 	case Scene::End:
 		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
+
 		EndRender();
+
+		if (recvScene == Scene::Title) {
+			currentScene = Scene::Title;
+			std::cout << "게임 스테이트 Title로 바꿈" << std::endl;
+		}
+
 		break;
 	}
 	glEnable(GL_DEPTH_TEST);
@@ -427,11 +434,21 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 			}
 			break;
 			case Scene::End:
-				// 한번만 보내기
+				// 스코어 한번만 보내기
 				if (isSendscore == false) {
-					sendFixedVar(sock, sizeof(int), (char*)&score);
 					isSendscore = true;
+					sendFixedVar(sock, sizeof(int), (char*)&score);
 				}
+				std::cout << "score : " << score << std::endl;
+				
+				// rankingData처리한 데이터 정보 받기
+				for (ObjectData& obj : objectDatas) {
+					recvFixedVar(sock, len, buf);
+					memcpy(&obj, buf, sizeof(ObjectData));
+					ZeroMemory(&buf, sizeof(buf));
+				}
+				std::cout << objectDatas[0].tag << std::endl;
+				
 				break;
 			}
 
@@ -583,8 +600,18 @@ void MainGameRender() {
 	//}
 }
 
-// 필요 확인
 void EndRender() {
 	//set shader
+	//fontShader->use();
+	shader1->use();
+	
 	// draw numbers
+	for (const ObjectData& obj : objectDatas) {
+		if (obj.tag == -1)
+			break;
+
+		DrawObject(obj.tag, glm::vec3(obj.positionX, obj.positionY, obj.positionZ)
+			, glm::vec3(obj.rotationX, obj.rotationY, obj.rotationZ)
+			, glm::vec3(obj.sizeX, obj.sizeY, obj.sizeZ));
+	}
 }

@@ -8,7 +8,7 @@ End_State::End_State() {
 	int num;
 	while (!in.eof()) {
 		in >> num;
-		rank.push_back(num);
+		//rank.push_back(num);
 	}
 	in.close();
 }
@@ -264,4 +264,44 @@ void End_State::third_number(float y_pos)
 	model = scaling * translation;
 	third.setTransform(model);
 	third.draw();
+}
+
+void End_State::rankingData(ObjectData mapdatas[])
+{
+	std::ifstream in("rank.txt");
+	int rankData;
+	while (!in.eof()) {
+		in >> rankData;
+		rank.push_back(rankData);
+	}
+	rank.sort();
+
+	for (int i = 0; i < 100; ++i) {
+		if (mapdatas[i].tag != -1) {
+			mapdatas[i].tag = -1;
+			mapdatas[i].positionX = 0.0f;
+			mapdatas[i].positionY = 0.0f;
+			mapdatas[i].positionZ = 0.0f;
+			mapdatas[i].rotationX = 0.0f;
+			mapdatas[i].rotationY = 0.0f;
+			mapdatas[i].rotationZ = 0.0f;
+			mapdatas[i].sizeX = 0.0f;
+			mapdatas[i].sizeY = 0.0f;
+			mapdatas[i].sizeZ = 0.0f;
+		}
+	}
+
+	ObjectData tmpMap;
+
+	tmpMap.tag = ModelIdx::Num0;
+	tmpMap.positionX = 0.f;
+	tmpMap.positionY = 0.f;
+	tmpMap.positionZ = 0.f;
+	tmpMap.rotationX = 0.0f;
+	tmpMap.rotationY = 0.0f;
+	tmpMap.rotationZ = 0.0f;
+	tmpMap.sizeX = 3.0f;
+	tmpMap.sizeY = 3.0f;
+	tmpMap.sizeZ = 3.0f;
+	mapdatas[0] = tmpMap;
 }

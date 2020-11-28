@@ -1,8 +1,10 @@
 #pragma once
 #include<list>
 #include <fstream>
+#include <algorithm>
 #include "loadObj.h"
 #include "MyHeader.h"
+#include "DataStruct.h"
 
 class End_State
 {
@@ -32,5 +34,7 @@ public:
 	void first_number(float y_pos);
 	void second_number(float y_pos);
 	void third_number(float y_pos);
+
+	void rankingData(ObjectData[]);
 };
 
