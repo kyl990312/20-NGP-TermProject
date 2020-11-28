@@ -40,7 +40,7 @@ void kyrHero::Jump(int tag, MyPos* obs_pos, int obs_cnt1)
 
 	switch (tag) {
 	case MapState::River:
-		if (direction_angle == 0.f) {
+		if (jump_DeltaX > 5) {
 			for (int i = 0; i < obs_cnt1; i++) {
 				// if True : Land on Log
 				if (check_collision(obs_pos[i], tag)) {

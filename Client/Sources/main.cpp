@@ -105,7 +105,7 @@ GLvoid drawScene()
 
 	switch (currentScene) {
 	case Scene::Title:
-		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
+		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
 		if (WaitForSingleObject(hAllDataStore, INFINITE) == WAIT_OBJECT_0) {
 			TitleRender();
 			if (recvScene == Scene::MainGame) {
@@ -117,7 +117,7 @@ GLvoid drawScene()
 		}
 		break;
 	case Scene::MainGame:
-		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
+		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
 		if (WaitForSingleObject(hAllDataStore, INFINITE) == WAIT_OBJECT_0) {
 			MainGameRender();
 			ResetEvent(hAllDataStore);
@@ -125,7 +125,7 @@ GLvoid drawScene()
 		}
 		break;
 	case Scene::End:
-		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
+		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
 		break;
 	}
 	glEnable(GL_DEPTH_TEST);
