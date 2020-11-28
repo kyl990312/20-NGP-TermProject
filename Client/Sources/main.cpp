@@ -90,7 +90,7 @@ int main(int argc, char** argv)
 
 	// ฤÝน้
 	glutDisplayFunc(drawScene);
-	glutTimerFunc(33, TimerFunction, 1);
+	glutTimerFunc(16, TimerFunction, 1);
 	glutKeyboardFunc(keyboard);
 	glutMouseFunc(mouse);
 	glutReshapeFunc(Reshape);
@@ -325,8 +325,10 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 		return 1;
 
 	// socket()
+	int option = 1;
 	SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (sock == INVALID_SOCKET) err_quit((char*)"socket()");
+	setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (char*)&option, sizeof(option));
 
 	// connect()
 	SOCKADDR_IN serveraddr;

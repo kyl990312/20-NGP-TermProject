@@ -147,7 +147,7 @@ int main(int argc, char** argv)
 	HANDLE hThread0 = CreateThread(NULL, 0, ProcessServer, NULL, 0, NULL);
 
 	glutDisplayFunc(drawScene);
-	glutTimerFunc(33, TimerFunction, 1);
+	glutTimerFunc(16, TimerFunction, 1);
 	glutKeyboardFunc(keyboard);
 	glutReshapeFunc(Reshape);
 	glutMainLoop();
@@ -217,18 +217,6 @@ GLvoid TimerFunction(int value)
 	case Scene::MainGame:
 		if (WaitForMultipleObjects(3, hAllSend, TRUE, INFINITE) == WAIT_OBJECT_0) {
 			main_game->update();
-			//main_game;
-			/*if (currentScene != 1) {
-				currentScene = main_game->next_state;
-				delete main_game;
-				end = new End_State;
-
-			}*/
-			/*currentScene = main_game->next_state;
-			if (currentScene != 1) {
-				delete main_game;
-				end = new End_State;
-			}*/
 			for (int i = 0; i < 3; ++i) {
 				SetEvent(hAllUpdated[i]);
 				ResetEvent(hAllSend[i]);
@@ -311,8 +299,10 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 
 	// socket()
 	// 대기 소켓
+	int option = 1;
 	SOCKET listen_sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (listen_sock == INVALID_SOCKET) err_quit((char*)"socket()");
+	setsockopt(listen_sock, IPPROTO_TCP, TCP_NODELAY, (char*)&option, sizeof(option));
 
 	// bind()
 	SOCKADDR_IN serveraddr;
