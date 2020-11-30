@@ -32,12 +32,14 @@ int currentScene = Scene::Title;
 HANDLE hThread[3];
 HANDLE hAllUpdated[3];
 HANDLE hAllSend[3];
+HANDLE hAllScoreRecv[3];
+
 
 
 // GL
 Title_State* title_game = nullptr;
 MainGame_State* main_game = nullptr;
-End_State* end_game;
+End_State* end_game = nullptr;
 
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
@@ -51,6 +53,7 @@ bool startSignal = false;
 
 int score[3] = {};
 bool isRecvscore[3] = {false, false, false};
+
 
 loadOBJ models[27];
 Shader* shader1;
@@ -144,6 +147,7 @@ int main(int argc, char** argv)
 
 	main_game = new MainGame_State;
 	title_game = new Title_State;
+	end_game = new End_State;
 
 	// 통신
 	// 윈속 - 데이터 처리 스레드 분리 
@@ -184,6 +188,7 @@ GLvoid drawScene()
 		break;
 	case 2:
 		end_game->Display();
+		break;
 	}
 	glutSwapBuffers();
 }
@@ -238,7 +243,14 @@ GLvoid TimerFunction(int value)
 		}
 		break;
 	case Scene::End:
-		//end->update();
+		if (WaitForMultipleObjects(3, hAllScoreRecv, TRUE, INFINITE) == WAIT_OBJECT_0) {
+			end_game->update();
+			end_game->rankingData(mapdatas);
+			for (int i = 0; i < 3; ++i) {
+				ResetEvent(hAllScoreRecv[i]);
+				SetEvent(hAllUpdated[i]);
+			}
+		}
 		break;
 	}
 	glutTimerFunc(33, TimerFunction, 1);
@@ -293,6 +305,17 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 			NULL           // 이름 없는 event
 		);
 		if (hAllSend[i] == NULL) {
+			printf("Event object creation error \n");
+			return -1;
+		}
+
+		hAllScoreRecv[i] = CreateEvent(  // event object 생성
+			NULL,          // 상속 불가
+			TRUE,          // manual-reset mode로 생상
+			TRUE,         // signaled 상태로 생성
+			NULL           // 이름 없는 event
+		);
+		if (hAllScoreRecv[i] == NULL) {
 			printf("Event object creation error \n");
 			return -1;
 		}
@@ -478,15 +501,25 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 				// 스코어 받기
 				recvFixedVar(client_sock, sizeof(int), (char*)&score[cnt]);
 				out << score[cnt] << std::endl;
-				
-				// 랭킹데이터 처리
-				end_game->rankingData(mapdatas);
+				SetEvent(hAllScoreRecv[cnt]);
 			}
 
 			// rankingData처리한 데이터 정보 넘겨주기
-			for (const ObjectData& mapdata : mapdatas) {
-				sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
+			//end_game->update();
+			if (WaitForSingleObject(hAllUpdated[cnt], INFINITE) == WAIT_OBJECT_0) {
+				for (const ObjectData& mapdata : mapdatas) {
+					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
+				}
 			}
+
+			
+
+			/*if (isRecvscore[0] == true && isRecvscore[1] == true && isRecvscore[2] == true)
+			{
+				std::cout << "client sock close" << std::endl;
+				closesocket(client_sock);
+				return 0;
+			}*/
 			break;
 		}
 	}

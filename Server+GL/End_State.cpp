@@ -3,14 +3,13 @@
 extern loadOBJ models[26];
 
 End_State::End_State() {
-	std::cout << "enter endstate" << std::endl;
-	std::ifstream in("rank.txt");
-	int num;
-	while (!in.eof()) {
-		in >> num;
-		//rank.push_back(num);
-	}
-	in.close();
+	//std::cout << "enter endstate" << std::endl;
+	//std::ifstream in("rank.txt");
+	//int num;
+	//while (!in.eof()) {
+	//	in >> num;
+	//	//rank.push_back(num);
+	//}
 }
 
 End_State::~End_State() {
@@ -20,39 +19,35 @@ End_State::~End_State() {
 void End_State::Display() {
 	shader1->use();
 	shader1->setVec3("obj_color", glm::vec3(1.0, 1.0, 0.0));
-	draw_score(400, cur_score);
-	draw_score(200, best_score);
-	draw_score(80, mid_score);
-	draw_score(-40, last_score);
+	draw_score(cur_score);		//400
+	draw_score(best_score);		//200
+	draw_score(mid_score);		//80
+	draw_score(last_score);		//-40
 }
 
 void End_State::update() {
-	std::cout << "update" << std::endl;
-	if (!rank.empty()) {
-		rank.reverse();
-		std::list<int>::iterator iter = rank.begin();
-		cur_score = *iter;
-		rank.sort();
-		rank.reverse();
-		iter = rank.begin();
-		best_score = *(iter);
-		if (best_score == cur_score) {
-			++iter;
-			mid_score = *(++iter);
-			last_score = *(++iter);
+	std::vector<int> rank;
+	rank.reserve(50);
+	std::ifstream in("rank.txt");
+	if (!in)
+		std::cout << "파일이 안 열림" << std::endl;
 
-		}
-		else if (mid_score == cur_score) {
-			mid_score = *(++iter);
-			++iter;
-			last_score = *(++iter);
-		}
-		else {
-			mid_score = *(++iter);
-			last_score = *(++iter);
-		}
-		rank.clear();
+	int n = 0;
+	while (!in.eof()) {
+		in >> n;
+		rank.push_back(n);
 	}
+
+	sort(begin(rank), end(rank), [](const int& a, const int& b) {
+		return a > b;
+		});
+
+	best_score = rank[0];
+	mid_score = rank[1];
+	last_score = rank[2];
+
+	rank.clear();
+
 }
 
 void End_State::keyboard(unsigned char key, int x, int y) {
@@ -63,148 +58,209 @@ void End_State::keyboard(unsigned char key, int x, int y) {
 	}
 }
 
-void End_State::draw_score(float y_pos, int score) {
-
+void End_State::draw_score(int score) {
 	num[2] = score / 100;
 	num[1] = (score - num[2] * 100) / 10;
 	num[0] = score - num[2] * 100 - num[1] * 10;
 
-	first_number(y_pos);
-	second_number(y_pos);
-	third_number(y_pos);
+	tag[0] = first_number();		// 백의 자리
+	tag[1] = second_number();		// 십의 자리
+	tag[2] = third_number();		// 일의 자리
 }
 
-void End_State::first_number(float y_pos)
+int End_State::first_number()
 {
-	loadOBJ first;
+	int tag;
 	shader1->use();
 
 	switch (num[2]) {
 	case 0:
-		first = models[2];
-		first.load(projection, view);
+		tag = Num0;
 		break;
 	case 1:
-		first = models[3];
-		first.load(projection, view);
+		tag = Num1;
 		break;
 	case 2:
-		first = models[3];
-		first.load(projection, view);
+		tag = Num2;
 		break;
 	case 3:
-		first = models[4];
-		first.load(projection, view);
+		tag = Num3;
 		break;
 	case 4:
-		first = models[5];
-		first.load(projection, view);
+		tag = Num4;
 		break;
 	case 5:
-		first = models[6];
-		first.load(projection, view);
+		tag = Num5;
 		break;
 	case 6:
-		first = models[7];
-		first.load(projection, view);
+		tag = Num6;
 		break;
 	case 7:
-		first = models[8];
-		first.load(projection, view);
+		tag = Num7;
 		break;
 	case 8:
-		first = models[9];
-		first.load(projection, view);
+		tag = Num8;
 		break;
 	case 9:
-		first = models[10];
-		first.load(projection, view);
+		tag = Num9;
 		break;
 	default:
-		first = models[2];
-		first.load(projection, view);
+		tag = Num0;
 		break;
 	}
 
+	return tag;
 
-	glm::mat4 model = glm::mat4(1.0f);
+	/*glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 translation = glm::mat4(1.0f);
 	glm::mat4 scaling = glm::mat4(1.0f);
 
 	translation = glm::translate(translation, glm::vec3(-100.0f, y_pos, 100.0f));
 	model = scaling * translation;
 	first.setTransform(model);
-	first.draw();
+	first.draw();*/
+
 }
 
-
-void End_State::second_number(float y_pos)
+int End_State::second_number()
 {
-	loadOBJ second;
-
+	int tag;
 	shader1->use();
 
 	switch (num[1]) {
+		/*case 0:
+			second = models[2];
+			second.load(projection, view);
+			break;
+		case 1:
+			second = models[3];
+			second.load(projection, view);
+			break;
+		case 2:
+			second = models[3];
+			second.load(projection, view);
+			break;
+		case 3:
+			second = models[4];
+			second.load(projection, view);
+			break;
+		case 4:
+			second = models[5];
+			second.load(projection, view);
+			break;
+		case 5:
+			second = models[6];
+			second.load(projection, view);
+			break;
+		case 6:
+			second = models[7];
+			second.load(projection, view);
+			break;
+		case 7:
+			second = models[8];
+			second.load(projection, view);
+			break;
+		case 8:
+			second = models[9];
+			second.load(projection, view);
+			break;
+		case 9:
+			second = models[10];
+			second.load(projection, view);
+			break;
+		default:
+			second = models[2];
+			second.load(projection, view);
+			break;*/
 	case 0:
-		second = models[2];
-		second.load(projection, view);
+		tag = Num0;
 		break;
 	case 1:
-		second = models[3];
-		second.load(projection, view);
+		tag = Num1;
 		break;
 	case 2:
-		second = models[3];
-		second.load(projection, view);
+		tag = Num2;
 		break;
 	case 3:
-		second = models[4];
-		second.load(projection, view);
+		tag = Num3;
 		break;
 	case 4:
-		second = models[5];
-		second.load(projection, view);
+		tag = Num4;
 		break;
 	case 5:
-		second = models[6];
-		second.load(projection, view);
+		tag = Num5;
 		break;
 	case 6:
-		second = models[7];
-		second.load(projection, view);
+		tag = Num6;
 		break;
 	case 7:
-		second = models[8];
-		second.load(projection, view);
+		tag = Num7;
 		break;
 	case 8:
-		second = models[9];
-		second.load(projection, view);
+		tag = Num8;
 		break;
 	case 9:
-		second = models[10];
-		second.load(projection, view);
+		tag = Num9;
 		break;
 	default:
-		second = models[2];
-		second.load(projection, view);
+		tag = Num0;
 		break;
 	}
+	return tag;
 
-	glm::mat4 model = glm::mat4(1.0f);
+	/*glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 translation = glm::mat4(1.0f);
 	glm::mat4 scaling = glm::mat4(1.0f);
 
 	translation = glm::translate(translation, glm::vec3(0.0f, y_pos, 100.0f));
 	model = scaling * translation;
 	second.setTransform(model);
-	second.draw();
+	second.draw();*/
 }
 
-
-void End_State::third_number(float y_pos)
+int End_State::third_number()
 {
-	loadOBJ third;
+	int tag;
+	shader1->use();
+
+	switch (num[0]) {
+	case 0:
+		tag = Num0;
+		break;
+	case 1:
+		tag = Num1;
+		break;
+	case 2:
+		tag = Num2;
+		break;
+	case 3:
+		tag = Num3;
+		break;
+	case 4:
+		tag = Num4;
+		break;
+	case 5:
+		tag = Num5;
+		break;
+	case 6:
+		tag = Num6;
+		break;
+	case 7:
+		tag = Num7;
+		break;
+	case 8:
+		tag = Num8;
+		break;
+	case 9:
+		tag = Num9;
+		break;
+	default:
+		tag = Num0;
+		break;
+	}
+	return tag;
+
+	/*loadOBJ third;
 
 	shader1->use();
 
@@ -263,37 +319,112 @@ void End_State::third_number(float y_pos)
 	translation = glm::translate(translation, glm::vec3(100.0f, y_pos, 100.0f));
 	model = scaling * translation;
 	third.setTransform(model);
-	third.draw();
+	third.draw();*/
 }
+
 
 void End_State::rankingData(ObjectData mapdatas[])
 {
-	std::ifstream in("rank.txt");
-	int rankData;
-	while (!in.eof()) {
-		in >> rankData;
-		rank.push_back(rankData);
-	}
-	rank.sort();
-
+	shader1->use();
+	//shader1->setVec3("obj_color", glm::vec3(1.0, 1.0, 0.0));
 	for (int i = 0; i < 100; ++i) {
-		if (mapdatas[i].tag != -1) {
-			mapdatas[i].tag = -1;
-			mapdatas[i].positionX = 0.0f;
-			mapdatas[i].positionY = 0.0f;
-			mapdatas[i].positionZ = 0.0f;
-			mapdatas[i].rotationX = 0.0f;
-			mapdatas[i].rotationY = 0.0f;
-			mapdatas[i].rotationZ = 0.0f;
-			mapdatas[i].sizeX = 0.0f;
-			mapdatas[i].sizeY = 0.0f;
-			mapdatas[i].sizeZ = 0.0f;
-		}
+		mapdatas[i].tag = -1;
+		mapdatas[i].positionX = 0.0f;
+		mapdatas[i].positionY = 0.0f;
+		mapdatas[i].positionZ = 0.0f;
+		mapdatas[i].rotationX = 0.0f;
+		mapdatas[i].rotationY = 0.0f;
+		mapdatas[i].rotationZ = 0.0f;
+		mapdatas[i].sizeX = 0.0f;
+		mapdatas[i].sizeY = 0.0f;
+		mapdatas[i].sizeZ = 0.0f;
 	}
+
+	//draw_score(cur_score);		//400
+	//draw_score(best_score);		//200
+	//draw_score(mid_score);		//80
+	//draw_score(last_score);		//-40
+
+
 
 	ObjectData tmpMap;
 
-	tmpMap.tag = ModelIdx::Num0;
+	draw_score(best_score);		//400
+	tmpMap.tag = tag[0];
+	tmpMap.positionX = 0.f;
+	tmpMap.positionY = 400.f;
+	tmpMap.positionZ = 0.f;
+	tmpMap.rotationX = 0.0f;
+	tmpMap.rotationY = 0.0f;
+	tmpMap.rotationZ = 0.0f;
+	tmpMap.sizeX = 3.0f;
+	tmpMap.sizeY = 3.0f;
+	tmpMap.sizeZ = 3.0f;
+	mapdatas[0] = tmpMap;
+
+	tmpMap.tag = tag[1];
+	tmpMap.positionX = 100.f;
+	tmpMap.positionY = 400.f;
+	tmpMap.positionZ = 0.f;
+	tmpMap.rotationX = 0.0f;
+	tmpMap.rotationY = 0.0f;
+	tmpMap.rotationZ = 0.0f;
+	tmpMap.sizeX = 3.0f;
+	tmpMap.sizeY = 3.0f;
+	tmpMap.sizeZ = 3.0f;
+	mapdatas[1] = tmpMap;
+
+	tmpMap.tag = tag[2];
+	tmpMap.positionX = 200.f;
+	tmpMap.positionY = 400.f;
+	tmpMap.positionZ = 0.f;
+	tmpMap.rotationX = 0.0f;
+	tmpMap.rotationY = 0.0f;
+	tmpMap.rotationZ = 0.0f;
+	tmpMap.sizeX = 3.0f;
+	tmpMap.sizeY = 3.0f;
+	tmpMap.sizeZ = 3.0f;
+	mapdatas[2] = tmpMap;
+
+	draw_score(mid_score);		//400
+	tmpMap.tag = tag[0];
+	tmpMap.positionX = 0.f;
+	tmpMap.positionY = 200.f;
+	tmpMap.positionZ = 0.f;
+	tmpMap.rotationX = 0.0f;
+	tmpMap.rotationY = 0.0f;
+	tmpMap.rotationZ = 0.0f;
+	tmpMap.sizeX = 3.0f;
+	tmpMap.sizeY = 3.0f;
+	tmpMap.sizeZ = 3.0f;
+	mapdatas[3] = tmpMap;
+
+	tmpMap.tag = tag[1];
+	tmpMap.positionX = 100.f;
+	tmpMap.positionY = 200.f;
+	tmpMap.positionZ = 0.f;
+	tmpMap.rotationX = 0.0f;
+	tmpMap.rotationY = 0.0f;
+	tmpMap.rotationZ = 0.0f;
+	tmpMap.sizeX = 3.0f;
+	tmpMap.sizeY = 3.0f;
+	tmpMap.sizeZ = 3.0f;
+	mapdatas[4] = tmpMap;
+
+	tmpMap.tag = tag[2];
+	tmpMap.positionX = 200.f;
+	tmpMap.positionY = 200.f;
+	tmpMap.positionZ = 0.f;
+	tmpMap.rotationX = 0.0f;
+	tmpMap.rotationY = 0.0f;
+	tmpMap.rotationZ = 0.0f;
+	tmpMap.sizeX = 3.0f;
+	tmpMap.sizeY = 3.0f;
+	tmpMap.sizeZ = 3.0f;
+	mapdatas[5] = tmpMap;
+
+	draw_score(last_score);		//400
+	tmpMap.tag = tag[0];
 	tmpMap.positionX = 0.f;
 	tmpMap.positionY = 0.f;
 	tmpMap.positionZ = 0.f;
@@ -303,5 +434,29 @@ void End_State::rankingData(ObjectData mapdatas[])
 	tmpMap.sizeX = 3.0f;
 	tmpMap.sizeY = 3.0f;
 	tmpMap.sizeZ = 3.0f;
-	mapdatas[0] = tmpMap;
+	mapdatas[6] = tmpMap;
+
+	tmpMap.tag = tag[1];
+	tmpMap.positionX = 100.f;
+	tmpMap.positionY = 0.f;
+	tmpMap.positionZ = 0.f;
+	tmpMap.rotationX = 0.0f;
+	tmpMap.rotationY = 0.0f;
+	tmpMap.rotationZ = 0.0f;
+	tmpMap.sizeX = 3.0f;
+	tmpMap.sizeY = 3.0f;
+	tmpMap.sizeZ = 3.0f;
+	mapdatas[7] = tmpMap;
+
+	tmpMap.tag = tag[2];
+	tmpMap.positionX = 200.f;
+	tmpMap.positionY = 0.f;
+	tmpMap.positionZ = 0.f;
+	tmpMap.rotationX = 0.0f;
+	tmpMap.rotationY = 0.0f;
+	tmpMap.rotationZ = 0.0f;
+	tmpMap.sizeX = 3.0f;
+	tmpMap.sizeY = 3.0f;
+	tmpMap.sizeZ = 3.0f;
+	mapdatas[8] = tmpMap;
 }

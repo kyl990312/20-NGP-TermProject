@@ -1,5 +1,5 @@
 #pragma once
-#include<list>
+#include <list>
 #include <fstream>
 #include <algorithm>
 #include "loadObj.h"
@@ -16,13 +16,14 @@ public:
 	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::mat4 view = glm::lookAt(cameraPos, cameraDirection, cameraUp);
 
-	std::list<int> rank;
+	std::list<int> rank = {};
 	int cur_score;
 	int best_score;
 	int mid_score;
 	int last_score;
 	Shader* shader1 = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
 	int num[3] = { 0, };
+	int tag[3];
 
 public:
 	End_State();
@@ -30,10 +31,10 @@ public:
 	void Display();
 	void update();
 	void keyboard(unsigned char key, int x, int y);
-	void draw_score(float y_pos, int score);
-	void first_number(float y_pos);
-	void second_number(float y_pos);
-	void third_number(float y_pos);
+	void draw_score(int);
+	int first_number();
+	int second_number();
+	int third_number();
 
 	void rankingData(ObjectData[]);
 };
