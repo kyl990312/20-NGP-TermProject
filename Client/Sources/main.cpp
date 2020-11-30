@@ -439,16 +439,14 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 					isSendscore = true;
 					sendFixedVar(sock, sizeof(int), (char*)&score);
 				}
-				std::cout << "score : " << score << std::endl;
 				
+
 				// rankingData처리한 데이터 정보 받기
 				for (ObjectData& obj : objectDatas) {
 					recvFixedVar(sock, len, buf);
 					memcpy(&obj, buf, sizeof(ObjectData));
 					ZeroMemory(&buf, sizeof(buf));
 				}
-				std::cout << objectDatas[0].tag << std::endl;
-				
 				break;
 			}
 
@@ -600,10 +598,151 @@ void MainGameRender() {
 	//}
 }
 
+int num[3] = {};
+int tag[3] = {};
+
+int first_number()
+{
+	int tag;
+
+	switch (num[2]) {
+	case 0:
+		tag = Num0;
+		break;
+	case 1:
+		tag = Num1;
+		break;
+	case 2:
+		tag = Num2;
+		break;
+	case 3:
+		tag = Num3;
+		break;
+	case 4:
+		tag = Num4;
+		break;
+	case 5:
+		tag = Num5;
+		break;
+	case 6:
+		tag = Num6;
+		break;
+	case 7:
+		tag = Num7;
+		break;
+	case 8:
+		tag = Num8;
+		break;
+	case 9:
+		tag = Num9;
+		break;
+	default:
+		tag = Num0;
+		break;
+	}
+
+	return tag;
+}
+
+int second_number()
+{
+	int tag;
+
+	switch (num[1]) {
+	case 0:
+		tag = Num0;
+		break;
+	case 1:
+		tag = Num1;
+		break;
+	case 2:
+		tag = Num2;
+		break;
+	case 3:
+		tag = Num3;
+		break;
+	case 4:
+		tag = Num4;
+		break;
+	case 5:
+		tag = Num5;
+		break;
+	case 6:
+		tag = Num6;
+		break;
+	case 7:
+		tag = Num7;
+		break;
+	case 8:
+		tag = Num8;
+		break;
+	case 9:
+		tag = Num9;
+		break;
+	default:
+		tag = Num0;
+		break;
+	}
+	return tag;
+}
+
+int third_number()
+{
+	int tag;
+	//shader1->use();
+
+	switch (num[0]) {
+	case 0:
+		tag = Num0;
+		break;
+	case 1:
+		tag = Num1;
+		break;
+	case 2:
+		tag = Num2;
+		break;
+	case 3:
+		tag = Num3;
+		break;
+	case 4:
+		tag = Num4;
+		break;
+	case 5:
+		tag = Num5;
+		break;
+	case 6:
+		tag = Num6;
+		break;
+	case 7:
+		tag = Num7;
+		break;
+	case 8:
+		tag = Num8;
+		break;
+	case 9:
+		tag = Num9;
+		break;
+	default:
+		tag = Num0;
+		break;
+	}
+	return tag;
+}
+
+void draw_score(int score) {
+	num[2] = score / 100;
+	num[1] = (score - num[2] * 100) / 10;
+	num[0] = score - num[2] * 100 - num[1] * 10;
+
+	tag[0] = first_number();		// 백의 자리
+	tag[1] = second_number();		// 십의 자리
+	tag[2] = third_number();		// 일의 자리
+}
+
 void EndRender() {
 	//set shader
 	//fontShader->use();
-	shader1->use();
+	fontShader->use();
 	
 	// draw numbers
 	for (const ObjectData& obj : objectDatas) {
@@ -614,4 +753,19 @@ void EndRender() {
 			, glm::vec3(obj.rotationX, obj.rotationY, obj.rotationZ)
 			, glm::vec3(obj.sizeX, obj.sizeY, obj.sizeZ));
 	}
+	draw_score(score);
+
+	DrawObject(tag[0], glm::vec3(-300.f, 400.f, 0.f)
+		, glm::vec3(0.f, 0.f, 0.f)
+		, glm::vec3(3.f, 3.f, 3.f));
+
+	DrawObject(tag[1], glm::vec3(0.f, 400.f, 0.f)
+		, glm::vec3(0.f, 0.f, 0.f)
+		, glm::vec3(3.f, 3.f, 3.f));
+
+	DrawObject(tag[2], glm::vec3(300.f, 400.f, 0.f)
+		, glm::vec3(0.f, 0.f, 0.f)
+		, glm::vec3(3.f, 3.f, 3.f));
 }
+
+

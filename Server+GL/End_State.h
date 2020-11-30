@@ -21,7 +21,7 @@ public:
 	int best_score;
 	int mid_score;
 	int last_score;
-	Shader* shader1 = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
+	Shader* fontshader = new Shader("shaders/font_vertexshader.glvs", "shaders/font_fragmentshader.glfs");
 	int num[3] = { 0, };
 	int tag[3];
 
