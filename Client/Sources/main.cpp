@@ -391,8 +391,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 				m_key = '\0';
 
 				// heroData 수신
-				// recvFixedVar(sock, sizeof(HeroData) * 3, (char*)heroData);
-
 				for (HeroData& data : heroData) {
 					HeroData tmpMap;
 					recvFixedVar(sock, len, buf);
@@ -402,23 +400,17 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 				}
 
 				// mapData 수신
-				//recvFixedVar(sock, sizeof(ObjectData)*100, (char*)objectDatas);
-
 				for (ObjectData& obj : objectDatas) {
 					ObjectData tmpMap;
 					recvFixedVar(sock, len, buf);
 					memcpy(&tmpMap, buf, sizeof(ObjectData));
-					//objectDatas.emplace_back(tmpMap);
 					obj = tmpMap;
 					ZeroMemory(&buf, sizeof(buf));
 				}
 				
 				// 자신이 몇번째 클라이언트인지 받기
-				//recvFixedVar(sock, sizeof(int), (char*)&clientCnt);
 				recvFixedVar(sock, sizeof(bool), (char*)&isAlive);
-
-				//std::cout << objectDatas.size() << std::endl;
-
+				// Scene 상태 받기
 				recvFixedVar(sock, sizeof(int), (char*)&recvScene);
 
 				/*	int cnt = 0;
@@ -441,6 +433,9 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 					sendFixedVar(sock, sizeof(int), (char*)&score);
 				}
 
+				/*for (ObjectData& obj : objectDatas) {
+					obj.tag = -1;
+				}*/
 				// rankingData처리한 데이터 정보 받기
 				for (ObjectData& obj : objectDatas) {
 					recvFixedVar(sock, len, buf);
@@ -451,11 +446,10 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 				isSendscore = false;
 				isReady = false;
 				startSignal = false;
-				score = 0;
 				isAlive = true;
 
 				recvFixedVar(sock, sizeof(int), (char*)&recvScene);
-
+				_sleep(5000);
 				break;
 			}
 
@@ -781,6 +775,7 @@ void EndRender() {
 	DrawObject(tag[2], glm::vec3(300.f, 400.f, 0.f)
 		, glm::vec3(0.f, 0.f, 0.f)
 		, glm::vec3(3.f, 3.f, 3.f));
+	
 }
 
 

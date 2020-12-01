@@ -46,7 +46,6 @@ GLvoid TimerFunction(int value);
 int state_mode = 0;
 int clientCnt = 0;
 bool ready_check[3] = { false, false, false };
-bool startSignal = false;
 
 int score[3] = {};
 bool isRecvscore[3] = {false, false, false};
@@ -152,7 +151,7 @@ int main(int argc, char** argv)
 
 	glutDisplayFunc(drawScene);
 	glutTimerFunc(16, TimerFunction, 1);
-	glutKeyboardFunc(keyboard);
+	//glutKeyboardFunc(keyboard);
 	glutReshapeFunc(Reshape);
 	glutMainLoop();
 
@@ -398,39 +397,20 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 	getpeername(client_sock, (SOCKADDR*)&clientaddr, &addrlen);
 	std::cout << "클라이언트 접속" << std::endl;
 
-	bool ready = false;
 	int cnt = ((MultipleArg*)arg)->clientCount;
 	char key;
 
 	std::ofstream out("rank.txt", std::ios::app);
 
 	while (1) {
-		//test
-		/*int cnt = 0;
-		for (const ObjectData& mapdata : mapdatas) {
-			if (mapdata.tag != -1) {
-				std::cout << cnt<<"."<<"Map tag = " << mapdata.tag << std::endl;
-
-				std::cout <<cnt<<"."<< "Map Position = " << mapdata.positionX <<","<<mapdata.positionY<<","<<mapdata.positionZ << std::endl;
-				std::cout << cnt << "." << "Map Size = " << mapdata.sizeX <<","<<mapdata.sizeY<<","<<mapdata.sizeZ << std::endl;
-				std::cout << cnt << "." << "Map Roatation = " << mapdata.rotationX <<","<<mapdata.rotationY<<","<<mapdata.rotationZ << std::endl;
-				cnt++;
-			}
-		}*/
 		switch (currentScene) {
 		case Scene::Title:
 			if (WaitForSingleObject(hAllUpdated[cnt], INFINITE) == WAIT_OBJECT_0) {
 				// ready 받기
-				recvFixedVar(client_sock, sizeof(bool), (char*)&ready);
+				recvFixedVar(client_sock, sizeof(bool), (char*)&ready_check[cnt]);
 
-				if (ready == true)
-					ready_check[cnt] = true;
-
-				if (ready_check[0] == true && ready_check[1] == true && ready_check[2] == true
-					) {
-					startSignal = true;
+				if (ready_check[0] == true && ready_check[1] == true && ready_check[2] == true)
 					currentScene = Scene::MainGame;
-				}
 
 				// 맵 데이터 넘겨주기
 				title_game->TitleDatas(mapdatas);
@@ -457,17 +437,13 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 				for (const HeroData data : heroDatas) {
 					sendFixedVar(client_sock, sizeof(HeroData), (char*)&data);
 				}
-				//sendFixedVar(client_sock, sizeof(HeroData) * 3, (char*)&heroDatas);
-
 				// map data 전송
 				main_game->GetMapDatas(mapdatas);
 				for (const ObjectData& mapdata : mapdatas) {
 					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
 				}
-				//sendFixedVar(client_sock, sizeof(ObjectData)*100, (char*)&mapdatas);
 
 				//cnt 전송- 죽었는지 안죽었는지 send
-				//sendFixedVar(client_sock, sizeof(int), (char*)&cnt);
 				sendFixedVar(client_sock, sizeof(bool), (char*)&heroDatas[cnt].alive);
 
 				// 3명 다 죽으면 scene::end로 
@@ -495,12 +471,10 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
 				}
 			}
-			//ready = false;
+			
 			ready_check[cnt] = false;
-			startSignal = false;
 			isRecvscore[cnt] = false;
 			heroDatas[cnt].alive = true;
-			//score[cnt] = 0;
 
 			currentScene = Scene::Title;
 			sendFixedVar(client_sock, sizeof(int), (char*)&currentScene);
