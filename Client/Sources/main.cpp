@@ -49,13 +49,14 @@ char m_key = '\0';
 
 int currentScene = Scene::Title;
 int clientCnt = 0;
-bool readyState = false;
 bool isReady = false;
 bool startSignal = false;
 bool isSendscore = false;
 int score = 0;
-
 bool isAlive = true;
+
+int num[3] = {};
+int tag[3] = {};
 
 loadOBJ models[27];
 Shader* shader1;
@@ -136,12 +137,10 @@ GLvoid drawScene()
 		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
 
 		EndRender();
-
 		if (recvScene == Scene::Title) {
 			currentScene = Scene::Title;
 			std::cout << "게임 스테이트 Title로 바꿈" << std::endl;
 		}
-
 		break;
 	}
 	glEnable(GL_DEPTH_TEST);
@@ -377,7 +376,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 					memcpy(&obj, buf, sizeof(ObjectData));
 					ZeroMemory(&buf, sizeof(buf));
 				}
-				// Client 개수 받아오기
+				// Scene 상태 받기
 				recvFixedVar(sock, sizeof(int), (char*)&recvScene);
 			}
 			break;
@@ -439,7 +438,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 					isSendscore = true;
 					sendFixedVar(sock, sizeof(int), (char*)&score);
 				}
-				
 
 				// rankingData처리한 데이터 정보 받기
 				for (ObjectData& obj : objectDatas) {
@@ -447,6 +445,15 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 					memcpy(&obj, buf, sizeof(ObjectData));
 					ZeroMemory(&buf, sizeof(buf));
 				}
+
+				isSendscore = false;
+				isReady = false;
+				startSignal = false;
+				score = 0;
+				isAlive = true;
+
+				recvFixedVar(sock, sizeof(int), (char*)&recvScene);
+
 				break;
 			}
 
@@ -598,8 +605,7 @@ void MainGameRender() {
 	//}
 }
 
-int num[3] = {};
-int tag[3] = {};
+
 
 int first_number()
 {

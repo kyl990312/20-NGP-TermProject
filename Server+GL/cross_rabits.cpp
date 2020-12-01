@@ -34,8 +34,6 @@ HANDLE hAllUpdated[3];
 HANDLE hAllSend[3];
 HANDLE hAllScoreRecv[3];
 
-
-
 // GL
 Title_State* title_game = nullptr;
 MainGame_State* main_game = nullptr;
@@ -44,7 +42,6 @@ End_State* end_game = nullptr;
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 GLvoid TimerFunction(int value);
-//GLvoid keyboard(unsigned char key, int x, int y);
 
 int state_mode = 0;
 int clientCnt = 0;
@@ -379,14 +376,11 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 		}
 		break;
 		case Scene::MainGame:
-
 			break;
 		case Scene::End:
-			
 			break;
 		}
 	}
-
 	// close Event
 	for (int i = 0; i < 3; ++i) {
 		CloseHandle(hAllUpdated[i]);
@@ -505,25 +499,24 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 			}
 
 			// rankingData처리한 데이터 정보 넘겨주기
-			//end_game->update();
 			if (WaitForSingleObject(hAllUpdated[cnt], INFINITE) == WAIT_OBJECT_0) {
 				for (const ObjectData& mapdata : mapdatas) {
 					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
 				}
 			}
+			//ready = false;
+			ready_check[cnt] = false;
+			startSignal = false;
+			isRecvscore[cnt] = false;
+			heroDatas[cnt].alive = true;
+			//score[cnt] = 0;
 
-			
+			currentScene = Scene::Title;
+			sendFixedVar(client_sock, sizeof(int), (char*)&currentScene);
 
-			/*if (isRecvscore[0] == true && isRecvscore[1] == true && isRecvscore[2] == true)
-			{
-				std::cout << "client sock close" << std::endl;
-				closesocket(client_sock);
-				return 0;
-			}*/
 			break;
 		}
 	}
-	// closesocket()
 	closesocket(client_sock);
 
 	return 0;

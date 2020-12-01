@@ -96,6 +96,10 @@ void Title_State::draw_startbutton()
 }
 
 void Title_State::TitleDatas(ObjectData mapdatas[]) {
+	for (int i = 0; i < 100; ++i) {
+		mapdatas[i].tag = -1;
+	}
+
 	ObjectData tmpMap;
 
 	tmpMap.tag = ModelIdx::Hero;

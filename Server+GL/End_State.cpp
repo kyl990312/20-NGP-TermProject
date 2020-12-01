@@ -19,8 +19,6 @@ void End_State::update() {
 	std::vector<int> rank;
 	rank.reserve(50);
 	std::ifstream in("rank.txt");
-	if (!in)
-		std::cout << "파일이 안 열림" << std::endl;
 
 	int n = 0;
 	while (!in.eof()) {
@@ -37,7 +35,6 @@ void End_State::update() {
 	last_score = rank[2];
 
 	rank.clear();
-
 }
 
 void End_State::keyboard(unsigned char key, int x, int y) {
@@ -194,15 +191,6 @@ void End_State::rankingData(ObjectData mapdatas[])
 	
 	for (int i = 0; i < 100; ++i) {
 		mapdatas[i].tag = -1;
-		mapdatas[i].positionX = 0.0f;
-		mapdatas[i].positionY = 0.0f;
-		mapdatas[i].positionZ = 0.0f;
-		mapdatas[i].rotationX = 0.0f;
-		mapdatas[i].rotationY = 0.0f;
-		mapdatas[i].rotationZ = 0.0f;
-		mapdatas[i].sizeX = 0.0f;
-		mapdatas[i].sizeY = 0.0f;
-		mapdatas[i].sizeZ = 0.0f;
 	}
 
 	ObjectData tmpMap;
