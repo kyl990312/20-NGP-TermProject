@@ -95,7 +95,7 @@ int main(int argc, char** argv)
 
 	// ฤÝน้
 	glutDisplayFunc(drawScene);
-	glutTimerFunc(33, TimerFunction, 1);
+	glutTimerFunc(16, TimerFunction, 1);
 	glutKeyboardFunc(keyboard);
 	glutMouseFunc(mouse);
 	glutReshapeFunc(Reshape);
@@ -110,7 +110,7 @@ GLvoid drawScene()
 
 	switch (currentScene) {
 	case Scene::Title:
-		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
+		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
 		if (WaitForSingleObject(hAllDataStore, INFINITE) == WAIT_OBJECT_0) {
 			TitleRender();
 			if (recvScene == Scene::MainGame) {
@@ -342,8 +342,10 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 		return 1;
 
 	// socket()
+	int option = 1;
 	SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (sock == INVALID_SOCKET) err_quit((char*)"socket()");
+	setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (char*)&option, sizeof(option));
 
 	// connect()
 	SOCKADDR_IN serveraddr;
@@ -584,9 +586,16 @@ void MainGameRender() {
 	}
 
 	for (const HeroData hero : heroData) {
-		DrawObject(ModelIdx::Hero, glm::vec3(hero.x, hero.y, hero.z),
-			glm::vec3(0.0f, hero.rotaionAngle, 0.0f),
-			glm::vec3(1.0f, 1.0f, 1.0f));
+		if (hero.alive) {
+			DrawObject(ModelIdx::Hero, glm::vec3(hero.x, hero.y, hero.z),
+				glm::vec3(0.0f, hero.rotaionAngle, 0.0f),
+				glm::vec3(1.0f, 1.0f, 1.0f));
+		}
+		else {
+			DrawObject(ModelIdx::Ghost, glm::vec3(hero.x, hero.y, hero.z),
+				glm::vec3(0.0f, hero.rotaionAngle, 0.0f),
+				glm::vec3(1.0f, 1.0f, 1.0f));
+		}
 	}
 
 	//// draw all heros

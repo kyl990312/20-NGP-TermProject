@@ -20,9 +20,6 @@ void Title_State::Display() {
 	startbutton_shader->use();
 	startbutton_shader->setVec3("obj_color", glm::vec3(1.0, 0.5, 0.0));
 	draw_startbutton();
-
-	for (int i = 0; i < 4; i++)
-		firework_particle[i].draw();
 }
 
 void Title_State::update() {
