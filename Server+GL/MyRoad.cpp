@@ -1,8 +1,6 @@
 #include "MyRoad.h"
 #include<iostream>
 
-extern loadOBJ models[26];
-extern Shader* shader1;
 
 MyRoad::MyRoad() {
 
@@ -32,21 +30,6 @@ MyRoad::MyRoad() {
 
 }
 
- void MyRoad::draw(glm::mat4 projection, glm::mat4 view, Shader shader)  {
-	 //loadOBJ obj(obj_path, shader.ID);
-	 shader1->use();
-	 models[13].load(projection, view);
-
-	 glm::mat4 model = glm::mat4(1.0f);
-	 
-	 // change road's positoin 
-	 model = glm::translate(model,glm::vec3(pos.x, pos.y, pos.z));
-	 models[13].setTransform(model);
-	
-	 models[13].draw();
-	 for (int i = 0; i < 2; ++i)
-		trucks[i]->draw(projection, view, model, shader);
-}
 
  void MyRoad::move() {
 	 // make trucks move
@@ -79,7 +62,8 @@ MyRoad::MyRoad() {
 
  void MyRoad::remove_truck(int i) {
 	 // 1. delete
-	 delete trucks[i];
+	 if(trucks[i] != NULL)
+		delete trucks[i];
 
 	 // 2. create
 	 if (pos.z <= 600) {

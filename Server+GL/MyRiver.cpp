@@ -1,7 +1,5 @@
 #include "MyRiver.h"
 
-extern loadOBJ models[26];
-extern Shader* shader1;
 
 MyRiver::MyRiver() {
 
@@ -29,26 +27,6 @@ MyRiver::MyRiver() {
 	moving_degree = 0;
 	obs_cnt = 3;
 	tag = 1;
-
-}
-
-void MyRiver::draw(glm::mat4 projection, glm::mat4 view, Shader shader) {
-	//loadOBJ obj(obj_path, shader.ID);
-	//shader.use();
-
-	shader1->use();
-	models[14].load(projection, view);
-
-	glm::mat4 model = glm::mat4(1.0f);
-
-	// change road's positoin 
-	model = glm::translate(model, glm::vec3(pos.x, pos.y, pos.z));
-
-	models[14].setTransform(model);
-
-	models[14].draw();
-	for (int i = 0; i < 3; i++)
-		logs[i]->draw(projection, view, model, shader);
 }
 
 void MyRiver::move() {
@@ -84,7 +62,8 @@ void MyRiver::CreateLog(int idx) {
 
 void MyRiver::remove_log(int i) {
 	// 1. delete
-	delete logs[i];
+	if(logs[i]!= NULL)
+		delete logs[i];
 
 	// 2. create
 	if (pos.z <= 600)

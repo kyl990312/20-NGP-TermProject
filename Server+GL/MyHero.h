@@ -1,5 +1,4 @@
 #pragma once
-#include "loadObj.h"
 #include "MyHeader.h"
 #include <math.h>
 
@@ -44,8 +43,6 @@ public:
 	void Die();
 	//bool check_death(MyPos obs_pos, int obs_tag);
 	void update(int tag, MyPos* obs_pos, int obs_cnt1);
-	void draw(glm::mat4 projection, glm::mat4 view, Shader shader);
-	void soul_draw(glm::mat4 projection, glm::mat4 view,Shader shader);
 	bool CheckCollistionWithHero(MyPos position, float size);
 
 };

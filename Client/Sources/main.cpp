@@ -168,7 +168,7 @@ GLvoid TimerFunction(int value)
 
 		break;
 	}
-	glutTimerFunc(33, TimerFunction, 1);
+	glutTimerFunc(16, TimerFunction, 1);
 	glutPostRedisplay();
 }
 
@@ -484,16 +484,16 @@ void ModelLoad() {
 	models[1] = loadOBJ("Resources/box.obj", shader1->ID);
 
 	// ¼ýÀÚ
-	models[2] = loadOBJ("Resources/number_0.obj", shader1->ID);
-	models[3] = loadOBJ("Resources/number_1.obj", shader1->ID);
-	models[4] = loadOBJ("Resources/number_2.obj", shader1->ID);
-	models[5] = loadOBJ("Resources/number_3.obj", shader1->ID);
-	models[6] = loadOBJ("Resources/number_4.obj", shader1->ID);
-	models[7] = loadOBJ("Resources/number_5.obj", shader1->ID);
-	models[8] = loadOBJ("Resources/number_6.obj", shader1->ID);
-	models[9] = loadOBJ("Resources/number_7.obj", shader1->ID);
-	models[10] = loadOBJ("Resources/number_8.obj", shader1->ID);
-	models[11] = loadOBJ("Resources/number_9.obj", shader1->ID);
+	models[2] = loadOBJ("Resources/number_0.obj", fontShader->ID);
+	models[3] = loadOBJ("Resources/number_1.obj", fontShader->ID);
+	models[4] = loadOBJ("Resources/number_2.obj", fontShader->ID);
+	models[5] = loadOBJ("Resources/number_3.obj", fontShader->ID);
+	models[6] = loadOBJ("Resources/number_4.obj", fontShader->ID);
+	models[7] = loadOBJ("Resources/number_5.obj", fontShader->ID);
+	models[8] = loadOBJ("Resources/number_6.obj", fontShader->ID);
+	models[9] = loadOBJ("Resources/number_7.obj", fontShader->ID);
+	models[10] = loadOBJ("Resources/number_8.obj", fontShader->ID);
+	models[11] = loadOBJ("Resources/number_9.obj", fontShader->ID);
 
 	// State
 	models[12] = loadOBJ("Resources/common.obj", shader1->ID);

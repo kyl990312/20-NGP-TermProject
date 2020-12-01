@@ -146,11 +146,7 @@
     <ClCompile Include="cross_rabits.cpp" />
     <ClCompile Include="DataStruct.h" />
     <ClCompile Include="End_State.cpp" />
-    <ClCompile Include="firework.cpp" />
-    <ClCompile Include="FirstState.cpp" />
-    <ClCompile Include="loadOBJ.cpp" />
     <ClCompile Include="MainGame_State.cpp" />
-    <ClCompile Include="Model.cpp" />
     <ClCompile Include="Mycommon.cpp" />
     <ClCompile Include="MyHero.cpp" />
     <ClCompile Include="MyLog.cpp" />
@@ -165,16 +161,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="End_State.h" />
-    <ClInclude Include="firework_particle.h" />
-    <ClInclude Include="FirstState.h" />
-    <ClInclude Include="loadObj.h" />
     <ClInclude Include="MainGame_State.h" />
-    <ClInclude Include="Model.h" />
     <ClInclude Include="MyCommon.h" />
     <ClInclude Include="MyHeader.h" />
     <ClInclude Include="MyHero.h" />
     <ClInclude Include="MyLog.h" />
-    <ClInclude Include="MyObstacles.h" />
     <ClInclude Include="MyRiver.h" />
     <ClInclude Include="MyRoad.h" />
     <ClInclude Include="MyState.h" />
@@ -182,7 +173,6 @@
     <ClInclude Include="MyTrain.h" />
     <ClInclude Include="MyTree.h" />
     <ClInclude Include="MyTruck.h" />
-    <ClInclude Include="shader.h" />
     <ClInclude Include="Title_State.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

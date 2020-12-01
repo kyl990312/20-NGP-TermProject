@@ -27,16 +27,7 @@
     <ClCompile Include="End_State.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="firework.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="loadOBJ.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="MainGame_State.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Mycommon.cpp">
@@ -69,15 +60,9 @@
     <ClCompile Include="MyTruck.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="FirstState.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyTruck.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="shader.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="MainGame_State.h">
@@ -92,15 +77,6 @@
     <ClInclude Include="End_State.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="firework_particle.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="loadObj.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="MyCommon.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -108,9 +84,6 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="MyLog.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="MyObstacles.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="MyRiver.h">
@@ -129,9 +102,6 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="MyTree.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="FirstState.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

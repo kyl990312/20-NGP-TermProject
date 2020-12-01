@@ -50,74 +50,10 @@ bool ready_check[3] = { false, false, false };
 int score[3] = {};
 bool isRecvscore[3] = {false, false, false};
 
-
-loadOBJ models[27];
-Shader* shader1;
-Shader* fontShader;
-Shader* startbutton_shader;
-
 // frame
 int prevTime = 0;
 float elapsedTimeSec = 0;
 
-void ModelLoad() {
-	shader1 = new Shader("shaders/vertexshader.glvs", "shaders/fragmentshader.glfs");
-	fontShader = new Shader("shaders/vertexshader.glvs", "shaders/font_fragmentshader.glfs");
-	startbutton_shader = new Shader("shaders/startbutton_vertexshader.glvs", "shaders/startbutton_fragmentshader.glfs");
-
-	// Hero
-	models[0] = loadOBJ("Resources/rabit.obj", shader1->ID);
-
-	// box
-	models[1] = loadOBJ("Resources/box.obj", shader1->ID);
-
-	// ¼ýÀÚ
-	models[2] = loadOBJ("Resources/number_0.obj", fontShader->ID);
-	models[3] = loadOBJ("Resources/number_1.obj", fontShader->ID);
-	models[4] = loadOBJ("Resources/number_2.obj", fontShader->ID);
-	models[5] = loadOBJ("Resources/number_3.obj", fontShader->ID);
-	models[6] = loadOBJ("Resources/number_4.obj", fontShader->ID);
-	models[7] = loadOBJ("Resources/number_5.obj", fontShader->ID);
-	models[8] = loadOBJ("Resources/number_6.obj", fontShader->ID);
-	models[9] = loadOBJ("Resources/number_7.obj", fontShader->ID);
-	models[10] = loadOBJ("Resources/number_8.obj", fontShader->ID);
-	models[11] = loadOBJ("Resources/number_9.obj", fontShader->ID);
-
-	// State
-	models[12] = loadOBJ("Resources/common.obj", shader1->ID);
-	models[13] = loadOBJ("Resources/road.obj", shader1->ID);
-	models[14] = loadOBJ("Resources/river.obj", shader1->ID);
-	models[15] = loadOBJ("Resources/trail.obj", shader1->ID);
-
-	// obj in state
-	models[16] = loadOBJ("Resources/car.obj", shader1->ID);
-	models[17] = loadOBJ("Resources/truck.obj", shader1->ID);
-	models[18] = loadOBJ("Resources/train.obj", shader1->ID);
-	models[19] = loadOBJ("Resources/tree.obj", shader1->ID);
-	models[20] = loadOBJ("Resources/log.obj", shader1->ID);
-
-	// ±âÅ¸
-	models[21] = loadOBJ("Resources/snow.obj", shader1->ID);
-	models[22] = loadOBJ("Resources/soul_cube.obj", shader1->ID);
-	models[23] = loadOBJ("Resources/title_font.obj", fontShader->ID);
-	models[24] = loadOBJ("Resources/title_plane.obj", shader1->ID);
-	models[25] = loadOBJ("Resources/ghost.obj", shader1->ID);
-	models[26] = loadOBJ("Resources/start_button.obj", startbutton_shader->ID);
-
-	shader1->setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
-	shader1->setVec3("lightColor", glm::vec3(0.5f, 0.5f, 0.5f));
-	shader1->setVec3("lightPos", glm::vec3(0, 800, 2000));
-
-	fontShader->setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
-	fontShader->setVec3("lightColor", glm::vec3(0.5f, 0.5f, 0.5f));
-	fontShader->setVec3("lightPos", glm::vec3(0, 800, 2000));
-	fontShader->setVec3("obj_color", glm::vec3(1.0, 0.6, 0.0));
-
-	startbutton_shader->setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
-	startbutton_shader->setVec3("lightColor", glm::vec3(0.5f, 0.5f, 0.5f));
-	startbutton_shader->setVec3("lightPos", glm::vec3(0, 800, 2000));
-	startbutton_shader->setVec3("obj_color", glm::vec3(0.8, 0.6, 0.0));
-}
 
 int main(int argc, char** argv)
 {
@@ -134,7 +70,6 @@ int main(int argc, char** argv)
 	}
 	else
 		std::cout << "GLEW Initialized" << std::endl;
-	ModelLoad();
 
 	// tag init
 	for (ObjectData data : mapdatas) {
@@ -151,7 +86,6 @@ int main(int argc, char** argv)
 
 	glutDisplayFunc(drawScene);
 	glutTimerFunc(16, TimerFunction, 1);
-	//glutKeyboardFunc(keyboard);
 	glutReshapeFunc(Reshape);
 	glutMainLoop();
 
@@ -169,31 +103,8 @@ GLvoid drawScene()
 {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	switch (currentScene) {
-	case 0:
-	case 2:
-		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
-		break;
-	case 1:
-		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
-		break;
-	}
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
 
-	switch (currentScene) {
-	case 0:
-		title_game->Display();
-		break;
-	case 1:
-		if (main_game != NULL)
-			main_game->Display();
-		break;
-	case 2:
-		end_game->Display();
-		break;
-	}
+
 	glutSwapBuffers();
 }
 
@@ -249,7 +160,7 @@ GLvoid TimerFunction(int value)
 		}
 		break;
 	}
-	glutTimerFunc(33, TimerFunction, 1);
+	glutTimerFunc(16, TimerFunction, 1);
 	glutPostRedisplay();
 }
 

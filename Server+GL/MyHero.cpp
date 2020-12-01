@@ -1,6 +1,5 @@
 #include "MyHero.h"
 
-extern loadOBJ models[26];
 extern float elapsedTimeSec;
 
 void kyrHero::Jump(int tag, MyPos* obs_pos, int obs_cnt1)
@@ -137,31 +136,6 @@ bool kyrHero::check_collision(MyPos obs_pos, int obs_tag) {
 	return true;
 }
 
-void kyrHero::draw(glm::mat4 projection, glm::mat4 view, Shader shader) {
-	//loadOBJ obj("Resources/rabit.obj", shader.ID);
-	shader.use();
-	models[0].load(projection, view);
-	// init model_matrix
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(current_pos.x, current_pos.y, current_pos.z));
-	model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(-direction_angle), glm::vec3(0.0f, 1.0f, 0.0f));
-
-	// lightning
-	//shader.setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
-	//shader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 0.9f));
-	//shader.setVec3("lightPos", glm::vec3(0, 800, 2000));
-
-	// apply transform matix(
-	models[0].setTransform(model);
-
-	// draw obj
-	if(_state == HeroState::Die)
-		soul_draw(projection,view,shader);
-	else
-		models[0].draw();
-
-}
 
 void kyrHero::update(int tag, MyPos* obs_pos1, int obs_cnt1) {
 		
@@ -207,17 +181,7 @@ void kyrHero::Die() {
 	soul_pos.z -= 5 * elapsedTimeSec * SPEED;
 }
 
-void kyrHero::soul_draw(glm::mat4 projection, glm::mat4 view, Shader shader){
 
-	loadOBJ soul_obj("Resources/ghost.obj", shader.ID);
-	soul_obj.load(projection, view);
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(soul_pos.x+current_pos.x, soul_pos.y+current_pos.y, current_pos.z));
-	model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
-
-	soul_obj.setTransform(model);
-	soul_obj.draw();
-}
 
 bool kyrHero::CheckCollistionWithHero(MyPos position, float size)
 {

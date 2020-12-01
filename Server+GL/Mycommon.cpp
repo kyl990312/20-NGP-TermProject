@@ -1,8 +1,5 @@
 #include "MyCommon.h"
 
-extern loadOBJ models[26];
-extern Shader* shader1;
-
 MyCommon::MyCommon() {
 	// init pos
 	// only its z_pos will change in MyCommon()
@@ -34,30 +31,8 @@ MyCommon::MyCommon() {
 
 }
 
-void MyCommon::draw(glm::mat4 projection, glm::mat4 view, Shader shader) {
-	//loadOBJ obj(obj_path, shader.ID);
-	//shader.use();
-	shader1->use();
-	models[12].load(projection, view);
-
-	glm::mat4 model = glm::mat4(1.0f);
-
-	// change road's positoin 
-	model = glm::translate(model, glm::vec3(pos.x, pos.y, pos.z));
-
-	models[12].setTransform(model);
-
-	models[12].draw();
-	for (int i = 0; i < 3; i++)
-		trees[i]->draw(projection, view, model, shader);
-}
 
 void MyCommon::move() {
-	// make trees move
-	// make road move
-	if (moving) {
-
-	}
 }
 
 bool MyCommon::check_removing() {
@@ -77,7 +52,8 @@ void MyCommon::CreateTree(int idx) {
 }
 
 void MyCommon::remove_tree(int i) {
-	delete trees[i];
+	if(trees[i] != NULL)
+		delete trees[i];
 }
 
 MyCommon::~MyCommon() { 

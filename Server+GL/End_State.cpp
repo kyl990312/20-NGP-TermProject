@@ -1,19 +1,10 @@
 #include "End_State.h"
-
-extern loadOBJ models[26];
+#include<vector>
 
 End_State::End_State() {}
 
 End_State::~End_State() {}
 
-void End_State::Display() {
-	fontshader->use();
-	fontshader->setVec3("obj_color", glm::vec3(1.0, 1.0, 0.0));
-	draw_score(cur_score);		//400
-	draw_score(best_score);		//200
-	draw_score(mid_score);		//80
-	draw_score(last_score);		//-40
-}
 
 void End_State::update() {
 	std::vector<int> rank;
@@ -37,13 +28,6 @@ void End_State::update() {
 	rank.clear();
 }
 
-void End_State::keyboard(unsigned char key, int x, int y) {
-	switch (key) {
-	default:
-		next_state = 0;
-		break;
-	}
-}
 
 void End_State::draw_score(int score) {
 	num[2] = score / 100;
@@ -186,8 +170,6 @@ int End_State::third_number()
 
 void End_State::rankingData(ObjectData mapdatas[])
 {
-	fontshader->use();
-	fontshader->setVec3("obj_color", glm::vec3(1.0, 1.0, 0.0));
 	
 	for (int i = 0; i < 100; ++i) {
 		mapdatas[i].tag = -1;

@@ -1,54 +1,18 @@
 #include "MainGame_State.h"
-#include"FirstState.h"
 // this is main game state
 extern float elapsedTimeSec;
 
 MainGame_State::MainGame_State() {
-	//test
-	//PlaySound(TEXT("Resources/Spongebob.wav"), NULL, SND_FILENAME | SND_NODEFAULT | SND_ASYNC | SND_LOOP);
 	init_map();
 }
 
 MainGame_State::~MainGame_State() {
-	std::ofstream out("rank.txt", std::ios::app);
-	out << pass_state_cnt << '\n';
-	out.close();
 	for (int i = 0; i < map_count;++i) {
 		if(states[i] != NULL)
 			delete states[i];
 	}
 	if(states != NULL)
 	delete states;
-}
-
-void MainGame_State::Display() {
-	for (int i = 0; i < map_count; i++) {
-		states[i]->draw(projection, view, *shader);
-		if (states[i]->check_removing()) {
-			delete states[i];
-			int create_state_random = rand() % 5;
-			switch (create_state_random)
-			{
-			case 0:
-				states[i] = new MyRoad;
-				break;
-			case 1:
-				states[i] = new MyRiver;
-				break;
-			case 2:
-				states[i] = new MyTrail;
-				break;
-			default:
-				states[i] = new MyCommon;
-				break;
-			}
-			states[i]->pos.z = -545;
-		}
-	}
-
-	// hero draw
-	for(int i = 0 ; i<1;++i)
-		hero[i].draw(projection, view, *hero_shader);
 }
 
 void MainGame_State::update() {
@@ -70,10 +34,6 @@ void MainGame_State::update() {
 		}
 	}
 	if (hero[0]._state == HeroState::Die && hero[1]._state == HeroState::Die && hero[2]._state == HeroState::Die) {
-		if (back_music) {
-			PlaySound(TEXT("Resources/fail2.wav"), NULL, SND_FILENAME | SND_NODEFAULT | SND_ASYNC);
-			back_music = false;
-		}
 		change_timer -= 1;
 		if (change_timer < 0) {
 			next_state = 2;
@@ -247,21 +207,4 @@ void MainGame_State::GetHeroDatas(HeroData* herodatas)
 	}
 }
 
-void MainGame_State::Init()
-{
-	//test
-	//PlaySound(TEXT("Resources/Spongebob.wav"), NULL, SND_FILENAME | SND_NODEFAULT | SND_ASYNC | SND_LOOP);
-	init_map();
-}
-
-void MainGame_State::DeleteAll()
-{
-	for (int i = 0; i < map_count; i++) {
-		if (states[i] != NULL)
-			delete states[i];
-	}
-
-	if (states != NULL)
-		delete states;
-}
 

@@ -1,6 +1,5 @@
 #include "MyTruck.h"
 
-extern loadOBJ models[26];
 extern float elapsedTimeSec;
 
 MyTruck::MyTruck(MyPos road_pos, float state_speed) {
@@ -10,29 +9,11 @@ MyTruck::MyTruck(MyPos road_pos, float state_speed) {
 	size = 50.0f; 
 	direction = 1;
 	if (speed < 20) {
-		obj = models[17];
 		tag = 17;
 	}
 	else {
-		obj = models[16];
 		tag = 16;
 	}
-}
-
-void MyTruck::draw(glm::mat4 projection, glm::mat4 view, glm::mat4 model, Shader shader) {
-	obj.load(projection, view);
-
-	// change road's positoin 
-	model = glm::translate(model, glm::vec3(pos.x, 0.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0, 0.0f));
-	obj.setTransform(model);
-
-	//Ä«¸Þ¶ó º¤ÅÍ 
-	//shader.setVec3("viewPos", glm::vec3(0.0f, 45.0f, 50));
-	//shader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 0.9f));
-	//shader.setVec3("lightPos", glm::vec3(0, 800, 2000));
-
-	obj.draw();
 }
 
 void MyTruck::move(MyPos road_pos) {
