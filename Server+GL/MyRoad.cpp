@@ -5,7 +5,7 @@ extern loadOBJ models[26];
 extern Shader* shader1;
 
 MyRoad::MyRoad() {
-	std::cout << "creating Road..." << std::endl;
+
 	// init pos
 	// only its z_pos will change in MyRoad()
 	pos = { 0.0f,0.0f,0.0f };
@@ -29,7 +29,7 @@ MyRoad::MyRoad() {
 	obsSize[0] = { 1.f,1.f,1.f };
 	obsSize[1] = { 1.f,1.f,1.f };
 	obs_cnt = 2;
-	std::cout << "complete creating road!" << std::endl;
+
 }
 
  void MyRoad::draw(glm::mat4 projection, glm::mat4 view, Shader shader)  {
@@ -80,12 +80,18 @@ MyRoad::MyRoad() {
  void MyRoad::remove_truck(int i) {
 	 // 1. delete
 	 delete trucks[i];
-	 std::cout << "삭제 : "<< pos.z << std::endl;
+
 	 // 2. create
 	 if (pos.z <= 600) {
 		 trucks[i] = new MyTruck(pos, speed);
-		 std::cout <<"생성: "<< pos.z << std::endl;
+
 	}
  }
 
- MyRoad::~MyRoad() {};
+ MyRoad::~MyRoad() { 
+	 for (int i = 0; i < obs_cnt; ++i) {
+		 if (trucks[i] != NULL)
+			 delete trucks[i];
+	 }
+
+ };

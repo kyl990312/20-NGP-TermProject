@@ -5,7 +5,7 @@ extern loadOBJ models[26];
 extern Shader* shader1;
 
 FirstState::FirstState() {
-	std::cout << "creating River..." << std::endl;
+
 	// init pos
 	// only its z_pos will change in FirstState()
 	pos = { 0.0f,0.0f,0.0f };

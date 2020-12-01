@@ -4,7 +4,6 @@ extern loadOBJ models[26];
 extern Shader* shader1;
 
 MyCommon::MyCommon() {
-	std::cout << "creating River..." << std::endl;
 	// init pos
 	// only its z_pos will change in MyCommon()
 	pos = { 0.0f,0.0f,0.0f };
@@ -32,7 +31,7 @@ MyCommon::MyCommon() {
 	obsTags[2] = 19;
 	obs_cnt = 3;
 	tag = 2;
-	std::cout << "complete creating River!" << std::endl;
+
 }
 
 void MyCommon::draw(glm::mat4 projection, glm::mat4 view, Shader shader) {
@@ -81,4 +80,9 @@ void MyCommon::remove_tree(int i) {
 	delete trees[i];
 }
 
-MyCommon::~MyCommon() {};
+MyCommon::~MyCommon() { 
+	for (int i = 0; i < obs_cnt; ++i) {
+		if (trees[i] != NULL)
+			delete trees[i];
+	}
+};

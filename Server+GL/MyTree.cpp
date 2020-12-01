@@ -28,4 +28,6 @@ bool MyTree::check_removing() {
 	return false;
 }
 
-MyTree::~MyTree() {};
+MyTree::~MyTree() {
+
+};

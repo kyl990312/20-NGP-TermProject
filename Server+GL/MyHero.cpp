@@ -5,7 +5,7 @@ extern float elapsedTimeSec;
 
 void kyrHero::Jump(int tag, MyPos* obs_pos, int obs_cnt1)
 {
-	std::cout << "JUMP" << std::endl;
+
 	// Jump
 	switch ((int)direction_angle) {
 	case 0:
@@ -93,7 +93,7 @@ void kyrHero::Jump(int tag, MyPos* obs_pos, int obs_cnt1)
 
 void kyrHero::Float()
 {
-	std::cout << "Float" << std::endl;
+
 	// move along the log
 	current_pos.x += log_speed * elapsedTimeSec * SPEED;
 
@@ -172,7 +172,7 @@ void kyrHero::update(int tag, MyPos* obs_pos1, int obs_cnt1) {
 	switch (_state)
 	{
 	case HeroState::Idle:
-		std::cout << "Idle" << std::endl;
+
 		// Check hero included in screen range			
 		// screen out
 		if (hero_view_pos.z > 550 || hero_view_pos.x < -400 || hero_view_pos.x > 400) {
@@ -195,7 +195,7 @@ void kyrHero::update(int tag, MyPos* obs_pos1, int obs_cnt1) {
 		Float();
 		break;
 	case HeroState::Die:
-		std::cout << "Die" << std::endl;
+
 		Die();
 		break;
 	}	

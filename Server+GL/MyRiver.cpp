@@ -4,7 +4,7 @@ extern loadOBJ models[26];
 extern Shader* shader1;
 
 MyRiver::MyRiver() {
-	std::cout << "creating River..." << std::endl;
+
 	// init pos
 	// only its z_pos will change in MyRiver()
 	pos = { 0.0f,0.0f,0.0f };
@@ -29,7 +29,7 @@ MyRiver::MyRiver() {
 	moving_degree = 0;
 	obs_cnt = 3;
 	tag = 1;
-	std::cout << "complete creating River!" << std::endl;
+
 }
 
 void MyRiver::draw(glm::mat4 projection, glm::mat4 view, Shader shader) {
@@ -91,7 +91,13 @@ void MyRiver::remove_log(int i) {
 		logs[i] = new MyLog(pos, speed);
 }
 
-MyRiver::~MyRiver() {};
+MyRiver::~MyRiver() {
+	for (int i = 0; i < obs_cnt; ++i) {
+		if (logs[i] != NULL)
+			delete logs[i];
+	}
+
+};
 
 
 float MyRiver::get_obs_speed(int idx) {

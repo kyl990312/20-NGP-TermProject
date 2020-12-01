@@ -36,4 +36,4 @@ bool MyTrain::check_removing() {
 	return false;
 }
 
-MyTrain::~MyTrain() {};
+MyTrain::~MyTrain() {  };

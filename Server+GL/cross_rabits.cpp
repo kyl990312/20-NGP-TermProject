@@ -156,6 +156,13 @@ int main(int argc, char** argv)
 	glutMainLoop();
 
 	CloseHandle(hThread0);
+
+	if (title_game != NULL)
+		delete title_game;
+	if (main_game != NULL)
+		delete main_game;
+	if (end_game != NULL)
+		delete end_game;
 }
 
 GLvoid drawScene()
@@ -226,9 +233,13 @@ GLvoid TimerFunction(int value)
 				ResetEvent(hAllSend[i]);
 			}
 		}
-		break;
-	case Scene::End:
+		break;	
+	case Scene::End:		
 		if (WaitForMultipleObjects(3, hAllScoreRecv, TRUE, INFINITE) == WAIT_OBJECT_0) {
+			if (main_game != NULL) {
+				delete main_game;
+				main_game = new MainGame_State;
+			}
 			end_game->update();
 			end_game->rankingData(mapdatas);
 			for (int i = 0; i < 3; ++i) {
@@ -308,7 +319,6 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 
 	int retval;
 
-	std::cout << "ProcessServer" << std::endl;
 
 	// 윈속 초기화
 	WSADATA wsa;
@@ -368,6 +378,7 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 		case Scene::MainGame:
 			break;
 		case Scene::End:
+
 			break;
 		}
 	}
@@ -430,7 +441,6 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 				recv(client_sock, &key, sizeof(char), 0);
 				if (key != '\0' || key != NULL) {
 					main_game->keyboard(key, cnt, 0);
-					std::cout << key << std::endl;
 				}
 				// hero data 전송
 				main_game->GetHeroDatas(heroDatas);
@@ -478,7 +488,6 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 
 			currentScene = Scene::Title;
 			sendFixedVar(client_sock, sizeof(int), (char*)&currentScene);
-
 			break;
 		}
 	}

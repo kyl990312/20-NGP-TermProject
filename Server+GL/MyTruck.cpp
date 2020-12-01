@@ -47,6 +47,5 @@ bool MyTruck::check_removing() {
 	return false;
 }
 
-MyTruck::~MyTruck() {}
+MyTruck::~MyTruck() {  }
 
-;

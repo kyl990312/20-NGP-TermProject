@@ -35,4 +35,4 @@ bool MyLog::check_removing() {
 	return false;
 }
 
-MyLog::~MyLog() {};
+MyLog::~MyLog() {  };

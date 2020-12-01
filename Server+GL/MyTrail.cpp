@@ -5,7 +5,7 @@ extern loadOBJ models[26];
 extern Shader* shader1;
 
 MyTrail::MyTrail() {
-	std::cout << "creating Trail..." << std::endl;
+
 	// init pos
 	// only its z_pos will change in MyTrail()
 	pos = { 0.0f,0.0f,0.0f };
@@ -27,7 +27,7 @@ MyTrail::MyTrail() {
 	obsTags[0] = 18;
 	obs_cnt = 1;
 	tag = 3;
-	std::cout << "complete creating trail!" << std::endl;
+
 }
 
 void MyTrail::draw(glm::mat4 projection, glm::mat4 view, Shader shader) {
@@ -114,4 +114,11 @@ void MyTrail::train_warning_light(glm::mat4 projection, glm::mat4 view)
 	lightbox.draw();
 }
 
-MyTrail::~MyTrail() {};
+MyTrail::~MyTrail() {
+	for (int i = 0; i < obs_cnt; ++i) {
+		if (trains[i] != NULL)
+			delete trains[i];
+	}
+
+
+};
