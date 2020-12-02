@@ -26,7 +26,6 @@ int recvn(SOCKET, char*, int, int);
 DWORD WINAPI ProcessClient(LPVOID);
 HANDLE hAllDataStore;
 HANDLE hDraw;
-int recvScene;
 
 
 // gameProceess
@@ -47,10 +46,9 @@ HeroData heroData[3];
 
 char m_key = '\0';
 
+int recvScene;
 int currentScene = Scene::Title;
-int clientCnt = 0;
 bool isReady = false;
-bool startSignal = false;
 bool isSendscore = false;
 int score = 0;
 bool isAlive = true;
@@ -360,7 +358,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 	// 데이터 통신에 사용할 변수
 	char buf[BUFSIZE + 1];
 	int len = 0;
-	//ready = false;
 	int clientCnt = 0;
 
 	//서버와 데이터 통신
@@ -370,6 +367,8 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 			{
 			case Scene::Title:
 			{
+				score = 0;
+
 				// ready 보내기
 				sendFixedVar(sock, sizeof(bool), (char*)&isReady);
 
@@ -408,7 +407,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 					ZeroMemory(&buf, sizeof(buf));
 				}
 				
-				// 자신이 몇번째 클라이언트인지 받기
+				// 캐릭터가 죽었는지 안죽었는지 recv
 				recvFixedVar(sock, sizeof(bool), (char*)&isAlive);
 				// Scene 상태 받기
 				recvFixedVar(sock, sizeof(int), (char*)&recvScene);
@@ -433,23 +432,20 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 					sendFixedVar(sock, sizeof(int), (char*)&score);
 				}
 
-				/*for (ObjectData& obj : objectDatas) {
-					obj.tag = -1;
-				}*/
 				// rankingData처리한 데이터 정보 받기
 				for (ObjectData& obj : objectDatas) {
 					recvFixedVar(sock, len, buf);
 					memcpy(&obj, buf, sizeof(ObjectData));
 					ZeroMemory(&buf, sizeof(buf));
 				}
+				//recvFixedVar(sock, sizeof(int), (char*)&recvScene);
 
 				isSendscore = false;
 				isReady = false;
-				startSignal = false;
 				isAlive = true;
 
-				recvFixedVar(sock, sizeof(int), (char*)&recvScene);
-				_sleep(5000);
+				_sleep(3000);
+				currentScene = Scene::Title;
 				break;
 			}
 
@@ -608,8 +604,6 @@ void MainGameRender() {
 	//}
 }
 
-
-
 int first_number()
 {
 	int tag;
@@ -750,9 +744,8 @@ void draw_score(int score) {
 
 void EndRender() {
 	//set shader
-	//fontShader->use();
 	fontShader->use();
-	
+
 	// draw numbers
 	for (const ObjectData& obj : objectDatas) {
 		if (obj.tag == -1)
@@ -777,5 +770,3 @@ void EndRender() {
 		, glm::vec3(3.f, 3.f, 3.f));
 	
 }
-
-

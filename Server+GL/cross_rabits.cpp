@@ -43,7 +43,6 @@ GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 GLvoid TimerFunction(int value);
 
-int state_mode = 0;
 int clientCnt = 0;
 bool ready_check[3] = { false, false, false };
 
@@ -230,7 +229,6 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 
 	int retval;
 
-
 	// 윈속 초기화
 	WSADATA wsa;
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
@@ -306,8 +304,6 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 	WSACleanup();
 	return 0;
 }
-
-
 
 DWORD WINAPI ConversationWithClient(LPVOID arg)
 {
@@ -392,18 +388,14 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
 				}
 			}
-			
 			ready_check[cnt] = false;
 			isRecvscore[cnt] = false;
 			heroDatas[cnt].alive = true;
-
 			currentScene = Scene::Title;
-			sendFixedVar(client_sock, sizeof(int), (char*)&currentScene);
 			break;
 		}
 	}
 	closesocket(client_sock);
-
 	return 0;
 }
 
