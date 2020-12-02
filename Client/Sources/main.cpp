@@ -8,14 +8,17 @@
 #include "loadObj.h"
 
 #define SERVERIP   "127.0.0.1"
-#define SERVERPORT 9000
+#define SERVERPORT 9009
 #define BUFSIZE    256
 
 #define SCR_WIDTH 800
 #define SCR_HEIGHT 600
 
-#define HERO_CNT 1
-
+#define _CRT_NONSTDC_NO_WARNINGS
+#pragma comment(lib, "winmm.lib")
+#include <mmsystem.h>
+#include <conio.h>
+#include <windows.h>
 
 // Server-Client Process
 void err_quit(char*);
@@ -60,6 +63,9 @@ loadOBJ models[27];
 Shader* shader1;
 Shader* fontShader;
 Shader* startbuttonShader;
+
+// Sound
+bool backSound = false;
 
 glm::mat4 projection = glm::ortho(-300 * (float)SCR_WIDTH / (float)SCR_HEIGHT, 300 * (float)SCR_WIDTH / (float)SCR_HEIGHT, (float)-400, (float)400, (float)-600, (float)600);
 glm::vec3 cameraPos = glm::vec3(8.0f, 45.0f, 40);
@@ -155,16 +161,14 @@ GLvoid Reshape(int w, int h) {
 
 GLvoid TimerFunction(int value)
 {
-	switch (currentScene) {
-	case Scene::Title:
-
-		break;
-	case Scene::MainGame:
-
-		break;
-	case Scene::End:
-
-		break;
+	if (currentScene == Scene::MainGame) {
+		if (!backSound) {
+			PlaySound(TEXT("Resources/Spongebob.wav"), NULL, SND_FILENAME | SND_NODEFAULT | SND_ASYNC | SND_LOOP);
+			backSound = true;
+		}
+		if (!isAlive) {
+			backSound = false;
+		}
 	}
 	glutTimerFunc(16, TimerFunction, 1);
 	glutPostRedisplay();
@@ -411,18 +415,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 				recvFixedVar(sock, sizeof(bool), (char*)&isAlive);
 				// Scene 상태 받기
 				recvFixedVar(sock, sizeof(int), (char*)&recvScene);
-
-				/*	int cnt = 0;
-					for (const ObjectData& mapdata : objectDatas) {
-						if (mapdata.tag != -1) {
-							std::cout << cnt << "." << "Map tag = " << mapdata.tag << std::endl;
-
-							std::cout << cnt << "." << "Map Position = " << mapdata.positionX << "," << mapdata.positionY << "," << mapdata.positionZ << std::endl;
-							std::cout << cnt << "." << "Map Size = " << mapdata.sizeX << "," << mapdata.sizeY << "," << mapdata.sizeZ << std::endl;
-							std::cout << cnt << "." << "Map Roatation = " << mapdata.rotationX << "," << mapdata.rotationY << "," << mapdata.rotationZ << std::endl;
-							cnt++;
-						}
-					}*/
 			}
 			break;
 			case Scene::End:
@@ -567,7 +559,6 @@ void MainGameRender() {
 
 	// draw all objects
 	for (const ObjectData& obj : objectDatas) {
-		//DrawObject(int modelIdx, glm::vec3 position, glm::vec3 rotation, glm::vec3 size);
 		if (obj.tag == -1)
 			break;
 		DrawObject(obj.tag, glm::vec3(obj.positionX, obj.positionY, obj.positionZ)
@@ -588,20 +579,6 @@ void MainGameRender() {
 		}
 	}
 
-	//// draw all heros
-	//if (heroData.alive) {
-	//	models[ModelIdx::Hero].load(projection, view);
-
-	//	glm::mat4 model = glm::mat4(1.0f);
-	//	model = glm::translate(model, glm::vec3(heroData.x, heroData.y, heroData.z));
-	//	model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	//	model = glm::rotate(model, glm::radians(-heroData.rotaionAngle), glm::vec3(0.0f, 1.0f, 0.0f));
-
-	//	// transform
-	//	models[ModelIdx::Hero].setTransform(model);
-
-	//	models[ModelIdx::Hero].draw();
-	//}
 }
 
 int first_number()

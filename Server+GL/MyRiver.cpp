@@ -49,8 +49,6 @@ bool MyRiver::check_removing() {
 	// check its position_y.
 	// if it out off the screen, request removing to state_class
 	if (pos.z > 600) {
-		for (int i = 0; i < 3; ++i)
-			remove_log(i);
 		return true;
 	}
 	return false;
@@ -80,5 +78,7 @@ MyRiver::~MyRiver() {
 
 
 float MyRiver::get_obs_speed(int idx) {
-	return logs[idx]->speed;
+	if(logs[idx] != NULL)
+		return logs[idx]->speed;
+	return 0;
 }

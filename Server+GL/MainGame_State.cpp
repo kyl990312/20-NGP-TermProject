@@ -22,6 +22,28 @@ void MainGame_State::update() {
 			for (int i = 0; i < map_count; i++) {
 				states[i]->move();
 				states[i]->pos.z += 5 * elapsedTimeSec * SPEED;
+				if (states[i] != NULL) {
+					if (states[i]->check_removing()) {
+						delete states[i];
+						int create_state_random = rand() % 5;
+						switch (create_state_random)
+						{
+						case 0:
+							states[i] = new MyRoad;
+							break;
+						case 1:
+							states[i] = new MyRiver;
+							break;
+						case 2:
+							states[i] = new MyTrail;
+							break;
+						default:
+							states[i] = new MyCommon;
+							break;
+						}
+						states[i]->pos.z = -545;
+					}
+				}
 			}
 		}
 		

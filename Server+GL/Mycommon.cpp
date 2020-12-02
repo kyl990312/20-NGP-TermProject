@@ -40,8 +40,6 @@ bool MyCommon::check_removing() {
 	// check its position_y.
 	// if it out off the screen, request removing to state_class
 	if (pos.z > 600) {
-		for (int i = 0; i < 3; ++i)
-			remove_tree(i);
 		return true;
 	}
 	return false;

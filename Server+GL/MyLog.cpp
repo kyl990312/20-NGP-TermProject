@@ -15,7 +15,7 @@ void MyLog::move(MyPos road_pos) {
 }
 
 bool MyLog::check_removing() {
-	if (pos.x > 450 && pos.z <= 600)
+	if (pos.x > 460 && pos.z <= 600)
 		return true;
 	return false;
 }

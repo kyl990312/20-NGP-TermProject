@@ -46,8 +46,6 @@ MyRoad::MyRoad() {
  bool MyRoad::check_removing() {
 	 // check its position_y.
 	 if (pos.z > 600) {
-		 for (int i = 0; i < 2; ++i)
-			remove_truck(i);
 		 return true;
 	 }
 	 // if it out off the screen, request removing to state_class

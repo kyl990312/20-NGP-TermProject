@@ -10,7 +10,7 @@
 #include "Title_State.h"
 #include "End_State.h"
 
-#define SERVERPORT 9000
+#define SERVERPORT 9009
 #define BUFSIZE    512
 
 #define MAX_CLIENT 3
@@ -335,7 +335,7 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 				for (const ObjectData& mapdata : mapdatas) {
 					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
 				}
-				// start signal
+				
 				sendFixedVar(client_sock, sizeof(int), (char*)&currentScene);
 
 				ResetEvent(hAllUpdated[cnt]);
