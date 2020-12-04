@@ -47,7 +47,7 @@ int clientCnt = 0;
 bool ready_check[3] = { false, false, false };
 
 int score[3] = {};
-bool isRecvscore[3] = {false, false, false};
+bool isRecvscore[3] = { false, false, false };
 
 // frame
 int prevTime = 0;
@@ -143,15 +143,18 @@ GLvoid TimerFunction(int value)
 				ResetEvent(hAllSend[i]);
 			}
 		}
-		break;	
-	case Scene::End:		
+		break;
+	case Scene::End:
 		if (WaitForMultipleObjects(3, hAllScoreRecv, TRUE, INFINITE) == WAIT_OBJECT_0) {
+			std::cout << "스코어 업데이트" << std::endl;
 			if (main_game != NULL) {
 				delete main_game;
 				main_game = new MainGame_State;
 			}
 			end_game->update();
 			end_game->rankingData(mapdatas);
+
+			std::cout << "스코어 업데이트 끝" << std::endl;
 			for (int i = 0; i < 3; ++i) {
 				ResetEvent(hAllScoreRecv[i]);
 				SetEvent(hAllUpdated[i]);
@@ -218,7 +221,7 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 		hAllScoreRecv[i] = CreateEvent(  // event object 생성
 			NULL,          // 상속 불가
 			TRUE,          // manual-reset mode로 생상
-			TRUE,         // signaled 상태로 생성
+			TRUE,         // non - signaled 상태로 생성
 			NULL           // 이름 없는 event
 		);
 		if (hAllScoreRecv[i] == NULL) {
@@ -335,7 +338,7 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 				for (const ObjectData& mapdata : mapdatas) {
 					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
 				}
-				
+
 				sendFixedVar(client_sock, sizeof(int), (char*)&currentScene);
 
 				ResetEvent(hAllUpdated[cnt]);
@@ -374,25 +377,36 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 			}
 			break;
 		case Scene::End:
+		{
 			if (isRecvscore[cnt] == false) {
 				isRecvscore[cnt] = true;
 				// 스코어 받기
 				recvFixedVar(client_sock, sizeof(int), (char*)&score[cnt]);
 				out << score[cnt] << std::endl;
 				SetEvent(hAllScoreRecv[cnt]);
+				std::cout << "스코어 받음" << std::endl;
 			}
+
 
 			// rankingData처리한 데이터 정보 넘겨주기
 			if (WaitForSingleObject(hAllUpdated[cnt], INFINITE) == WAIT_OBJECT_0) {
+				std::cout << "스코어 보내는 중" << std::endl;
 				for (const ObjectData& mapdata : mapdatas) {
 					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
 				}
 			}
+			std::cout << "스코어 다 보냄" << std::endl;
+
 			ready_check[cnt] = false;
 			isRecvscore[cnt] = false;
 			heroDatas[cnt].alive = true;
 			currentScene = Scene::Title;
+
+			sendFixedVar(client_sock, sizeof(int), (char*)&currentScene);
+			ResetEvent(hAllUpdated[cnt]);
+			SetEvent(hAllSend[cnt]);
 			break;
+		}
 		}
 	}
 	closesocket(client_sock);

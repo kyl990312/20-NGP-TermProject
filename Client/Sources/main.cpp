@@ -139,11 +139,20 @@ GLvoid drawScene()
 		break;
 	case Scene::End:
 		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
+		if (WaitForSingleObject(hAllDataStore, INFINITE) == WAIT_OBJECT_0) {
+			EndRender();
+			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
 
-		EndRender();
-		if (recvScene == Scene::Title) {
-			currentScene = Scene::Title;
-			std::cout << "게임 스테이트 Title로 바꿈" << std::endl;
+			glutSwapBuffers();
+			_sleep(4000);
+			if (recvScene == Scene::Title) {
+				currentScene = Scene::Title;
+				std::cout << "게임 스테이트 Title로 바꿈" << std::endl;
+			}
+			ResetEvent(hAllDataStore);
+			SetEvent(hDraw);
 		}
 		break;
 	}
@@ -410,14 +419,16 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 					obj = tmpMap;
 					ZeroMemory(&buf, sizeof(buf));
 				}
-				
+
 				// 캐릭터가 죽었는지 안죽었는지 recv
 				recvFixedVar(sock, sizeof(bool), (char*)&isAlive);
+
 				// Scene 상태 받기
 				recvFixedVar(sock, sizeof(int), (char*)&recvScene);
 			}
 			break;
-			case Scene::End:
+			case Scene::End: 
+			{
 				// 스코어 한번만 보내기
 				if (isSendscore == false) {
 					isSendscore = true;
@@ -436,11 +447,12 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 				isReady = false;
 				isAlive = true;
 
-				_sleep(3000);
-				currentScene = Scene::Title;
-				break;
+				recvFixedVar(sock, sizeof(int), (char*)&recvScene);
+				// Scene 상태 받기
+				//currentScene = Scene::Title;
+				break; 
 			}
-
+			}
 			ResetEvent(hDraw);
 			SetEvent(hAllDataStore);
 		}
@@ -714,9 +726,9 @@ void draw_score(int score) {
 	num[1] = (score - num[2] * 100) / 10;
 	num[0] = score - num[2] * 100 - num[1] * 10;
 
-	tag[0] = first_number();		// 백의 자리
-	tag[1] = second_number();		// 십의 자리
-	tag[2] = third_number();		// 일의 자리
+	tag[0] = first_number();      // 백의 자리
+	tag[1] = second_number();      // 십의 자리
+	tag[2] = third_number();      // 일의 자리
 }
 
 void EndRender() {
@@ -745,5 +757,4 @@ void EndRender() {
 	DrawObject(tag[2], glm::vec3(300.f, 400.f, 0.f)
 		, glm::vec3(0.f, 0.f, 0.f)
 		, glm::vec3(3.f, 3.f, 3.f));
-	
 }
