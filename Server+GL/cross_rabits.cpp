@@ -84,7 +84,7 @@ int main(int argc, char** argv)
 	HANDLE hThread0 = CreateThread(NULL, 0, ProcessServer, NULL, 0, NULL);
 
 	glutDisplayFunc(drawScene);
-	glutTimerFunc(16, TimerFunction, 1);
+	glutTimerFunc(33, TimerFunction, 1);
 	glutReshapeFunc(Reshape);
 	glutMainLoop();
 
@@ -162,7 +162,7 @@ GLvoid TimerFunction(int value)
 		}
 		break;
 	}
-	glutTimerFunc(16, TimerFunction, 1);
+	glutTimerFunc(33, TimerFunction, 1);
 	glutPostRedisplay();
 }
 
@@ -239,10 +239,9 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 
 	// socket()
 	// 대기 소켓
-	int option = 1;
 	SOCKET listen_sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (listen_sock == INVALID_SOCKET) err_quit((char*)"socket()");
-	setsockopt(listen_sock, IPPROTO_TCP, TCP_NODELAY, (char*)&option, sizeof(option));
+	
 
 	// bind()
 	SOCKADDR_IN serveraddr;
@@ -267,7 +266,9 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 			// accept() 
 			SOCKADDR_IN clientaddr;
 			int addrlen = sizeof(clientaddr);
+			int option = 1;
 			SOCKET client_sock = accept(listen_sock, (SOCKADDR*)&clientaddr, &addrlen);
+			setsockopt(client_sock, IPPROTO_TCP, TCP_NODELAY, (char*)&option, sizeof(option));
 			if (client_sock == INVALID_SOCKET) {
 				err_display((char*)"accept()");
 				break;

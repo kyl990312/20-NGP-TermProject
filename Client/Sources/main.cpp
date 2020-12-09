@@ -99,7 +99,7 @@ int main(int argc, char** argv)
 
 	// ฤÝน้
 	glutDisplayFunc(drawScene);
-	glutTimerFunc(16, TimerFunction, 1);
+	glutTimerFunc(33, TimerFunction, 1);
 	glutKeyboardFunc(keyboard);
 	glutMouseFunc(mouse);
 	glutReshapeFunc(Reshape);
@@ -179,7 +179,7 @@ GLvoid TimerFunction(int value)
 			backSound = false;
 		}
 	}
-	glutTimerFunc(16, TimerFunction, 1);
+	glutTimerFunc(33, TimerFunction, 1);
 	glutPostRedisplay();
 }
 
