@@ -403,22 +403,28 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 				m_key = '\0';
 
 				// heroData 수신
+				char heroBuf[20*3];
+				char* p = heroBuf;
+				recvFixedVar(sock, sizeof(heroBuf), heroBuf);
 				for (HeroData& data : heroData) {
-					HeroData tmpMap;
-					recvFixedVar(sock, len, buf);
-					memcpy(&tmpMap, buf, sizeof(HeroData));
-					data = tmpMap;
-					ZeroMemory(&buf, sizeof(buf));
+					HeroData tmpHero;
+					memcpy(&tmpHero, p, sizeof(HeroData));
+					data = tmpHero;
+					p += sizeof(HeroData);
 				}
+				ZeroMemory(heroBuf, sizeof(heroBuf));
 
 				// mapData 수신
+				char mapBuf[40 * 100];
+				p = mapBuf;
+				recvFixedVar(sock, sizeof(mapBuf), mapBuf);
 				for (ObjectData& obj : objectDatas) {
 					ObjectData tmpMap;
-					recvFixedVar(sock, len, buf);
-					memcpy(&tmpMap, buf, sizeof(ObjectData));
+					memcpy(&tmpMap, p, sizeof(ObjectData));
 					obj = tmpMap;
-					ZeroMemory(&buf, sizeof(buf));
+					p += sizeof(ObjectData);
 				}
+				ZeroMemory(mapBuf, sizeof(mapBuf));
 
 				// 캐릭터가 죽었는지 안죽었는지 recv
 				recvFixedVar(sock, sizeof(bool), (char*)&isAlive);

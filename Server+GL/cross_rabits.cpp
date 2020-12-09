@@ -354,15 +354,20 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 					main_game->keyboard(key, cnt, 0);
 				}
 				// hero data 전송
+				char heroBuf[20*3];
+				ZeroMemory(heroBuf, sizeof(heroBuf));
 				main_game->GetHeroDatas(heroDatas);
-				for (const HeroData data : heroDatas) {
-					sendFixedVar(client_sock, sizeof(HeroData), (char*)&data);
-				}
+				memcpy(heroBuf, heroDatas, sizeof(heroDatas));
+				std::cout << heroBuf << std::endl;
+				sendFixedVar(client_sock, sizeof(heroBuf), heroBuf);
+
+
 				// map data 전송
+				char mapBuf[40 * 100];
+				ZeroMemory(mapBuf, sizeof(mapBuf));
 				main_game->GetMapDatas(mapdatas);
-				for (const ObjectData& mapdata : mapdatas) {
-					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
-				}
+				memcpy(mapBuf, mapdatas, sizeof(mapdatas));
+				sendFixedVar(client_sock, sizeof(mapBuf), mapBuf);
 
 				//cnt 전송- 죽었는지 안죽었는지 send
 				sendFixedVar(client_sock, sizeof(bool), (char*)&heroDatas[cnt].alive);
