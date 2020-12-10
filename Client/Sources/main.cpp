@@ -1,13 +1,16 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS // 최신 VC++ 컴파일 시 경고 방지
 #pragma comment(lib, "ws2_32")
+#pragma comment(lib, "winmm.lib")
 #include <winsock2.h>
 #include <stdlib.h>
-#include <vector>
+#include <mmsystem.h>
+#include <conio.h>
+#include <windows.h>
 #include "DataStruct.h"
 #include "shader.h"
 #include "loadObj.h"
 
-#define SERVERIP   "127.0.0.1"
+#define SERVERIP   "192.168.80.86"
 #define SERVERPORT 9009
 #define BUFSIZE    256
 
@@ -15,10 +18,6 @@
 #define SCR_HEIGHT 600
 
 #define _CRT_NONSTDC_NO_WARNINGS
-#pragma comment(lib, "winmm.lib")
-#include <mmsystem.h>
-#include <conio.h>
-#include <windows.h>
 
 // Server-Client Process
 void err_quit(char*);
@@ -81,6 +80,9 @@ int main(int argc, char** argv)
 	//if (hThread != NULL)
 	CloseHandle(hThread);
 
+	HWND hWndConsole = GetConsoleWindow();
+	ShowWindow(hWndConsole, SW_HIDE);
+
 	srand((unsigned int)time(NULL));
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -95,6 +97,7 @@ int main(int argc, char** argv)
 	else
 		std::cout << "GLEW Initialized" << std::endl;
 
+	// 사용할 obj 로드
 	ModelLoad();
 
 	// 콜백
@@ -117,10 +120,10 @@ GLvoid drawScene()
 		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
 		if (WaitForSingleObject(hAllDataStore, INFINITE) == WAIT_OBJECT_0) {
 			TitleRender();
-			if (recvScene == Scene::MainGame) {
+
+			if (recvScene == Scene::MainGame) 
 				currentScene = Scene::MainGame;
-				std::cout << "게임 스테이트 Main으로 바꿈" << std::endl;
-			}
+			
 			ResetEvent(hAllDataStore);
 			SetEvent(hDraw);
 		}
@@ -129,10 +132,10 @@ GLvoid drawScene()
 		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
 		if (WaitForSingleObject(hAllDataStore, INFINITE) == WAIT_OBJECT_0) {
 			MainGameRender();
-			if (recvScene == Scene::End) {
+
+			if (recvScene == Scene::End) 
 				currentScene = Scene::End;
-				std::cout << "게임 스테이트 End로 바꿈" << std::endl;
-			}
+			
 			ResetEvent(hAllDataStore);
 			SetEvent(hDraw);
 		}
@@ -147,10 +150,10 @@ GLvoid drawScene()
 
 			glutSwapBuffers();
 			_sleep(4000);
-			if (recvScene == Scene::Title) {
+
+			if (recvScene == Scene::Title) 
 				currentScene = Scene::Title;
-				std::cout << "게임 스테이트 Title로 바꿈" << std::endl;
-			}
+
 			ResetEvent(hAllDataStore);
 			SetEvent(hDraw);
 		}
@@ -344,7 +347,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 		return -1;
 	}
 
-	std::cout << "ProcessClient" << std::endl;
 	int retval;
 
 	// 윈속 초기화
@@ -385,11 +387,9 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 				// ready 보내기
 				sendFixedVar(sock, sizeof(bool), (char*)&isReady);
 
-				for (ObjectData& obj : objectDatas) {
-					recvFixedVar(sock, len, buf);
-					memcpy(&obj, buf, sizeof(ObjectData));
-					ZeroMemory(&buf, sizeof(buf));
-				}
+				// mapDataVar
+				recvFixedVar(sock, sizeof(objectDatas), (char*)objectDatas);
+
 				// Scene 상태 받기
 				recvFixedVar(sock, sizeof(int), (char*)&recvScene);
 			}
@@ -403,28 +403,10 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 				m_key = '\0';
 
 				// heroData 수신
-				char heroBuf[20*3];
-				char* p = heroBuf;
-				recvFixedVar(sock, sizeof(heroBuf), heroBuf);
-				for (HeroData& data : heroData) {
-					HeroData tmpHero;
-					memcpy(&tmpHero, p, sizeof(HeroData));
-					data = tmpHero;
-					p += sizeof(HeroData);
-				}
-				ZeroMemory(heroBuf, sizeof(heroBuf));
+				recvFixedVar(sock, sizeof(heroData), (char*)heroData);
 
 				// mapData 수신
-				char mapBuf[40 * 100];
-				p = mapBuf;
-				recvFixedVar(sock, sizeof(mapBuf), mapBuf);
-				for (ObjectData& obj : objectDatas) {
-					ObjectData tmpMap;
-					memcpy(&tmpMap, p, sizeof(ObjectData));
-					obj = tmpMap;
-					p += sizeof(ObjectData);
-				}
-				ZeroMemory(mapBuf, sizeof(mapBuf));
+				recvFixedVar(sock, sizeof(objectDatas), (char*)objectDatas);
 
 				// 캐릭터가 죽었는지 안죽었는지 recv
 				recvFixedVar(sock, sizeof(bool), (char*)&isAlive);
@@ -442,12 +424,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 				}
 
 				// rankingData처리한 데이터 정보 받기
-				for (ObjectData& obj : objectDatas) {
-					recvFixedVar(sock, len, buf);
-					memcpy(&obj, buf, sizeof(ObjectData));
-					ZeroMemory(&buf, sizeof(buf));
-				}
-				//recvFixedVar(sock, sizeof(int), (char*)&recvScene);
+				recvFixedVar(sock, sizeof(objectDatas), (char*)objectDatas);
 
 				isSendscore = false;
 				isReady = false;
@@ -463,11 +440,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 			SetEvent(hAllDataStore);
 		}
 	}
-	// test
-	for (const ObjectData& obj : objectDatas) {
-		std::cout << obj.tag << std::endl;
-	}
-	std::cout << "통신 끝" << std::endl;
 
 	CloseHandle(hAllDataStore);
 	CloseHandle(hDraw);
@@ -526,7 +498,6 @@ void ModelLoad() {
 	shader1->setVec3("lightColor", glm::vec3(0.5f, 0.5f, 0.5f));
 	shader1->setVec3("lightPos", glm::vec3(0, 800, 2000));
 }
-
 
 void DrawObject(int modelIdx, glm::vec3 position, glm::vec3 rotation, glm::vec3 size) {
 	models[modelIdx].load(projection, view);
