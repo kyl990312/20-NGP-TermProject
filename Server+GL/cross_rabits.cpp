@@ -70,6 +70,9 @@ int main(int argc, char** argv)
 	else
 		std::cout << "GLEW Initialized" << std::endl;
 
+	HWND hWndConsole = GetConsoleWindow();
+	ShowWindow(hWndConsole, SW_HIDE);
+
 	// tag init
 	for (ObjectData data : mapdatas) {
 		data.tag = -1;
@@ -146,15 +149,12 @@ GLvoid TimerFunction(int value)
 		break;
 	case Scene::End:
 		if (WaitForMultipleObjects(3, hAllScoreRecv, TRUE, INFINITE) == WAIT_OBJECT_0) {
-			std::cout << "스코어 업데이트" << std::endl;
 			if (main_game != NULL) {
 				delete main_game;
 				main_game = new MainGame_State;
 			}
 			end_game->update();
 			end_game->rankingData(mapdatas);
-
-			std::cout << "스코어 업데이트 끝" << std::endl;
 			for (int i = 0; i < 3; ++i) {
 				ResetEvent(hAllScoreRecv[i]);
 				SetEvent(hAllUpdated[i]);
@@ -317,7 +317,6 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 
 	int addrlen = sizeof(clientaddr);
 	getpeername(client_sock, (SOCKADDR*)&clientaddr, &addrlen);
-	std::cout << "클라이언트 접속" << std::endl;
 
 	int cnt = ((MultipleArg*)arg)->clientCount;
 	char key;
@@ -336,9 +335,7 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 
 				// 맵 데이터 넘겨주기
 				title_game->TitleDatas(mapdatas);
-				for (const ObjectData& mapdata : mapdatas) {
-					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
-				}
+				sendFixedVar(client_sock, sizeof(mapdatas), (char*)mapdatas);
 
 				sendFixedVar(client_sock, sizeof(int), (char*)&currentScene);
 
@@ -353,21 +350,14 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 				if (key != '\0' || key != NULL) {
 					main_game->keyboard(key, cnt, 0);
 				}
-				// hero data 전송
-				char heroBuf[20*3];
-				ZeroMemory(heroBuf, sizeof(heroBuf));
-				main_game->GetHeroDatas(heroDatas);
-				memcpy(heroBuf, heroDatas, sizeof(heroDatas));
-				std::cout << heroBuf << std::endl;
-				sendFixedVar(client_sock, sizeof(heroBuf), heroBuf);
 
+				// hero data 전송
+				main_game->GetHeroDatas(heroDatas);
+				sendFixedVar(client_sock, sizeof(heroDatas), (char*)heroDatas);
 
 				// map data 전송
-				char mapBuf[40 * 100];
-				ZeroMemory(mapBuf, sizeof(mapBuf));
 				main_game->GetMapDatas(mapdatas);
-				memcpy(mapBuf, mapdatas, sizeof(mapdatas));
-				sendFixedVar(client_sock, sizeof(mapBuf), mapBuf);
+				sendFixedVar(client_sock, sizeof(mapdatas), (char*)mapdatas);
 
 				//cnt 전송- 죽었는지 안죽었는지 send
 				sendFixedVar(client_sock, sizeof(bool), (char*)&heroDatas[cnt].alive);
@@ -390,18 +380,13 @@ DWORD WINAPI ConversationWithClient(LPVOID arg)
 				recvFixedVar(client_sock, sizeof(int), (char*)&score[cnt]);
 				out << score[cnt] << std::endl;
 				SetEvent(hAllScoreRecv[cnt]);
-				std::cout << "스코어 받음" << std::endl;
 			}
 
 
 			// rankingData처리한 데이터 정보 넘겨주기
 			if (WaitForSingleObject(hAllUpdated[cnt], INFINITE) == WAIT_OBJECT_0) {
-				std::cout << "스코어 보내는 중" << std::endl;
-				for (const ObjectData& mapdata : mapdatas) {
-					sendFixedVar(client_sock, sizeof(ObjectData), (char*)&mapdata);
-				}
+				sendFixedVar(client_sock, sizeof(mapdatas), (char*)mapdatas);
 			}
-			std::cout << "스코어 다 보냄" << std::endl;
 
 			ready_check[cnt] = false;
 			isRecvscore[cnt] = false;
