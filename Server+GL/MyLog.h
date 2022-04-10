@@ -4,13 +4,13 @@
 class MyLog
 {
 public:
-	MyPos pos;
+	glm::vec3 pos;
 	float speed;
 	float size;
 	float direction;
 public:
-	MyLog(MyPos road_pos, float speed);
-	void move(MyPos road_pos);
+	MyLog(glm::vec3 road_pos, float speed);
+	void move(glm::vec3 road_pos);
 	bool check_removing();
 	~MyLog();
 };

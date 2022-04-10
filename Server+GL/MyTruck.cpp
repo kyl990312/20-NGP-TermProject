@@ -2,7 +2,7 @@
 
 extern float elapsedTimeSec;
 
-MyTruck::MyTruck(MyPos road_pos, float state_speed) {
+MyTruck::MyTruck(glm::vec3 road_pos, float state_speed) {
 	// pos init
 	pos = { road_pos.x - 500 - (rand() % 8) * 110,road_pos.y,road_pos.z };
 	speed = state_speed;
@@ -16,7 +16,7 @@ MyTruck::MyTruck(MyPos road_pos, float state_speed) {
 	}
 }
 
-void MyTruck::move(MyPos road_pos) {
+void MyTruck::move(glm::vec3 road_pos) {
 	pos.x += speed * elapsedTimeSec *direction * SPEED;
 }
 

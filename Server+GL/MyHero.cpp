@@ -2,7 +2,7 @@
 
 extern float elapsedTimeSec;
 
-void kyrHero::Jump(int tag, MyPos* obs_pos, int obs_cnt1)
+void kyrHero::Jump(int tag, glm::vec3* obs_pos, int obs_cnt1)
 {
 
 	// Jump
@@ -97,14 +97,14 @@ void kyrHero::Float()
 	current_pos.x += log_speed * elapsedTimeSec * SPEED;
 
 	// Check hero included in screen range
-	MyPos hero_view_pos = { current_pos.x * cos(glm::radians(10.0f)) - current_pos.z * sin(glm::radians(10.0f)),0.0f,current_pos.x * sin(glm::radians(10.0f)) + current_pos.z * cos(glm::radians(10.0f)) };
+	glm::vec3 hero_view_pos = { current_pos.x * cos(glm::radians(10.0f)) - current_pos.z * sin(glm::radians(10.0f)),0.0f,current_pos.x * sin(glm::radians(10.0f)) + current_pos.z * cos(glm::radians(10.0f)) };
 	// screen out
 	if (hero_view_pos.z > 550 || hero_view_pos.x < -400 || hero_view_pos.x > 400) {
 		_state = HeroState::Die;
 	}
 }
 
-bool kyrHero::check_collision(MyPos obs_pos, int obs_tag) {
+bool kyrHero::check_collision(glm::vec3 obs_pos, int obs_tag) {
 	// make obs_bounding_box
 	MyBoundingBox obs_bounding_box = {
 		obs_pos.x + 20,20.0f,25.0f,
@@ -137,11 +137,11 @@ bool kyrHero::check_collision(MyPos obs_pos, int obs_tag) {
 }
 
 
-void kyrHero::update(int tag, MyPos* obs_pos1, int obs_cnt1) {
+void kyrHero::update(int tag, glm::vec3* obs_pos1, int obs_cnt1) {
 		
 	// move backward following map
 	current_pos.z += 5 * elapsedTimeSec * SPEED;
-	MyPos hero_view_pos = { current_pos.x * cos(glm::radians(10.0f)) - current_pos.z * sin(glm::radians(10.0f)),0.0f,current_pos.x * sin(glm::radians(10.0f)) + current_pos.z * cos(glm::radians(10.0f)) };
+	glm::vec3 hero_view_pos = { current_pos.x * cos(glm::radians(10.0f)) - current_pos.z * sin(glm::radians(10.0f)),0.0f,current_pos.x * sin(glm::radians(10.0f)) + current_pos.z * cos(glm::radians(10.0f)) };
 
 	switch (_state)
 	{
@@ -183,7 +183,7 @@ void kyrHero::Die() {
 
 
 
-bool kyrHero::CheckCollistionWithHero(MyPos position, float size)
+bool kyrHero::CheckCollistionWithHero(glm::vec3 position, float size)
 {
 	float aMinX, aMinY, aMinZ, aMaxX, aMaxY, aMaxZ;
 	float bMinX, bMinY, bMinZ, bMaxX, bMaxY, bMaxZ;

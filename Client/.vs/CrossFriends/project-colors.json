@@ -1,0 +1,16 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "f57bc4ab-4a6e-4348-9476-e38a8efbb3b2": {
+      "ProjectGuid": "f57bc4ab-4a6e-4348-9476-e38a8efbb3b2",
+      "DisplayName": "CrossFriends",
+      "ColorIndex": 0
+    },
+    "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3": {
+      "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
+      "DisplayName": "기타 파일",
+      "ColorIndex": -1
+    }
+  },
+  "NextColorIndex": 1
+}

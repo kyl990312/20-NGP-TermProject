@@ -9,9 +9,9 @@ public:
 	float direction;
 	int tag;
 public:
-	MyPos pos;
-	MyTruck(MyPos road_pos, float speed);
-	void move(MyPos road_pos);
+	glm::vec3 pos;
+	MyTruck(glm::vec3 road_pos, float speed);
+	void move(glm::vec3 road_pos);
 	bool check_removing();
 	~MyTruck();
 };

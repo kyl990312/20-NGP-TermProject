@@ -2,7 +2,7 @@
 
 extern float elapsedTimeSec;
 
-MyTrain::MyTrain(MyPos road_pos) {
+MyTrain::MyTrain(glm::vec3 road_pos) {
 	// pos init
 	pos = { road_pos.x - 2000.0f,road_pos.y,road_pos.z };
 	speed = rand()% 100 + 150;
@@ -11,7 +11,7 @@ MyTrain::MyTrain(MyPos road_pos) {
 
 }
 
-void MyTrain::move(MyPos road_pos) {
+void MyTrain::move(glm::vec3 road_pos) {
 	pos.x += speed * elapsedTimeSec * direction * SPEED;
 }
 

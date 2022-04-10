@@ -10,7 +10,7 @@
 #include "shader.h"
 #include "loadObj.h"
 
-#define SERVERIP   "192.168.80.86"
+#define SERVERIP   "192.168.35.66"
 #define SERVERPORT 9009
 #define BUFSIZE    256
 
@@ -63,12 +63,10 @@ Shader* shader1;
 Shader* fontShader;
 Shader* startbuttonShader;
 
-// Sound
-bool backSound = false;
 
 glm::mat4 projection = glm::ortho(-300 * (float)SCR_WIDTH / (float)SCR_HEIGHT, 300 * (float)SCR_WIDTH / (float)SCR_HEIGHT, (float)-400, (float)400, (float)-600, (float)600);
-glm::vec3 cameraPos = glm::vec3(8.0f, 45.0f, 40);
-glm::vec3 cameraDirection = cameraDirection = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 cameraPos = glm::vec3(8.0f, 45.0f, 40.0f);
+glm::vec3 cameraDirection = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::mat4 view = glm::lookAt(cameraPos, cameraDirection, cameraUp);
 
@@ -117,6 +115,11 @@ GLvoid drawScene()
 
 	switch (currentScene) {
 	case Scene::Title:
+		cameraPos = glm::vec3(8.0f, 45.0f, 40.0f);
+		cameraDirection = cameraDirection = glm::vec3(0.0f, 0.0f, 0.0f);
+		cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+		view = glm::lookAt(cameraPos, cameraDirection, cameraUp);
+
 		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
 		if (WaitForSingleObject(hAllDataStore, INFINITE) == WAIT_OBJECT_0) {
 			TitleRender();
@@ -129,6 +132,11 @@ GLvoid drawScene()
 		}
 		break;
 	case Scene::MainGame:
+		cameraPos = glm::vec3(8.0f, 45.0f, 40.0f);
+		cameraDirection = glm::vec3(0.0f, 0.0f, 0.0f);
+		cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+		view = glm::lookAt(cameraPos, cameraDirection, cameraUp);
+
 		glClearColor(0.5f, 0.9f, 0.4f, 1.0f);
 		if (WaitForSingleObject(hAllDataStore, INFINITE) == WAIT_OBJECT_0) {
 			MainGameRender();
@@ -141,6 +149,11 @@ GLvoid drawScene()
 		}
 		break;
 	case Scene::End:
+		cameraPos = glm::vec3(-0.0f, 0.0f, 40.0f);
+		cameraDirection = glm::vec3(0.0f, 0.0f, 1.0f);
+		cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+		view = glm::lookAt(cameraPos, cameraDirection, cameraUp);
+
 		glClearColor(1.0f, 0.7f, 0.9f, 1.0f);
 		if (WaitForSingleObject(hAllDataStore, INFINITE) == WAIT_OBJECT_0) {
 			EndRender();
@@ -173,15 +186,6 @@ GLvoid Reshape(int w, int h) {
 
 GLvoid TimerFunction(int value)
 {
-	if (currentScene == Scene::MainGame) {
-		if (!backSound) {
-			PlaySound(TEXT("Resources/Spongebob.wav"), NULL, SND_FILENAME | SND_NODEFAULT | SND_ASYNC | SND_LOOP);
-			backSound = true;
-		}
-		if (!isAlive) {
-			backSound = false;
-		}
-	}
 	glutTimerFunc(33, TimerFunction, 1);
 	glutPostRedisplay();
 }
@@ -462,16 +466,16 @@ void ModelLoad() {
 	models[1] = loadOBJ("Resources/box.obj", shader1->ID);
 
 	// ¼ýÀÚ
-	models[2] = loadOBJ("Resources/number_0.obj", fontShader->ID);
-	models[3] = loadOBJ("Resources/number_1.obj", fontShader->ID);
-	models[4] = loadOBJ("Resources/number_2.obj", fontShader->ID);
-	models[5] = loadOBJ("Resources/number_3.obj", fontShader->ID);
-	models[6] = loadOBJ("Resources/number_4.obj", fontShader->ID);
-	models[7] = loadOBJ("Resources/number_5.obj", fontShader->ID);
-	models[8] = loadOBJ("Resources/number_6.obj", fontShader->ID);
-	models[9] = loadOBJ("Resources/number_7.obj", fontShader->ID);
-	models[10] = loadOBJ("Resources/number_8.obj", fontShader->ID);
-	models[11] = loadOBJ("Resources/number_9.obj", fontShader->ID);
+	models[2] = loadOBJ("Resources/0.obj", fontShader->ID);
+	models[3] = loadOBJ("Resources/1.obj", fontShader->ID);
+	models[4] = loadOBJ("Resources/2.obj", fontShader->ID);
+	models[5] = loadOBJ("Resources/3.obj", fontShader->ID);
+	models[6] = loadOBJ("Resources/4.obj", fontShader->ID);
+	models[7] = loadOBJ("Resources/5.obj", fontShader->ID);
+	models[8] = loadOBJ("Resources/6.obj", fontShader->ID);
+	models[9] = loadOBJ("Resources/7.obj", fontShader->ID);
+	models[10] = loadOBJ("Resources/8.obj", fontShader->ID);
+	models[11] = loadOBJ("Resources/9.obj", fontShader->ID);
 
 	// State
 	models[12] = loadOBJ("Resources/common.obj", shader1->ID);
@@ -722,16 +726,16 @@ void EndRender() {
 			, glm::vec3(obj.sizeX, obj.sizeY, obj.sizeZ));
 	}
 	draw_score(score);
+	DrawObject(tag[0], glm::vec3(-150.f, 250.f, 0.f)
 
-	DrawObject(tag[0], glm::vec3(-300.f, 400.f, 0.f)
 		, glm::vec3(0.f, 0.f, 0.f)
-		, glm::vec3(3.f, 3.f, 3.f));
+		, glm::vec3(1.5f, 1.5f, 1.5f));
 
-	DrawObject(tag[1], glm::vec3(0.f, 400.f, 0.f)
+	DrawObject(tag[1], glm::vec3(0.f, 250.f, 0.f)
 		, glm::vec3(0.f, 0.f, 0.f)
-		, glm::vec3(3.f, 3.f, 3.f));
+		, glm::vec3(1.5f, 1.5f, 1.5f));
 
-	DrawObject(tag[2], glm::vec3(300.f, 400.f, 0.f)
+	DrawObject(tag[2], glm::vec3(150.f, 250.f, 0.f)
 		, glm::vec3(0.f, 0.f, 0.f)
-		, glm::vec3(3.f, 3.f, 3.f));
+		, glm::vec3(1.5f, 1.5f, 1.5f));
 }

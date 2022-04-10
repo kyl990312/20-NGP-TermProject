@@ -4,13 +4,13 @@
 class MyTrain
 {
 public:
-	MyPos pos;
+	glm::vec3 pos;
 	float speed;
 	float size;
 	float direction;
 public:
-	MyTrain(MyPos road_pos);
-	void move(MyPos road_pos);
+	MyTrain(glm::vec3 road_pos);
+	void move(glm::vec3 road_pos);
 	bool check_removing();
 	~MyTrain();
 };

@@ -6,7 +6,7 @@
 class Title_State
 {
 public:
-	MyPos obj_pos = { 0.0f,0.0f,0.0f };
+	glm::vec3 obj_pos = { 0.0f,0.0f,0.0f };
 	float font_sin_angle = 0.0f;
 	int clientCnt = 0;
 

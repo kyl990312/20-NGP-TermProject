@@ -2,7 +2,7 @@
 
 extern float elapsedTimeSec;
 
-MyLog::MyLog(MyPos road_pos, float speed_state) {
+MyLog::MyLog(glm::vec3 road_pos, float speed_state) {
 	// pos init
 	pos = { road_pos.x - 500 - (rand() % 7)* 110, road_pos.y, road_pos.z };
 	speed = speed_state;
@@ -10,7 +10,7 @@ MyLog::MyLog(MyPos road_pos, float speed_state) {
 	direction = 1;
 }
 
-void MyLog::move(MyPos road_pos) {
+void MyLog::move(glm::vec3 road_pos) {
 	pos.x += speed * elapsedTimeSec * direction * SPEED;
 }
 

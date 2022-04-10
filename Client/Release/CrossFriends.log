@@ -1,0 +1,11 @@
+﻿  loadOBJ.cpp
+D:\Projects\20-NGP-TermProject\Client\Sources\loadOBJ.cpp(79,48): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+  main.cpp
+D:\Projects\20-NGP-TermProject\Client\Sources\main.cpp(165,4): warning C4996: '_sleep': This function or variable has been superceded by newer library or operating system functionality. Consider using Sleep instead. See online help for details.
+D:\Projects\20-NGP-TermProject\Client\Sources\main.cpp(378,7): warning C4101: 'buf' :참조되지 않은 지역 변수입니다.
+  코드를 생성하고 있습니다.
+  116 of 399 functions (29.1%) were compiled, the rest were copied from previous compilation.
+    97 functions were new in current compilation
+    12 functions had inline decision re-evaluated but remain unchanged
+  코드를 생성했습니다.
+  CrossFriends.vcxproj -> D:\Projects\20-NGP-TermProject\Client\Release\CrossFriends.exe

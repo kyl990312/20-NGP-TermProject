@@ -8,7 +8,7 @@ public:
 	bool moving;
 	// map move each frame, per this degree
 	float moving_degree;
-	MyPos collision_pos[3];
+	glm::vec3 collision_pos[3];
 	int obs_cnt;
 	int tag = -1;
 	glm::vec3 obsRotation[3] = {
@@ -25,7 +25,7 @@ public:
 
 public:
 	// current state's position
-	MyPos pos;
+	glm::vec3 pos;
 	MyState() {}
 	virtual void move() = 0;
 	virtual	bool check_removing() = 0;

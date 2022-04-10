@@ -1,0 +1,4 @@
+﻿  main.cpp
+D:\Projects\20-NGP-TermProject\Client\Sources\main.cpp(152,4): warning C4996: '_sleep': This function or variable has been superceded by newer library or operating system functionality. Consider using Sleep instead. See online help for details.
+D:\Projects\20-NGP-TermProject\Client\Sources\main.cpp(374,7): warning C4101: 'buf' :참조되지 않은 지역 변수입니다.
+  CrossFriends.vcxproj -> D:\Projects\20-NGP-TermProject\Client\Debug\CrossFriends.exe

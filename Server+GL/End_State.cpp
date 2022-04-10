@@ -176,115 +176,118 @@ void End_State::rankingData(ObjectData mapdatas[])
 	}
 
 	ObjectData tmpMap;
+	float startY = 100.0f;
+	float sizeY = 100.0f;
+	float padding = 50.0f;
 
 	draw_score(best_score);		//400
 	tmpMap.tag = tag[0];
-	tmpMap.positionX = -200.f;
-	tmpMap.positionY = 100.f;
+	tmpMap.positionX = -100.f;
+	tmpMap.positionY = startY - (sizeY + padding) * 0;
 	tmpMap.positionZ = 0.f;
 	tmpMap.rotationX = 0.0f;
 	tmpMap.rotationY = 0.0f;
 	tmpMap.rotationZ = 0.0f;
-	tmpMap.sizeX = 2.0f;
-	tmpMap.sizeY = 2.0f;
-	tmpMap.sizeZ = 2.0f;
+	tmpMap.sizeX = 1.0f;
+	tmpMap.sizeY = 1.0f;
+	tmpMap.sizeZ = 1.0f;
 	mapdatas[0] = tmpMap;
 
 	tmpMap.tag = tag[1];
 	tmpMap.positionX = 0.f;
-	tmpMap.positionY = 100.f;
+	tmpMap.positionY = startY - (sizeY + padding) * 0;
 	tmpMap.positionZ = 0.f;
 	tmpMap.rotationX = 0.0f;
 	tmpMap.rotationY = 0.0f;
 	tmpMap.rotationZ = 0.0f;
-	tmpMap.sizeX = 2.0f;
-	tmpMap.sizeY = 2.0f;
-	tmpMap.sizeZ = 2.0f;
+	tmpMap.sizeX = 1.0f;
+	tmpMap.sizeY = 1.0f;
+	tmpMap.sizeZ = 1.0f;
 	mapdatas[1] = tmpMap;
 
 	tmpMap.tag = tag[2];
-	tmpMap.positionX = 200.f;
-	tmpMap.positionY = 100.f;
+	tmpMap.positionX = 100.f;
+	tmpMap.positionY = startY - (sizeY + padding) * 0;
 	tmpMap.positionZ = 0.f;
 	tmpMap.rotationX = 0.0f;
 	tmpMap.rotationY = 0.0f;
 	tmpMap.rotationZ = 0.0f;
-	tmpMap.sizeX = 2.0f;
-	tmpMap.sizeY = 2.0f;
-	tmpMap.sizeZ = 2.0f;
+	tmpMap.sizeX = 1.0f;
+	tmpMap.sizeY = 1.0f;
+	tmpMap.sizeZ = 1.0f;
 	mapdatas[2] = tmpMap;
 
 	draw_score(mid_score);		//400
 	tmpMap.tag = tag[0];
-	tmpMap.positionX = -200.f;
-	tmpMap.positionY = -100.f;
+	tmpMap.positionX = -100.f;
+	tmpMap.positionY = startY - (sizeY + padding) * 1;
 	tmpMap.positionZ = 0.f;
 	tmpMap.rotationX = 0.0f;
 	tmpMap.rotationY = 0.0f;
 	tmpMap.rotationZ = 0.0f;
-	tmpMap.sizeX = 2.0f;
-	tmpMap.sizeY = 2.0f;
-	tmpMap.sizeZ = 2.0f;
+	tmpMap.sizeX = 1.0f;
+	tmpMap.sizeY = 1.0f;
+	tmpMap.sizeZ = 1.0f;
 	mapdatas[3] = tmpMap;
 
 	tmpMap.tag = tag[1];
 	tmpMap.positionX = 0.f;
-	tmpMap.positionY = -100.f;
+	tmpMap.positionY = startY - (sizeY + padding) * 1;
 	tmpMap.positionZ = 0.f;
 	tmpMap.rotationX = 0.0f;
 	tmpMap.rotationY = 0.0f;
 	tmpMap.rotationZ = 0.0f;
-	tmpMap.sizeX = 2.0f;
-	tmpMap.sizeY = 2.0f;
-	tmpMap.sizeZ = 2.0f;
+	tmpMap.sizeX = 1.0f;
+	tmpMap.sizeY = 1.0f;
+	tmpMap.sizeZ = 1.0f;
 	mapdatas[4] = tmpMap;
 
 	tmpMap.tag = tag[2];
-	tmpMap.positionX = 200.f;
-	tmpMap.positionY = -100.f;
+	tmpMap.positionX = 100.f;
+	tmpMap.positionY = startY - (sizeY + padding) * 1;
 	tmpMap.positionZ = 0.f;
 	tmpMap.rotationX = 0.0f;
 	tmpMap.rotationY = 0.0f;
 	tmpMap.rotationZ = 0.0f;
-	tmpMap.sizeX = 2.0f;
-	tmpMap.sizeY = 2.0f;
-	tmpMap.sizeZ = 2.0f;
+	tmpMap.sizeX = 1.0f;
+	tmpMap.sizeY = 1.0f;
+	tmpMap.sizeZ = 1.0f;
 	mapdatas[5] = tmpMap;
 
 	draw_score(last_score);		//400
 	tmpMap.tag = tag[0];
-	tmpMap.positionX = -200.f;
-	tmpMap.positionY = -300.f;
-	tmpMap.positionZ = 0.f;
+	tmpMap.positionX = -100.f;
+	tmpMap.positionY = startY - (sizeY + padding) * 2;
+	tmpMap.positionZ = 0.0f;
 	tmpMap.rotationX = 0.0f;
 	tmpMap.rotationY = 0.0f;
 	tmpMap.rotationZ = 0.0f;
-	tmpMap.sizeX = 2.0f;
-	tmpMap.sizeY = 2.0f;
-	tmpMap.sizeZ = 2.0f;
+	tmpMap.sizeX = 1.0f;
+	tmpMap.sizeY = 1.0f;
+	tmpMap.sizeZ = 1.0f;
 	mapdatas[6] = tmpMap;
 
 	tmpMap.tag = tag[1];
 	tmpMap.positionX = 0.f;
-	tmpMap.positionY = -300.f;
+	tmpMap.positionY = startY - (sizeY + padding) * 2;
 	tmpMap.positionZ = 0.f;
 	tmpMap.rotationX = 0.0f;
 	tmpMap.rotationY = 0.0f;
 	tmpMap.rotationZ = 0.0f;
-	tmpMap.sizeX = 2.0f;
-	tmpMap.sizeY = 2.0f;
-	tmpMap.sizeZ = 2.0f;
+	tmpMap.sizeX =1.0f;
+	tmpMap.sizeY =1.0f;
+	tmpMap.sizeZ =1.0f;
 	mapdatas[7] = tmpMap;
 
 	tmpMap.tag = tag[2];
-	tmpMap.positionX = 200.f;
-	tmpMap.positionY = -300.f;
+	tmpMap.positionX = 100.f;
+	tmpMap.positionY = startY - (sizeY + padding) * 2;
 	tmpMap.positionZ = 0.f;
 	tmpMap.rotationX = 0.0f;
 	tmpMap.rotationY = 0.0f;
 	tmpMap.rotationZ = 0.0f;
-	tmpMap.sizeX = 2.0f;
-	tmpMap.sizeY = 2.0f;
-	tmpMap.sizeZ = 2.0f;
+	tmpMap.sizeX = 1.0f;
+	tmpMap.sizeY = 1.0f;
+	tmpMap.sizeZ = 1.0f;
 	mapdatas[8] = tmpMap;
 }

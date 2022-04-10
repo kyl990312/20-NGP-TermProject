@@ -28,7 +28,7 @@ public:
 
 	//hero
 	kyrHero hero[3];
-	MyPos cur_state_obs_pos[3][3];
+	glm::vec3 cur_state_obs_pos[3][3];
 	int cur_state_tag[3];
 	int cur_state_obs_cnt[3];
 	int cur_state_idx[3] = { 0 };
